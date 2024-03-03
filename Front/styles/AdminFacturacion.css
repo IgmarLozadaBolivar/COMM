@@ -1,0 +1,100 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.navbar {
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    color: #000;
+    padding: 10px;
+    font-size: 1.1rem;
+}
+
+.navbar-brand {
+    color: #000;
+    font-weight: bold;
+}
+
+.navbar-brand:hover {
+    color: #0079FF;
+}
+
+#navbarNav {
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-nav .nav-item {
+    margin-right: 10px;
+}
+
+.navbar-nav .nav-link {
+    color: #000;
+    margin-right: 10px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #0079FF;
+    cursor: pointer;
+}
+
+.navbar-toggler {
+    border: none;
+    color: #000;
+}
+
+.dropdown-item {
+    color: #000;
+}
+
+.dropdown-item:hover {
+    color: #0079FF;
+}
+
+
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: black; 
+ 
+}
+
+
+  .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 450px; /* Ajustar el ancho máximo */
+    height: 400px !important;
+    margin: auto; /* Centrar horizontalmente */
+    margin-top: 150px; /* Ajustar el margen superior */
+  }
+  
+  .card-body {
+    padding: 50px;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 30px;
+    border-radius: 10px;
+  }
+  
+  .btn:hover {
+    transform: scale(1.05);
+  }

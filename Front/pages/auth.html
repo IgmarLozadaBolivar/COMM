@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../styles/auth.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/preset-triangles@3/tsparticles.preset.triangles.bundle.min.js"></script>
+</head>
+<body>
+    <div id="tsparticles"></div>
+    <div class="form-box">
+        <div class="logo">
+            <img class="logo" src="../assets/logo.png" alt="Logo-Raffinty">
+        </div>
+        <div class="form-value">
+            <form action="">
+                <h3>Entra a tu cuenta</h3>
+                <p>Ingresa tus datos para validar</p>
+                <div class="inputbox">
+                    <ion-icon name="person-outline"></ion-icon>
+                    <input type="tel" id="user_number" name="user_number" required maxlength="12"
+                    pattern="\d{3} \d{3} \d{4}"/>
+                    <label for="">Usuario</label>
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="key-outline"></ion-icon>
+                    <input id="password" type="password" required>
+                    <label for="">Contraseña</label>
+                </div>
+                <div class="btns">
+                    <button id="boton">
+                        <a href="../index.html">
+                            Volver
+                        </a>
+                    </button>
+                    <button id="boton">
+                            Enviar
+                    </button>
+                </div>
+                <div class="more">
+                    <p>No tienes una cuenta? <a href="./register.html" class="btn-about">Clic aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../scripts/particles.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

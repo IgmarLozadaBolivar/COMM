@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMM: Clientes</title>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="../assets/logo-removebg-preview.png" alt="">
+                </span>
+                <div class="text logo-text">
+                    <span class="name">COMM SAS</span>
+                    <span class="profession">Healthcare</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="./dashboard.html">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Tablero</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./clientes.html">
+                            <i class='bx bx-group icon'></i>
+                            <span class="text nav-text">Clientes</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./productos.html">
+                            <i class='bx bx-store icon'></i>
+                            <span class="text nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./proveedores.html">
+                            <i class='bx bx-package icon'></i>
+                            <span class="text nav-text">Proveedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./facturacion.html">
+                            <i class='bx bx-receipt icon'></i>
+                            <span class="text nav-text">Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-content">
+                <li class="">
+                    <a href="../index.html">
+                        <i class='bx bx-log-out icon'></i>
+                        <span class="text nav-text">Cerrar sesión</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="#">
+                        <i class='bx bx-user icon'></i>
+                        <span class="text nav-text">Tu información</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <section class="home">
+        <div class="text">Bienvenido!</div>
+        <div class="form-box">
+            <div class="form-box">
+                <div class="form-value">
+                    <form action="">
+                        <h3>Registro de clientes</h3>
+                        <p>Llena el formulario</p>
+                        <div class="inputbox">
+                            <ion-icon name="id-card-outline"></ion-icon>
+                            <input type="number" class="no-arrows" id="id_number" name="id_number" required />
+                            <label for="">N° Identificación</label>
+                        </div>
+                        <div class="inputbox">
+                            <ion-icon name="person-outline"></ion-icon>
+                            <input type="text" id="names" name="names" required />
+                            <label for="">Nombres</label>
+                        </div>
+                        <div class="inputbox">
+                            <ion-icon name="person-outline"></ion-icon>
+                            <input type="text" id="surnames" name="surnames" required />
+                            <label for="">Apellidos</label>
+                        </div>
+                        <div class="inputbox">
+                            <ion-icon name="mail-outline"></ion-icon>
+                            <input id="email" type="email" required>
+                            <label for="">Email</label>
+                        </div>
+                        <div class="inputbox">
+                            <ion-icon name="call-outline"></ion-icon>
+                            <input id="telefono" type="tel" required>
+                            <label for="">Teléfono</label>
+                        </div>
+                        <div class="btns">
+                            <button id="boton">
+                                Agregar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle")
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+    </script>
+</body>
+
+</html>

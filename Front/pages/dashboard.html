@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMM: Tablero</title>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="../assets/logo-removebg-preview.png" alt="">
+                </span>
+                <div class="text logo-text">
+                    <span class="name">COMM SAS</span>
+                    <span class="profession">Healthcare</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="./dashboard.html">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Tablero</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./clientes.html">
+                            <i class='bx bx-group icon'></i>
+                            <span class="text nav-text">Clientes</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./productos.html">
+                            <i class='bx bx-store icon'></i>
+                            <span class="text nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./proveedores.html">
+                            <i class='bx bx-package icon'></i>
+                            <span class="text nav-text">Proveedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./facturacion.html">
+                            <i class='bx bx-receipt icon'></i>
+                            <span class="text nav-text">Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-content">
+                <li class="">
+                    <a href="../index.html">
+                        <i class='bx bx-log-out icon'></i>
+                        <span class="text nav-text">Cerrar sesión</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="#">
+                        <i class='bx bx-user icon'></i>
+                        <span class="text nav-text">Tu información</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <section class="home">
+        <div class="text">Bienvenido a las consultas!</div>
+        <div class="form-box-2">
+            <div class="form-box">
+                <div class="form-value">
+                    <form id="myForm" action="">
+                        <h3>Seleccione una opción</h3>
+                        <p>Al seleccionar una entidad, se te libera una lista de consultas</p>
+                        <div class="inputbox">
+                            <select class="form-select" id="entidad">
+                                <option value="text">Seleccione una entidad</option>
+                                <option value="clientes">Clientes</option>
+                                <option value="proveedores">Productos</option>
+                                <option value="proveedores">Proveedores</option>
+                                <option value="facturacion">Facturación</option>
+                                <option value="facturacion">Informes</option>
+                            </select>
+                        </div>
+                        <div id="queries-clientes" class="inputbox" style="display: none;">
+                            <select class="form-select">
+                                <option value="text">Seleccione una consulta</option>
+                                <option value="querie1">Consulta 1</option>
+                                <option value="querie2">Consulta 2</option>
+                                <option value="querie3">Consulta 3</option>
+                                <option value="querie4">Consulta 4</option>
+                            </select>
+                        </div>
+                        <div id="queries-productos" class="inputbox" style="display: none;">
+                            <select class="form-select">
+                                <option value="text">Seleccione una consulta</option>
+                                <option value="querie1">Consulta 1</option>
+                                <option value="querie2">Consulta 2</option>
+                                <option value="querie3">Consulta 3</option>
+                                <option value="querie4">Consulta 4</option>
+                            </select>
+                        </div>
+                        <div id="queries-proveedores" class="inputbox" style="display: none;">
+                            <select class="form-select">
+                                <option value="text">Seleccione una consulta</option>
+                                <option value="querie1">Consulta 1</option>
+                                <option value="querie2">Consulta 2</option>
+                                <option value="querie3">Consulta 3</option>
+                                <option value="querie4">Consulta 4</option>
+                            </select>
+                        </div>
+                        <div id="queries-facturacion" class="inputbox" style="display: none;">
+                            <select class="form-select">
+                                <option value="text">Seleccione una consulta</option>
+                                <option value="querie1">Consulta 1</option>
+                                <option value="querie2">Consulta 2</option>
+                                <option value="querie3">Consulta 3</option>
+                                <option value="querie4">Consulta 4</option>
+                            </select>
+                        </div>
+                        <div id="queries-informes" class="inputbox" style="display: none;">
+                            <select class="form-select">
+                                <option value="text">Seleccione una consulta</option>
+                                <option value="querie1">Consulta 1</option>
+                                <option value="querie2">Consulta 2</option>
+                                <option value="querie3">Consulta 3</option>
+                                <option value="querie4">Consulta 4</option>
+                            </select>
+                        </div>
+                        <div class="btns">
+                            <button id="boton-siguiente">
+                                Siguiente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle")
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        const entidadSelect = document.getElementById("entidad");
+
+        entidadSelect.addEventListener("change", function () {
+            const selectedOption = entidadSelect.value;
+            const queryDivs = document.querySelectorAll("[id^='queries-']");
+
+            queryDivs.forEach(function (div) {
+                div.style.display = "none";
+            });
+
+            const selectedDiv = document.getElementById("queries-" + selectedOption);
+
+            if (selectedDiv) {
+                selectedDiv.style.display = "block";
+            }
+        });
+
+        const botonSiguiente = document.getElementById("boton-siguiente");
+
+        botonSiguiente.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            const entidadSeleccionada = document.getElementById("entidad").value;
+            const consultaSelect = document.querySelector(`#queries-${entidadSeleccionada} select`);
+            const consultaSeleccionada = consultaSelect.value;
+
+            if (entidadSeleccionada !== "text") {
+                if (consultaSeleccionada !== "text") {
+                    Swal.fire({
+                        title: 'Cargando resultados',
+                        text: 'Por favor espere mientras se cargan los resultados de la consulta...',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
+
+                    setTimeout(function () {
+                        Swal.close();
+
+                        Swal.fire({
+                            title: 'Consulta Seleccionada',
+                            html: `Entidad: ${entidadSeleccionada}<br>Consulta: ${consultaSeleccionada}`,
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ver resultados',
+                            cancelButtonText: 'Cerrar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = './resultados.html';
+                            } else {
+                                const form = document.getElementById("myForm");
+                                form.reset();
+                            }
+                        });
+                    }, 2000);
+                } else {
+                    console.error("Por favor seleccione una consulta válida");
+                }
+            } else {
+                console.error("Por favor seleccione una entidad válida");
+            }
+        });
+        document.getElementById("entidad").addEventListener("change", function () {
+            const botonSiguiente = document.getElementById("boton-siguiente");
+            botonSiguiente.disabled = this.value === "text";
+        });
+    </script>
+</body>
+
+</html>

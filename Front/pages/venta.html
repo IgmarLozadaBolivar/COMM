@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMM: Ventas</title>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="../assets/logo-removebg-preview.png" alt="">
+                </span>
+                <div class="text logo-text">
+                    <span class="name">COMM SAS</span>
+                    <span class="profession">Healthcare</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="./dashboard.html">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Tablero</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./clientes.html">
+                            <i class='bx bx-group icon'></i>
+                            <span class="text nav-text">Clientes</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./productos.html">
+                            <i class='bx bx-store icon'></i>
+                            <span class="text nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./proveedores.html">
+                            <i class='bx bx-package icon'></i>
+                            <span class="text nav-text">Proveedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./facturacion.html">
+                            <i class='bx bx-receipt icon'></i>
+                            <span class="text nav-text">Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-content">
+                <li class="">
+                    <a href="../index.html">
+                        <i class='bx bx-log-out icon'></i>
+                        <span class="text nav-text">Cerrar sesión</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="#">
+                        <i class='bx bx-user icon'></i>
+                        <span class="text nav-text">Tu información</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <section class="home">
+        <div class="text">Facturacion de ventas!</div>
+        <div class="form-box-2">
+            <div class="form-box">
+                <div class="form-value">
+                    <form action="">
+                        <h3 style="font-size: 35px;">Datos de la venta</h3>
+                        <p style="font-size: 20px;">Datos del cliente</p>
+                        <div class="input-box-only">
+                            <div class="inputbox">
+                                <ion-icon name="person-outline"></ion-icon>
+                                <input type="search" class="no-arrows" id="id_number" name="id_number" required />
+                                <label for="">Nombre del cliente</label>
+                            </div>
+                        </div>
+                        <p style="font-size: 20px;">Datos del producto(s)</p>
+                        <div class="inputsboxs">
+                            <div class="inputbox">
+                                <ion-icon name="person-outline"></ion-icon>
+                                <input type="text" id="names" name="names" required />
+                                <label for="">Nombre</label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="cash-outline"></ion-icon>
+                                <input type="number" class="no-arrows" id="price_number" name="price_number" min="0"
+                                    step="0.01" required />
+                                <label for="">Precio</label>
+                            </div>
+                            <div class="inputbox">
+                                <select class="form-select" id="usoclinico">
+                                    <option value="text">Uso clínico?</option>
+                                    <option value="yes">Sí</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="inputsboxs-2">
+                            <div class="inputbox">
+                                <ion-icon name="barcode-outline"></ion-icon>
+                                <input id="barcode" type="text" required>
+                                <label for="">Codigo de barra</label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                                <input id="brand" type="text" required>
+                                <label for="">Marca</label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="brush-outline"></ion-icon>
+                                <input id="presentation" type="text" required>
+                                <label for="">Presentación</label>
+                            </div>
+                        </div>
+                        <div class="input-box-only">
+                            <div class="inputbox">
+                                <ion-icon name="text-outline"></ion-icon>
+                                <input id="description" type="text" required>
+                                <label for="">Descripción</label>
+                            </div>
+                        </div>
+                        <div class="btns">
+                            <button id="boton">
+                                Agregar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>    
+    <script>
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle")
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+    </script>
+</body>
+</html>

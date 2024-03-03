@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMM: Facturación</title>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="../assets/logo-removebg-preview.png" alt="">
+                </span>
+                <div class="text logo-text">
+                    <span class="name">COMM SAS</span>
+                    <span class="profession">Healthcare</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="./dashboard.html">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Tablero</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./clientes.html">
+                            <i class='bx bx-group icon'></i>
+                            <span class="text nav-text">Clientes</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./productos.html">
+                            <i class='bx bx-store icon'></i>
+                            <span class="text nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./proveedores.html">
+                            <i class='bx bx-package icon'></i>
+                            <span class="text nav-text">Proveedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./facturacion.html">
+                            <i class='bx bx-receipt icon'></i>
+                            <span class="text nav-text">Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-content">
+                <li class="">
+                    <a href="../index.html">
+                        <i class='bx bx-log-out icon'></i>
+                        <span class="text nav-text">Cerrar sesión</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="#">
+                        <i class='bx bx-user icon'></i>
+                        <span class="text nav-text">Tu información</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <script>
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle")
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        Swal.fire({
+            title: '¡Bienvenido!',
+            text: 'Escoge una opción de facturación!',
+            icon: 'info',
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: 'Compras',
+            denyButtonText: 'Ventas'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = './compras.html';
+            } else if (result.isDenied) {
+                window.location.href = './venta.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

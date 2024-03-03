@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+body.swal2-shown>[aria-hidden="true"] {
+    transition: 0.1s filter;
+    filter: blur(10px);
+}
+
+body {
+    min-height: 100vh;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: -10;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.form-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(96, 96, 96, 0.462);
+    padding-top: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.form-value {
+    padding: 20px;
+    color: #000;
+}
+
+h3 {
+    font-size: 1.3em;
+    color: #000;
+    text-align: center;
+    font-family: 'Manrope', sans-serif;
+}
+
+p {
+    font-size: 1em;
+    color: #000;
+    text-align: center;
+    padding: 5px;
+    font-family: 'Manrope', sans-serif;
+}
+
+.inputbox {
+    position: relative;
+    margin: 20px 0;
+    width: 270px;
+}
+
+.inputbox label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #000;
+    font-size: 1em;
+    pointer-events: none;
+    transition: .5s;
+}
+
+input:focus~label,
+input:valid~label {
+    top: -10px;
+    font-size: 0.9em;
+}
+
+.form-box input[type="tel"] {
+    font-size: 1em;
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 15px;
+}
+
+.form-box input[type="password"] {
+    font-size: 1em;
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 15px;
+}
+
+.form-box input[type="text"] {
+    font-size: 1em;
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 15px;
+}
+
+.inputbox ion-icon {
+    position: absolute;
+    right: 8px;
+    color: #000;
+    font-size: 1.2em;
+    top: 12px;
+}
+
+.btns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btns a {
+    color: #000;
+    text-decoration: none;
+}
+
+button {
+    display: block;
+    width: 48%;
+    padding: 8px;
+    color: #000;
+    border: 2px solid #366ec9;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    color: #fff;
+    border: none;
+    background-color: #16418bd2;
+}
+
+.more {
+    font-size: 14px;
+    margin: 20px 0 10px;
+    font-family: 'Manrope', sans-serif;
+}
+
+.more p a {
+    color: #000;
+    text-decoration: none;
+}
+
+.more p a:hover {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}

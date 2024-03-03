@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #ffffff;
+    background-image: url(assets/scattered-forcefields.svg);
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.navbar {
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    color: #000;
+    font-size: .9rem;
+}
+
+.navbar-brand {
+    color: #000;
+    font-weight: bold;
+}
+
+.navbar-brand:hover {
+    color: #366ec9;
+}
+
+#navbarNav {
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-item {
+    position: relative;
+    display: inline-block;
+}
+
+
+.nav-item a {
+    color: #000;
+    text-decoration: none;
+    position: relative;
+}
+
+.nav-item a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    transition: width 0.2s ease;
+}
+
+.nav-item.active:first-child a::before {
+    width: 100%;
+    background-color: #366ec9;
+}
+
+.nav-item:nth-child(2) a::before {
+    background-color: #366ec9;
+}
+
+.nav-item:nth-child(3) a::before {
+    background-color: #366ec9;
+}
+
+.nav-item:nth-child(4) a::before {
+    background-color: #366ec9;
+}
+
+.nav-item a:hover::before {
+    width: 100%;
+}
+
+.navbar-nav .nav-item {
+    margin-right: 15px;
+}
+
+.navbar-nav .nav-link {
+    margin-right: 15px;
+}
+
+.navbar-toggler {
+    border: none;
+    color: #000;
+}
+
+div .dropdown-item:hover {
+    color: #366ec9;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    margin-left: 4%;
+}
+
+/* Configuraciones para todo el contenido del contenedor */
+.container-body {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+}
+
+/* Configuraciones para el texto, parrafo, ul, li y h1 */
+.parrafo-1 {
+    color: #000;
+    font-size: 1.1rem;
+    margin-right: -45%;
+}
+
+h1 {
+    font-size: 1.6rem;
+}
+
+.typewriter h1 {
+    color: #000;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 auto;
+    letter-spacing: .01em;
+    animation: typing-cycle 7s infinite;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes typing-cycle {
+    0% {
+        width: 0;
+    }
+
+    28.57% {
+        width: 100%;
+    }
+
+    33.33% {
+        width: 100%;
+    }
+
+    100% {
+        width: 0;
+    }
+}
+
+/* Configuraciones para la IMG - RIGHT */
+div .img-right {
+    width: 400px;
+}
+
+img {
+    height: 300px;
+    cursor: pointer;
+}
+
+.img-right {
+    margin-left: 30%;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, .8));
+}
+
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    50% {
+        transform: rotate(-5deg);
+    }
+
+    75% {
+        transform: rotate(3deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.img-right {
+    animation: shake 10s infinite;
+}
+
+/* Configuraciones para el BTN */
+.btn-about {
+    background: transparent;
+    color: #000;
+    border: 2px solid #366ec9;
+    padding: 8px 40px;
+    border-radius: 5px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.btn-1 {
+    padding: 0px 25px 0 0;
+}
+
+.btn-1 a {
+    text-decoration: none;
+}
+
+.btn-about:hover {
+    color: #fff;
+}
+
+.btn-about::after {
+    content: "";
+    background: #366ec9;
+    position: absolute;
+    z-index: -1;
+    padding: 16px 20px;
+    display: block;
+    left: -20%;
+    right: -20%;
+    top: 0;
+    bottom: 0;
+    transform: skewX(-45deg) scale(0, 1);
+    transition: all 0.3s ease;
+}
+
+.btn-about:hover::after {
+    transition: all 0.3s ease-out;
+    transform: skewX(-45deg) scale(1, 1);
+}
