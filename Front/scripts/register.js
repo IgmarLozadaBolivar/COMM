@@ -36,16 +36,16 @@ Swal.fire({
     confirmButtonText: 'Aceptar'
 });
 
-const urlAuth = "http://localhost:5033/Api/User/token";
+const botonRegister = document.getElementById('botonRegistro');
+const urlRegister = "http://localhost:5033/Api/User/register";
 const headers = new Headers({ 'Content-Type': 'application/json' });
-const botonLogin = document.getElementById('botonLogin');
 
-botonLogin.addEventListener("click", function (e) {
+botonRegister.addEventListener("click", function (e) {
     e.preventDefault();
-    autorizarUsuario();
+    registrarUsuario();
 });
 
-async function autorizarUsuario() {
+async function registrarUsuario() {
     let inputUsuario = document.getElementById('username').value;
     let inputPassword = document.getElementById('password').value;
 
@@ -61,14 +61,14 @@ async function autorizarUsuario() {
     };
 
     try {
-        const response = await fetch(urlAuth, config);
+        const response = await fetch(`${urlRegister}`, config);
 
-        if (response.ok) {
-            window.location.href = "./dashboard.html";
+        if (response.status === 200) {
+            window.location.href = './auth.html';
         } else {
-            alert("Autenticación fallida. Verifique sus credenciales o regístrese.");
+            console.error("La solicitud no fue exitosa. Estado:", response.status);
         }
     } catch (error) {
-        console.error("Error al realizar la autenticación:", error);
+        console.error("Error de red: ", error);
     }
 }
