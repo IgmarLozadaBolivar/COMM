@@ -30,4 +30,12 @@ public class ProductoRepository : GenericRepository<Producto>, IProducto
             .Include(p => p.IdCategoriaFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
     }
+    public override async Task<Producto> GetNombreAsync(string Nombre)
+{
+    return await _context.Productos
+        .Include(p => p.FacturaCompras)
+        .Include(p => p.FacturaVentas)
+        .Include(p => p.IdCategoriaFkNavigation)
+        .FirstOrDefaultAsync(p => p.Nombre == Nombre);
+}
 }

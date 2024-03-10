@@ -37,6 +37,24 @@ public class FacturaVentaController : BaseApiController
         }
         return mapper.Map<FacturaVentaDto>(data);
     }
+ [HttpGet("MesXFacturaVenta")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<FacturaVentaDto>>> MesXFacturaVenta(string FechaVenta)
+    {
+
+        var facturas = await unitOfwork.FacturaVentas.MesXFacturaVenta(FechaVenta);
+
+        if (facturas == null || !facturas.Any())
+        {
+            return NotFound();
+        }
+
+        var facturasDto = mapper.Map<IEnumerable<FacturaVentaDto>>(facturas);
+
+        return Ok(facturasDto);
+    }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]

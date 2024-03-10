@@ -30,4 +30,14 @@ public class PersonaRepository : GenericRepository<Persona>, IPersona
             .Include(p => p.IdTipoPersonaFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
     }
+
+     public override async Task<Persona> GetNombreAsync(string Nombre)
+{
+    return await _context.Personas
+        .Include(p => p.FacturaCompras)
+        .Include(p => p.FacturaVentas)
+        .Include(p => p.IdTipoPersonaFkNavigation)
+        .FirstOrDefaultAsync(p => p.Nombre == Nombre);
+}
+
 }

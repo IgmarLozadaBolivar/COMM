@@ -32,4 +32,29 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
             .Include(p => p.IdTipoPagoFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
     }
+     public async Task<IEnumerable<FacturaCompra>> MesXFacturaCompra(string FechaCompraStr)
+{
+
+    if (!DateTime.TryParse(FechaCompraStr, out DateTime FechaCompra))
+    {
+         throw new ArgumentException("Formato de fecha incorrecto. Utilice el formato adecuado.");
+    }
+    var factura = await _context.FacturaCompras
+        .Where(factura => factura.FechaCompra.Month == FechaCompra.Month && factura.FechaCompra.Year == FechaCompra.Year)
+        .Select(factura => new FacturaCompra
+        {
+          
+            FechaCompra = factura.FechaCompra,
+            IdProveedorFkNavigation = factura.IdProveedorFkNavigation,
+            IdEmpleadoFkNavigation = factura.IdEmpleadoFkNavigation,
+            IdProductoFkNavigation = factura.IdProductoFkNavigation,
+            CantidadxProducto = factura.CantidadxProducto,
+            CantidadTotal = factura.CantidadTotal,
+            PrecioTotal = factura.PrecioTotal,
+            IdTipoPagoFk = factura.IdTipoPagoFk
+            
+        })
+        .ToListAsync();
+    return factura;
+}
 }

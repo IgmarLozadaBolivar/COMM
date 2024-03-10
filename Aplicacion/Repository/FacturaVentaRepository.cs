@@ -29,5 +29,33 @@ public class FacturaVentaRepository : GenericRepository<FacturaVenta>, IFacturaV
             .Include(p => p.IdProductoFkNavigation)
             .Include(p => p.IdTipoPagoFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
+ 
+   }
+
+       public async Task<IEnumerable<FacturaVenta>> MesXFacturaVenta(string FechaVentaStr)
+{
+    //convertir el datetime a fecha
+    if (!DateTime.TryParse(FechaVentaStr, out DateTime FechaVenta))
+    {
+    
+        throw new ArgumentException("Formato de fecha incorrecto. Utilice el formato adecuado.");
     }
+
+    var facturas = await _context.FacturaVentas
+        .Where(factura => factura.FechaVenta.Month == FechaVenta.Month && factura.FechaVenta.Year == FechaVenta.Year)
+        .Select(factura => new FacturaVenta
+        {
+            FechaVenta = factura.FechaVenta,
+            IdEmpleadoFkNavigation = factura.IdEmpleadoFkNavigation,
+            IdProductoFkNavigation = factura.IdProductoFkNavigation,
+            Cantidad = factura.Cantidad,
+            PrecioTotal = factura.PrecioTotal,
+            Iva = factura.Iva,
+            IdTipoPagoFkNavigation = factura.IdTipoPagoFkNavigation
+        })
+        .ToListAsync();
+
+    return facturas;
+}
+
 }
