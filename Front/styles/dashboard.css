@@ -532,7 +532,8 @@ select {
     transition: background-color 0.3s ease;
 }
 
-#boton, #boton-siguiente:hover {
+#boton,
+#boton-siguiente:hover {
     color: #fff;
     border: 2px solid transparent;
     background-color: #45a049;
@@ -593,15 +594,12 @@ select {
     top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #212529;
-    border: 1px solid #ced4da;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(96, 96, 96, 0.462);
-    padding-top: 8px;
-    padding-left: 8px;
-    padding-right: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
-    color: #fff;
+    color: #333;
 }
 
 .table-box {
@@ -609,23 +607,31 @@ select {
     border-collapse: collapse;
 }
 
-th,
-td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #fff;
+td,
+th {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
 }
 
 th {
-    background: #212529;
+    background-color: var(--primary-color);
+    color: #fff;
 }
 
 td {
-    background: #2c3034;
+    background-color: #f2f2f2;
+}
+
+.description-cell {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .btns-actions {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
 }
 
@@ -633,43 +639,53 @@ td {
     display: flex;
 }
 
-.btn-edit, .btn-remove {
+.btn-edit,
+.btn-remove {
     display: inline-block;
 }
 
-.btn-options, .btn-edit, .btn-remove {
+.btn-options,
+.btn-edit,
+.btn-remove {
     padding: 8px 12px;
-    font-size: 10px;
-    border: 2px solid #fff;
+    border: 2px solid transparent;
     border-radius: 15px;
     background-color: transparent;
     cursor: pointer;
     transition: color 0.3s ease;
     margin-right: 14px;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
-.btn-options, .btn-edit, .btn-remove ion-icon {
+.btn-options,
+.btn-edit,
+.btn-remove ion-icon {
     font-size: 18px;
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
     color: #fff;
 }
 
-.btn-options:hover {
+.btn-options {
+    background-color: #3498db;
     color: #fff;
-    border: 2px solid transparent;
-    background-color: #0d6efd;
 }
 
-.btn-edit:hover {
+.btn-edit {
+    background-color: #2ecc71;
     color: #fff;
-    border: 2px solid transparent;
-    background-color: #4CAF50;
 }
 
+.btn-remove {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.btn-options:hover,
+.btn-edit:hover,
 .btn-remove:hover {
-    color: #fff;
-    border: 2px solid transparent;
-    background-color: red;
+    opacity: 0.8;
 }
 
 .swal2-confirm {
@@ -695,4 +711,14 @@ td {
 .input-box-only {
     display: flex;
     justify-content: center;
+}
+
+@media (max-width: 1200px) {
+    .list-box-4 {
+        width: 90%;
+    }
+
+    .table-box {
+        font-size: 12px;
+    }
 }

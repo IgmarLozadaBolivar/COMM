@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body>
     <nav class="sidebar close">
         <header>
@@ -90,27 +92,6 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-data">
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <div class="btns-actions">
-                                <button class="btn-options">
-                                    <ion-icon name="search-outline"></ion-icon>
-                                </button>
-                                <div class="btns-more-actions" style="display: none;">
-                                    <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
-                                    <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -142,6 +123,73 @@
                 }
             });
         });
+
+        function obtenerProductos() {
+            fetch('http://localhost:5033/Api/Producto')
+                .then(response => response.json())
+                .then(data => {
+                    const tablaData = document.getElementById('tabla-data');
+                    tablaData.innerHTML = '';
+
+                    data.forEach(producto => {
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                    <td>${producto.nombre}</td>
+                    <td>${producto.precio}</td>
+                    <td>${producto.usoClinico}</td>
+                    <td>${producto.codigoBarras}</td>
+                    <td>${producto.marca}</td>
+                    <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${producto.descripcion}</td>
+                    <td>${producto.presentacion}</td>
+                    <td>${producto.totalExistencias}</td>
+                    <td>
+                        <div class="btns-actions">
+                            <button class="btn-options">
+                                <ion-icon name="search-outline"></ion-icon>
+                            </button>
+                            <div class="btns-more-actions" style="display:none;">
+                                <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
+                                <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                        tablaData.appendChild(tableRow);
+
+                        const btnOptions = tableRow.querySelector('.btn-options');
+                        const btnsMoreActions = tableRow.querySelector('.btns-more-actions');
+                        btnOptions.addEventListener('click', function () {
+                            if (btnsMoreActions.style.display === 'none') {
+                                btnsMoreActions.style.display = 'block';
+                                btnsMoreActions.setAttribute('style', '/* display: block; */');
+                            } else {
+                                btnsMoreActions.style.display = 'none';
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error obteniendo productos:', error);
+                });
+        }
+        obtenerProductos();
+
+        function startMarquee(element) {
+            element.dataset.marqueeId = setInterval(function () {
+                if (element.scrollWidth > element.offsetWidth) {
+                    element.scrollLeft += 1;
+                    if (element.scrollLeft >= element.scrollWidth - element.offsetWidth) {
+                        element.scrollLeft = 0;
+                    }
+                }
+            }, 25);
+        }
+
+        function stopMarquee(element) {
+            clearInterval(element.dataset.marqueeId);
+        }
+
     </script>
 </body>
+
 </html>

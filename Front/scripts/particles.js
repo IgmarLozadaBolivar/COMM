@@ -29,12 +29,12 @@ tsParticles.load({
     },
 });
 
-Swal.fire({
+/* Swal.fire({
     title: '¡Bienvenido!',
     text: 'Te invito a que valides tu usuario!',
     icon: 'info',
     confirmButtonText: 'Aceptar'
-});
+}); */
 
 const urlAuth = "http://localhost:5033/Api/User/token";
 const headers = new Headers({ 'Content-Type': 'application/json' });
