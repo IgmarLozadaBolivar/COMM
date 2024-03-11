@@ -38,7 +38,7 @@ public class ProductoController : BaseApiController
         }
         return mapper.Map<ProductoDto>(data);
     }
-    
+
     [HttpGet("MesXFacturaCompra")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
