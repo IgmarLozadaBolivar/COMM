@@ -139,15 +139,15 @@ namespace Persistencia.Data.Migrations
                     Precio = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, comment: "Precio de venta del producto"),
                     UsoClinico = table.Column<string>(type: "enum('SI','NO')", nullable: true, collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CodigoBarras = table.Column<int>(type: "int", nullable: false, comment: "Codigo de barras del producto"),
+                    CodigoBarras = table.Column<int>(type: "int", nullable: true, comment: "Codigo de barras del producto"),
                     Marca = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Nombre de la marca del producto", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Descripcion = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, comment: "Descripcion del producto", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Presentacion = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Presentacion del producto, si es que incluye sea desde tallas, tamaños, unidades entre otros.", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdCategoriaFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla Categoria"),
-                    TotalExistencias = table.Column<int>(type: "int", nullable: false, comment: "Cantidad o existencia total por producto")
+                    IdCategoriaFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla Categoria"),
+                    TotalExistencias = table.Column<int>(type: "int", nullable: true, comment: "Cantidad o existencia total por producto")
                 },
                 constraints: table =>
                 {
@@ -170,7 +170,7 @@ namespace Persistencia.Data.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Nombre = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdDepartamentoFK = table.Column<int>(type: "int", nullable: false)
+                    IdDepartamentoFK = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -247,12 +247,12 @@ namespace Persistencia.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Apellidos = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Apellidos de la persona", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Cedula = table.Column<int>(type: "int", nullable: false, comment: "Numero de identificacion"),
+                    Cedula = table.Column<int>(type: "int", nullable: true, comment: "Numero de identificacion"),
                     Correo = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Correo electronico de la persona", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Telefono = table.Column<int>(type: "int", nullable: false, comment: "Telefono de la persona"),
-                    IdCiudadFK = table.Column<int>(type: "int", nullable: false),
-                    IdTipoPersonaFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puente con la tabla de Tipo Persona")
+                    Telefono = table.Column<int>(type: "int", nullable: true, comment: "Telefono de la persona"),
+                    IdCiudadFK = table.Column<int>(type: "int", nullable: true),
+                    IdTipoPersonaFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puente con la tabla de Tipo Persona")
                 },
                 constraints: table =>
                 {
@@ -279,14 +279,14 @@ namespace Persistencia.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Identificador de la factura de compra")
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FechaCompra = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Fecha de la compra"),
-                    IdProveedorFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Proveedor"),
-                    IdEmpleadoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador puenteo con la tabla de Empleado (Persona)"),
-                    IdProductoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Producto"),
-                    CantidadxProducto = table.Column<int>(type: "int", nullable: false, comment: "Cantidad por productos"),
-                    CantidadTotal = table.Column<int>(type: "int", nullable: false, comment: "Cantidad total de todos los productos"),
-                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, comment: "Precio total de los productos en la factura"),
-                    IdTipoPagoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Tipo Pago")
+                    FechaCompra = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Fecha de la compra"),
+                    IdProveedorFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Proveedor"),
+                    IdEmpleadoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador puenteo con la tabla de Empleado (Persona)"),
+                    IdProductoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Producto"),
+                    CantidadxProducto = table.Column<int>(type: "int", nullable: true, comment: "Cantidad por productos"),
+                    CantidadTotal = table.Column<int>(type: "int", nullable: true, comment: "Cantidad total de todos los productos"),
+                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true, comment: "Precio total de los productos en la factura"),
+                    IdTipoPagoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Tipo Pago")
                 },
                 constraints: table =>
                 {
@@ -325,13 +325,13 @@ namespace Persistencia.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Identificador de una factura de venta")
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FechaVenta = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Fecha de la venta"),
-                    IdEmpleadoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Empleado (Persona)"),
-                    IdProductoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Producto"),
-                    Cantidad = table.Column<int>(type: "int", nullable: false, comment: "Cantidad de productos"),
-                    Iva = table.Column<int>(type: "int", nullable: false, comment: "IVA o comision por compra, establecido por el gobierno"),
-                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, comment: "Precio total de la venta"),
-                    IdTipoPagoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Tipo Pago")
+                    FechaVenta = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Fecha de la venta"),
+                    IdEmpleadoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Empleado (Persona)"),
+                    IdProductoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Producto"),
+                    Cantidad = table.Column<int>(type: "int", nullable: true, comment: "Cantidad de productos"),
+                    Iva = table.Column<int>(type: "int", nullable: true, comment: "IVA o comision por compra, establecido por el gobierno"),
+                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true, comment: "Precio total de la venta"),
+                    IdTipoPagoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Tipo Pago")
                 },
                 constraints: table =>
                 {
