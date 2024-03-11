@@ -6,6 +6,7 @@ namespace Aplicacion.Repository;
 
 public class PersonaRepository : GenericRepository<Persona>, IPersona
 {
+
     protected readonly DbFirstContext _context;
 
     public PersonaRepository(DbFirstContext context) : base(context)
@@ -16,28 +17,23 @@ public class PersonaRepository : GenericRepository<Persona>, IPersona
     public override async Task<IEnumerable<Persona>> GetAllAsync()
     {
         return await _context.Personas
-            .Include(p => p.FacturaCompras)
-            .Include(p => p.FacturaVentas)
-            .Include(p => p.IdTipoPersonaFkNavigation)
+            //.Include(p => p.)
             .ToListAsync();
     }
 
-    public override async Task<Persona> GetByIdAsync(string id)
+    public override async Task<Persona> GetByIdAsync(int id)
+    {
+        return await _context.Personas
+            //.Include(p => p.)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public override async Task<Persona> GetNombreAsync(string Nombre)
     {
         return await _context.Personas
             .Include(p => p.FacturaCompras)
             .Include(p => p.FacturaVentas)
             .Include(p => p.IdTipoPersonaFkNavigation)
-            .FirstOrDefaultAsync(p => p.Id.ToString() == id);
+            .FirstOrDefaultAsync(p => p.Nombre == Nombre);
     }
-
-     public override async Task<Persona> GetNombreAsync(string Nombre)
-{
-    return await _context.Personas
-        .Include(p => p.FacturaCompras)
-        .Include(p => p.FacturaVentas)
-        .Include(p => p.IdTipoPersonaFkNavigation)
-        .FirstOrDefaultAsync(p => p.Nombre == Nombre);
-}
-
 }

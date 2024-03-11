@@ -22,20 +22,19 @@ public class ProductoRepository : GenericRepository<Producto>, IProducto
             .ToListAsync();
     }
 
-    public override async Task<Producto> GetByIdAsync(string id)
+    public override async Task<Producto> GetByIdAsync(int id)
+    {
+        return await _context.Productos
+            //.Include(p => p.)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public override async Task<Producto> GetNombreAsync(string Nombre)
     {
         return await _context.Productos
             .Include(p => p.FacturaCompras)
             .Include(p => p.FacturaVentas)
             .Include(p => p.IdCategoriaFkNavigation)
-            .FirstOrDefaultAsync(p => p.Id.ToString() == id);
+            .FirstOrDefaultAsync(p => p.Nombre == Nombre);
     }
-    public override async Task<Producto> GetNombreAsync(string Nombre)
-{
-    return await _context.Productos
-        .Include(p => p.FacturaCompras)
-        .Include(p => p.FacturaVentas)
-        .Include(p => p.IdCategoriaFkNavigation)
-        .FirstOrDefaultAsync(p => p.Nombre == Nombre);
-}
 }
