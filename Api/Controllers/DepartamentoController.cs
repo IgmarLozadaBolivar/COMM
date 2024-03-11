@@ -17,12 +17,13 @@ public class DepartamentoController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<Departamento>>> Get()
+    public async Task<ActionResult<IEnumerable<DepartamentoDto>>> Get()
     {
-        var datos = await unitOfwork.Departamentos.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.Departamentos.GetAllAsync();
+        return mapper.Map<List<DepartamentoDto>>(data);
     }
 
     [HttpGet("{id}")]

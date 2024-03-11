@@ -17,12 +17,13 @@ public class ProveedorController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<Proveedor>>> Get()
+    public async Task<ActionResult<IEnumerable<ProveedorDto>>> Get()
     {
-        var datos = await unitOfwork.Proveedores.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.Proveedores.GetAllAsync();
+        return mapper.Map<List<ProveedorDto>>(data);
     }
 
     [HttpGet("{id}")]

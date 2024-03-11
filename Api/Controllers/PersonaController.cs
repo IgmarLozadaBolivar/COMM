@@ -17,12 +17,13 @@ public class PersonaController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<Persona>>> Get()
+    public async Task<ActionResult<IEnumerable<PersonaDto>>> Get()
     {
-        var datos = await unitOfwork.Personas.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.Personas.GetAllAsync();
+        return mapper.Map<List<PersonaDto>>(data);
     }
 
     [HttpGet("{id}")]

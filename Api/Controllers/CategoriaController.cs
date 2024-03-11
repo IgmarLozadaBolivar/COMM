@@ -17,12 +17,13 @@ public class CategoriaController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<Categoria>>> Get()
+    public async Task<ActionResult<IEnumerable<CategoriaDto>>> Get()
     {
-        var datos = await unitOfwork.Categorias.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.Categorias.GetAllAsync();
+        return mapper.Map<List<CategoriaDto>>(data);
     }
 
     [HttpGet("{id}")]

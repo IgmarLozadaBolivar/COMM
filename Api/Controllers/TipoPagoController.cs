@@ -17,12 +17,13 @@ public class TipoPagoController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<TipoPago>>> Get()
+    public async Task<ActionResult<IEnumerable<TipoPagoDto>>> Get()
     {
-        var datos = await unitOfwork.TipoPagos.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.TipoPagos.GetAllAsync();
+        return mapper.Map<List<TipoPagoDto>>(data);
     }
 
     [HttpGet("{id}")]

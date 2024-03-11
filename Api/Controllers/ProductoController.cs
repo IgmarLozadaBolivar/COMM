@@ -17,12 +17,13 @@ public class ProductoController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<Producto>>> Get()
+    public async Task<ActionResult<IEnumerable<ProductoDto>>> Get()
     {
-        var datos = await unitOfwork.Productos.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.Productos.GetAllAsync();
+        return mapper.Map<List<ProductoDto>>(data);
     }
 
     [HttpGet("{id}")]

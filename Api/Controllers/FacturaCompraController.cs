@@ -17,12 +17,13 @@ public class FacturaCompraController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<FacturaCompra>>> Get()
+    public async Task<ActionResult<IEnumerable<FacturaCompraDto>>> Get()
     {
-        var datos = await unitOfwork.FacturaCompras.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.FacturaCompras.GetAllAsync();
+        return mapper.Map<List<FacturaCompraDto>>(data);
     }
 
     [HttpGet("{id}")]

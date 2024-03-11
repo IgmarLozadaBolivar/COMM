@@ -17,12 +17,13 @@ public class CiudadController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<Ciudad>>> Get()
+    public async Task<ActionResult<IEnumerable<CiudadDto>>> Get()
     {
-        var datos = await unitOfwork.Ciudades.GetAllAsync();
-        return Ok(datos);
+        var data = await unitOfwork.Ciudades.GetAllAsync();
+        return mapper.Map<List<CiudadDto>>(data);
     }
 
     [HttpGet("{id}")]
