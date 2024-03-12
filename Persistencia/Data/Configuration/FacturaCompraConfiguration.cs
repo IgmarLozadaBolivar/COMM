@@ -17,8 +17,6 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
 
         builder.HasIndex(e => e.IdProveedorFk, "facturacompra_proveedor_FK");
 
-        builder.HasIndex(e => e.IdTipoPagoFk, "facturacompra_tipopago_FK");
-
         builder.Property(e => e.Id).HasComment("Identificador de la factura de compra");
         builder.Property(e => e.CantidadTotal).HasComment("Cantidad total de todos los productos");
         builder.Property(e => e.CantidadxProducto).HasComment("Cantidad por productos");
@@ -34,9 +32,6 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
         builder.Property(e => e.IdProveedorFk)
             .HasComment("Identificador de puenteo con la tabla de Proveedor")
             .HasColumnName("IdProveedorFK");
-        builder.Property(e => e.IdTipoPagoFk)
-            .HasComment("Identificador de puenteo con la tabla de Tipo Pago")
-            .HasColumnName("IdTipoPagoFK");
         builder.Property(e => e.PrecioTotal)
             .HasPrecision(10, 2)
             .HasComment("Precio total de los productos en la factura");

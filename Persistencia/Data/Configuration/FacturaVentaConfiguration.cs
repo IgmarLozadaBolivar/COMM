@@ -15,8 +15,6 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
 
         builder.HasIndex(e => e.IdProductoFk, "facturaventa_producto_FK");
 
-        builder.HasIndex(e => e.IdTipoPagoFk, "facturaventa_tipopago_FK");
-
         builder.Property(e => e.Id).HasComment("Identificador de una factura de venta");
         builder.Property(e => e.Cantidad).HasComment("Cantidad de productos");
         builder.Property(e => e.FechaVenta)
@@ -28,9 +26,6 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
         builder.Property(e => e.IdProductoFk)
             .HasComment("Identificador de puenteo con la tabla de Producto")
             .HasColumnName("IdProductoFK");
-        builder.Property(e => e.IdTipoPagoFk)
-            .HasComment("Identificador de puenteo con la tabla de Tipo Pago")
-            .HasColumnName("IdTipoPagoFK");
         builder.Property(e => e.Iva).HasComment("IVA o comision por compra, establecido por el gobierno");
         builder.Property(e => e.PrecioTotal)
             .HasPrecision(10, 2)

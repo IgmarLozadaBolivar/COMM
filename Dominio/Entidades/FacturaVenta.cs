@@ -9,7 +9,6 @@ public class FacturaVenta : BaseEntity
     public int Cantidad { get; set; }
     public int Iva { get; set; }
     public decimal PrecioTotal { get; set; }
-    public int IdTipoPagoFk { get; set; }
     public virtual Persona IdEmpleadoFkNavigation { get; set; }
     public virtual Producto IdProductoFkNavigation { get; set; }
 }

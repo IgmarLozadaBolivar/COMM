@@ -219,7 +219,7 @@
                             </button>
                             <div class="btns-more-actions" style="display:none;">
                                 <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
-                                <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
+                                <button class="btn-remove" data-id="${persona.id}"><ion-icon name="trash-outline"></ion-icon></button>
                                 <button class="btn-regresar"><ion-icon name="log-out-outline"></ion-icon></button>
                             </div>
                         </div>
@@ -253,6 +253,27 @@
                 });
         }
         obtenerProveedores();
+
+        async function eliminarProveedor(id) {
+            const urlEliminar = `http://localhost:5033/Api/Proveedor/${id}`;
+            const config = {
+                method: 'DELETE'
+            };
+
+            try {
+                const response = await fetch(urlEliminar, config);
+
+                if (response.ok) {
+                    // Si la eliminación fue exitosa, actualiza la interfaz de usuario
+                    obtenerProveedores();
+                    console.log('Proveedor eliminado exitosamente.');
+                } else {
+                    console.error('Error al eliminar el proveedor:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
     </script>
 </body>
 

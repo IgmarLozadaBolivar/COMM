@@ -332,25 +332,13 @@ namespace Persistencia.Data.Migrations
                 name: "Producto");
 
             migrationBuilder.DropTable(
-                name: "TipoPago");
-
-            migrationBuilder.DropTable(
                 name: "Rol");
 
             migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
-                name: "Ciudad");
-
-            migrationBuilder.DropTable(
-                name: "TipoPersona");
-
-            migrationBuilder.DropTable(
                 name: "Categoria");
-
-            migrationBuilder.DropTable(
-                name: "Departamento");
         }
     }
 }

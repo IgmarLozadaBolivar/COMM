@@ -48,9 +48,7 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
             IdProductoFkNavigation = factura.IdProductoFkNavigation,
             CantidadxProducto = factura.CantidadxProducto,
             CantidadTotal = factura.CantidadTotal,
-            PrecioTotal = factura.PrecioTotal,
-            IdTipoPagoFk = factura.IdTipoPagoFk
-            
+            PrecioTotal = factura.PrecioTotal
         })
         .ToListAsync();
     return factura;

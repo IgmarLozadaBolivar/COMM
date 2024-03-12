@@ -20,11 +20,11 @@ public class ProveedorRepository : GenericRepository<Proveedor>, IProveedor
             .ToListAsync();
     }
 
-    public override async Task<Proveedor> GetByIdAsync(string id)
+    public override async Task<Proveedor> GetByIdAsync(int id)
     {
         return await _context.Proveedores
             .Include(p => p.FacturaCompras)
-            .FirstOrDefaultAsync(p => p.Id.ToString() == id);
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
 }
