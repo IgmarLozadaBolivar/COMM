@@ -153,6 +153,52 @@
         toggle.addEventListener("click", () => {
             sidebar.classList.toggle("close");
         });
+
+        async function generarID() {
+            try {
+                const response = await fetch('http://localhost:5033/Api/FacturaCompra');
+                const data = await response.json();
+
+                const existingIDs = data.map(item => item.id);
+
+                let nuevoID = 1;
+                while (existingIDs.includes(nuevoID)) {
+                    nuevoID++;
+                }
+
+                return nuevoID;
+            } catch (error) {
+                console.error('Error obteniendo los IDs existentes:', error);
+                return null;
+
+            }
+        }
+
+
+        async function registrarCompra() {
+            let inputNombre = document.getElementById('names').value;
+            let inputPrecio = document.getElementById('price_number').value;
+            let inputUsoClinico = document.getElementById('usoclinico').value;
+            let inputBarCode = document.getElementById('barcode').value;
+            let inputMarca = document.getElementById('brand').value;
+            let inputPresentacion = document.getElementById('presentacion').value;
+            let inputDescripcion = document.getElementById('description').value;
+
+            const nuevoID = await generarID();
+
+            if (nuevoID !== nul) {
+                let data =
+                {
+                    'id': nuevoID,
+                    'nombre': inputNombre,
+                    'precio': inputPrecio,
+                    'usoClinico': inputUsoClinico,
+                    'barCode': inputBarCode,
+                    'presentacion': inputPresentacion,
+                    'descripcion': inputDescripcion
+                }
+            }
+        }
     </script>
 </body>
 
