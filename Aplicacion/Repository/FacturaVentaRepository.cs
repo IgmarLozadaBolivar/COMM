@@ -18,7 +18,6 @@ public class FacturaVentaRepository : GenericRepository<FacturaVenta>, IFacturaV
         return await _context.FacturaVentas
             .Include(p => p.IdEmpleadoFkNavigation)
             .Include(p => p.IdProductoFkNavigation)
-            .Include(p => p.IdTipoPagoFkNavigation)
             .ToListAsync();
     }
 
@@ -27,7 +26,6 @@ public class FacturaVentaRepository : GenericRepository<FacturaVenta>, IFacturaV
         return await _context.FacturaVentas
             .Include(p => p.IdEmpleadoFkNavigation)
             .Include(p => p.IdProductoFkNavigation)
-            .Include(p => p.IdTipoPagoFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
  
    }
@@ -50,8 +48,7 @@ public class FacturaVentaRepository : GenericRepository<FacturaVenta>, IFacturaV
             IdProductoFkNavigation = factura.IdProductoFkNavigation,
             Cantidad = factura.Cantidad,
             PrecioTotal = factura.PrecioTotal,
-            Iva = factura.Iva,
-            IdTipoPagoFkNavigation = factura.IdTipoPagoFkNavigation
+            Iva = factura.Iva
         })
         .ToListAsync();
 

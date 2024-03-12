@@ -43,9 +43,5 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
         builder.HasOne(d => d.IdProductoFkNavigation).WithMany(p => p.FacturaVentas)
             .HasForeignKey(d => d.IdProductoFk)
             .HasConstraintName("facturaventa_producto_FK");
-
-        builder.HasOne(d => d.IdTipoPagoFkNavigation).WithMany(p => p.FacturaVentas)
-            .HasForeignKey(d => d.IdTipoPagoFk)
-            .HasConstraintName("facturaventa_tipopago_FK");
     }
 }

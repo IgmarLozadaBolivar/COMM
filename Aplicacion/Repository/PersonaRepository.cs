@@ -31,9 +31,7 @@ public class PersonaRepository : GenericRepository<Persona>, IPersona
     public override async Task<Persona> GetNombreAsync(string Nombre)
     {
         return await _context.Personas
-            .Include(p => p.FacturaCompras)
-            .Include(p => p.FacturaVentas)
-            .Include(p => p.IdTipoPersonaFkNavigation)
+            //.Include(p => p.)
             .FirstOrDefaultAsync(p => p.Nombre == Nombre);
     }
 }

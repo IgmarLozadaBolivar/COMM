@@ -52,9 +52,5 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
         builder.HasOne(d => d.IdProveedorFkNavigation).WithMany(p => p.FacturaCompras)
             .HasForeignKey(d => d.IdProveedorFk)
             .HasConstraintName("facturacompra_proveedor_FK");
-
-        builder.HasOne(d => d.IdTipoPagoFkNavigation).WithMany(p => p.FacturaCompras)
-            .HasForeignKey(d => d.IdTipoPagoFk)
-            .HasConstraintName("facturacompra_tipopago_FK");
     }
 }

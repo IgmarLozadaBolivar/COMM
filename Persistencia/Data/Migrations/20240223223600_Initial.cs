@@ -32,22 +32,6 @@ namespace Persistencia.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
-                name: "Departamento",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Nombre = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Departamento", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateTable(
                 name: "Proveedor",
                 columns: table => new
                 {
@@ -70,37 +54,6 @@ namespace Persistencia.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Identificador de rol")
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Nombre = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Nombre del rol", collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateTable(
-                name: "TipoPago",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false, comment: "Identificador de tipo de pago")
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Descripcion = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Descripcion del tipo de pago", collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateTable(
-                name: "TipoPersona",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false, comment: "Identificador de tipo de persona"),
-                    Nombre = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Nombre del tipo de persona", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -156,29 +109,6 @@ namespace Persistencia.Data.Migrations
                         name: "producto_categoria_FK",
                         column: x => x.IdCategoriaFK,
                         principalTable: "Categoria",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateTable(
-                name: "Ciudad",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Nombre = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdDepartamentoFK = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ciudad", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Ciudad_Departamento_IdDepartamentoFK",
-                        column: x => x.IdDepartamentoFK,
-                        principalTable: "Departamento",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -247,28 +177,14 @@ namespace Persistencia.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Apellidos = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Apellidos de la persona", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Cedula = table.Column<int>(type: "int", nullable: true, comment: "Numero de identificacion"),
+                    Cedula = table.Column<string>(type: "varchar(11)", nullable: true, comment: "Numero de identificacion"),
                     Correo = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Correo electronico de la persona", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Telefono = table.Column<int>(type: "int", nullable: true, comment: "Telefono de la persona"),
-                    IdCiudadFK = table.Column<int>(type: "int", nullable: true),
-                    IdTipoPersonaFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puente con la tabla de Tipo Persona")
+                    Telefono = table.Column<string>(type: "varchar(11)", nullable: true, comment: "Telefono de la persona")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PRIMARY", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Persona_Ciudad_IdCiudadFK",
-                        column: x => x.IdCiudadFK,
-                        principalTable: "Ciudad",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "persona_tipopersona_FK",
-                        column: x => x.IdTipoPersonaFK,
-                        principalTable: "TipoPersona",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
@@ -285,8 +201,7 @@ namespace Persistencia.Data.Migrations
                     IdProductoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Producto"),
                     CantidadxProducto = table.Column<int>(type: "int", nullable: true, comment: "Cantidad por productos"),
                     CantidadTotal = table.Column<int>(type: "int", nullable: true, comment: "Cantidad total de todos los productos"),
-                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true, comment: "Precio total de los productos en la factura"),
-                    IdTipoPagoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Tipo Pago")
+                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true, comment: "Precio total de los productos en la factura")
                 },
                 constraints: table =>
                 {
@@ -309,12 +224,6 @@ namespace Persistencia.Data.Migrations
                         principalTable: "Proveedor",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "facturacompra_tipopago_FK",
-                        column: x => x.IdTipoPagoFK,
-                        principalTable: "TipoPago",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
@@ -330,8 +239,7 @@ namespace Persistencia.Data.Migrations
                     IdProductoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Producto"),
                     Cantidad = table.Column<int>(type: "int", nullable: true, comment: "Cantidad de productos"),
                     Iva = table.Column<int>(type: "int", nullable: true, comment: "IVA o comision por compra, establecido por el gobierno"),
-                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true, comment: "Precio total de la venta"),
-                    IdTipoPagoFK = table.Column<int>(type: "int", nullable: true, comment: "Identificador de puenteo con la tabla de Tipo Pago")
+                    PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true, comment: "Precio total de la venta")
                 },
                 constraints: table =>
                 {
@@ -348,20 +256,9 @@ namespace Persistencia.Data.Migrations
                         principalTable: "Producto",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "facturaventa_tipopago_FK",
-                        column: x => x.IdTipoPagoFK,
-                        principalTable: "TipoPago",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ciudad_IdDepartamentoFK",
-                table: "Ciudad",
-                column: "IdDepartamentoFK");
 
             migrationBuilder.CreateIndex(
                 name: "facturacompra_persona_FK",
@@ -379,11 +276,6 @@ namespace Persistencia.Data.Migrations
                 column: "IdProveedorFK");
 
             migrationBuilder.CreateIndex(
-                name: "facturacompra_tipopago_FK",
-                table: "FacturaCompra",
-                column: "IdTipoPagoFK");
-
-            migrationBuilder.CreateIndex(
                 name: "facturaventa_persona_FK",
                 table: "FacturaVenta",
                 column: "IdEmpleadoFK");
@@ -392,21 +284,6 @@ namespace Persistencia.Data.Migrations
                 name: "facturaventa_producto_FK",
                 table: "FacturaVenta",
                 column: "IdProductoFK");
-
-            migrationBuilder.CreateIndex(
-                name: "facturaventa_tipopago_FK",
-                table: "FacturaVenta",
-                column: "IdTipoPagoFK");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Persona_IdCiudadFK",
-                table: "Persona",
-                column: "IdCiudadFK");
-
-            migrationBuilder.CreateIndex(
-                name: "persona_tipopersona_FK",
-                table: "Persona",
-                column: "IdTipoPersonaFK");
 
             migrationBuilder.CreateIndex(
                 name: "persona_unique",

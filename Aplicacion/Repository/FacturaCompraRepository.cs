@@ -19,7 +19,6 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
             .Include(p => p.IdEmpleadoFkNavigation)
             .Include(p => p.IdProductoFkNavigation)
             .Include(p => p.IdProveedorFkNavigation)
-            .Include(p => p.IdTipoPagoFkNavigation)
             .ToListAsync();
     }
 
@@ -29,7 +28,6 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
             .Include(p => p.IdEmpleadoFkNavigation)
             .Include(p => p.IdProductoFkNavigation)
             .Include(p => p.IdProveedorFkNavigation)
-            .Include(p => p.IdTipoPagoFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
     }
      public async Task<IEnumerable<FacturaCompra>> MesXFacturaCompra(string FechaCompraStr)

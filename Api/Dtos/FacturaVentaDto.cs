@@ -9,6 +9,5 @@ public class FacturaVentaDto
     public decimal PrecioTotal { get; set; }
     public PersonaDto Empleado { get; set; }
     public ProductoDto Producto { get; set; }
-    public TipoPagoDto TipoPago { get; set; }
 
 }

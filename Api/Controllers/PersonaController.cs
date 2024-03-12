@@ -49,6 +49,7 @@ public class PersonaController : BaseApiController
         }
        return mapper.Map<PersonaDto>(data);
     }
+    
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -10,15 +10,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private RolRepository _roles;
     
     private CategoriaRepository _categorias;
-    private DepartamentoRepository _departamentos;
-    private CiudadRepository _ciudades;
     private FacturaCompraRepository _facturaCompras;
     private FacturaVentaRepository _facturaVentas;
     private PersonaRepository _personas;
     private ProductoRepository _productos;
     private ProveedorRepository _proveedores;
-    private TipoPagoRepository _tipoPagos;
-    private TipoPersonaRepository _tipoPersonas;
     
     public UnitOfWork(DbFirstContext _context)
     {
@@ -58,30 +54,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
                 _categorias = new CategoriaRepository(context);
             }
             return _categorias;
-        }
-    }
-
-    public IDepartamento Departamentos
-    {
-        get
-        {
-            if (_departamentos == null)
-            {
-                _departamentos = new DepartamentoRepository(context);
-            }
-            return _departamentos;
-        }
-    }
-
-    public ICiudad Ciudades
-    {
-        get
-        {
-            if (_ciudades == null)
-            {
-                _ciudades = new CiudadRepository(context);
-            }
-            return _ciudades;
         }
     }
 
@@ -142,30 +114,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
                 _proveedores = new ProveedorRepository(context);
             }
             return _proveedores;
-        }
-    }
-
-    public ITipoPago TipoPagos
-    {
-        get
-        {
-            if (_tipoPagos == null)
-            {
-                _tipoPagos = new TipoPagoRepository(context);
-            }
-            return _tipoPagos;
-        }
-    }
-
-    public ITipoPersona TipoPersonas
-    {
-        get
-        {
-            if (_tipoPersonas == null)
-            {
-                _tipoPersonas = new TipoPersonaRepository(context);
-            }
-            return _tipoPersonas;
         }
     }
     

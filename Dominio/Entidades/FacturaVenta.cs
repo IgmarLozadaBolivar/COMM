@@ -12,5 +12,4 @@ public class FacturaVenta : BaseEntity
     public int IdTipoPagoFk { get; set; }
     public virtual Persona IdEmpleadoFkNavigation { get; set; }
     public virtual Producto IdProductoFkNavigation { get; set; }
-    public virtual TipoPago IdTipoPagoFkNavigation { get; set; }
 }
