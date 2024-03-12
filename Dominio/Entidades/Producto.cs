@@ -4,7 +4,7 @@ public class Producto : BaseEntity
 {
  
     public string Nombre { get; set; }
-    public decimal Precio { get; set; }
+    public decimal Precio { get; set; } = 0.00m;
     public string UsoClinico { get; set; }
     public int CodigoBarras { get; set; }
     public string Marca { get; set; }

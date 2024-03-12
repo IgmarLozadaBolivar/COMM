@@ -93,28 +93,6 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-data">
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <div class="btns-actions">
-                                <button class="btn-options">
-                                    <ion-icon name="search-outline"></ion-icon>
-                                </button>
-                                <div class="btns-more-actions" style="display: none;">
-                                    <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
-                                    <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -146,6 +124,17 @@
                 }
             });
         });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const entidadSeleccionada = urlParams.get('entidad');
+        const consultaSeleccionada = urlParams.get('consulta');
+
+        function mostrarTabla(entidad, consulta) {
+            console.log("Entidad seleccionada:", entidad);
+            console.log("Consulta seleccionada:", consulta);
+        }
+
+        mostrarTabla(entidadSeleccionada, consultaSeleccionada);
     </script>
 </body>
 

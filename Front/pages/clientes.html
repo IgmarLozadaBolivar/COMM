@@ -76,17 +76,12 @@
     </nav>
     <section class="home">
         <div class="text">Bienvenido!</div>
-        <div class="form-box">
+        <div class="form-box" style="display: block;">
             <div class="form-box">
                 <div class="form-value">
                     <form action="">
                         <h3>Registro de clientes</h3>
                         <p>Llena el formulario</p>
-                        <div class="inputbox">
-                            <ion-icon name="id-card-outline"></ion-icon>
-                            <input type="number" class="no-arrows" id="id_number" name="id_number" required />
-                            <label for="">N° Identificación</label>
-                        </div>
                         <div class="inputbox">
                             <ion-icon name="person-outline"></ion-icon>
                             <input type="text" id="names" name="names" required />
@@ -96,6 +91,11 @@
                             <ion-icon name="person-outline"></ion-icon>
                             <input type="text" id="surnames" name="surnames" required />
                             <label for="">Apellidos</label>
+                        </div>
+                        <div class="inputbox">
+                            <ion-icon name="id-card-outline"></ion-icon>
+                            <input type="number" class="no-arrows" id="id_number" name="id_number" required />
+                            <label for="">Cedula</label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="mail-outline"></ion-icon>
@@ -112,9 +112,32 @@
                                 Agregar
                             </button>
                         </div>
+                        <div class="more">
+                            <p>Visualizar clientes</p>
+                            <p>👇</p>
+                            <a href="#" class="btn-about" onclick="showFormAndFetchClientes()">Mostrar</a>
+                        </div>
                     </form>
                 </div>
             </div>
+        </div>
+        <div class="list-box-4" style="display: none;">
+            <table class="table-box">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Cedula</th>
+                        <th>Correo</th>
+                        <th>Telefono</th>
+                        <th>Ciudad</th>
+                        <th>TipoPersona</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-data">
+                </tbody>
+            </table>
         </div>
     </section>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -126,6 +149,162 @@
         toggle.addEventListener("click", () => {
             sidebar.classList.toggle("close");
         });
+
+        async function generarID() {
+            try {
+                const response = await fetch('http://localhost:5033/Api/Persona');
+                const data = await response.json();
+
+                const existingIDs = data.map(item => item.id);
+
+                let nuevoID = 1;
+                while (existingIDs.includes(nuevoID)) {
+                    nuevoID++;
+                }
+
+                return nuevoID;
+            } catch (error) {
+                console.error('Error obteniendo los IDs existentes:', error);
+                return null;
+            }
+        }
+
+        async function registrarPersonas() {
+            let inputNombres = document.getElementById('names').value;
+            let inputApellidos = document.getElementById('surnames').value;
+            let inputCedula = document.getElementById('id_number').value;
+            let inputCorreo = document.getElementById('email').value;
+            let inputTelefono = document.getElementById('telefono').value;
+
+            const nuevoID = await generarID();
+
+            if (nuevoID !== null) {
+                let data = {
+                    "id": nuevoID,
+                    "nombre": inputNombres
+                }
+
+                const headers = new Headers({ 'Content-Type': 'application/json' });
+                const urlRegister = "http://localhost:5033/Api/Persona";
+
+                const config = {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(data)
+                };
+
+                try {
+                    const response = await fetch(urlRegister, config);
+
+                    if (response.status === 200) {
+                        Swal.fire({
+                            title: '¡Felicidades!',
+                            text: 'Se ha registrado la persona',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        console.error("La solicitud no fue exitosa. Estado:", response.status);
+                    }
+                } catch (error) {
+                    console.error("Error de red: ", error);
+                }
+            } else {
+                console.error('No se pudo generar un nuevo ID.');
+            }
+        }
+
+        const botonRegister = document.getElementById('boton');
+        botonRegister.addEventListener("click", function (e) {
+            e.preventDefault();
+            registrarPersonas();
+        });
+
+        function showFormAndFetchClientes() {
+            const formBox = document.querySelector('.form-box');
+            const listBox = document.querySelector('.list-box-4');
+
+            formBox.style.display = 'none';
+            listBox.style.display = 'block';
+
+            obtenerClientes();
+        }
+
+        function obtenerClientes() {
+            fetch('http://localhost:5033/Api/Persona')
+                .then(response => response.json())
+                .then(data => {
+                    const tablaData = document.getElementById('tabla-data');
+                    tablaData.innerHTML = '';
+
+                    data.forEach(persona => {
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                    <td>${persona.nombre}</td>
+                    <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${persona.apellidos}</td>
+                    <td>${persona.cedula}</td>
+                    <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${persona.correo}</td>
+                    <td>${persona.telefono}</td>
+                    <td>${persona.ciudad}</td>
+                    <td>${persona.tipoPersona}</td>
+                    <td>
+                        <div class="btns-actions">
+                            <button class="btn-options">
+                                <ion-icon name="search-outline"></ion-icon>
+                            </button>
+                            <div class="btns-more-actions" style="display:none;">
+                                <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
+                                <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
+                                <button id="regresarFormulario" class="btn-regresar"><ion-icon name="log-out-outline"></ion-icon></button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                        tablaData.appendChild(tableRow);
+
+                        const btnOptions = tableRow.querySelector('.btn-options');
+                        const btnsMoreActions = tableRow.querySelector('.btns-more-actions');
+                        btnOptions.addEventListener('click', function () {
+                            if (btnsMoreActions.style.display === 'none') {
+                                btnsMoreActions.style.display = 'block';
+                                btnsMoreActions.setAttribute('style', '/* display: block; */');
+                            } else {
+                                btnsMoreActions.style.display = 'none';
+                            }
+                        });
+
+                        const regresarFormularioBtn = document.getElementById('regresarFormulario');
+                        regresarFormularioBtn.addEventListener('click', function () {
+                            const formBox = document.querySelector('.form-box');
+                            const listBox = document.querySelector('.list-box-4');
+
+                            formBox.style.display = 'block';
+                            listBox.style.display = 'none';
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error obteniendo clientes:', error);
+                });
+        }
+        obtenerClientes();
+
+        function startMarquee(element) {
+            element.dataset.marqueeId = setInterval(function () {
+                if (element.scrollWidth > element.offsetWidth) {
+                    element.scrollLeft += 1;
+                    if (element.scrollLeft >= element.scrollWidth - element.offsetWidth) {
+                        element.scrollLeft = 0;
+                    }
+                }
+            }, 25);
+        }
+
+        function stopMarquee(element) {
+            clearInterval(element.dataset.marqueeId);
+            delete element.dataset.marqueeId;
+            element.scrollLeft = 0;
+        }
     </script>
 </body>
 

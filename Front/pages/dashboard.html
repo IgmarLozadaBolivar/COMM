@@ -79,7 +79,7 @@
         <div class="text">Bienvenido a las consultas!</div>
         <div class="form-box-2">
             <div class="form-box">
-                <div class="form-value">
+                <div class="form-value" style="display: block;">
                     <form id="myForm" action="">
                         <h3>Seleccione una opción</h3>
                         <p>Al seleccionar una entidad, se te libera una lista de consultas</p>
@@ -90,7 +90,7 @@
                                 <option value="proveedores">Productos</option>
                                 <option value="proveedores">Proveedores</option>
                                 <option value="facturacion">Facturación</option>
-                                <option value="facturacion">Informes</option>
+                                <option value="informes">Informes</option>
                             </select>
                         </div>
                         <div id="queries-clientes" class="inputbox" style="display: none;">
@@ -132,10 +132,10 @@
                         <div id="queries-informes" class="inputbox" style="display: none;">
                             <select class="form-select">
                                 <option value="text">Seleccione una consulta</option>
-                                <option value="querie1">Consulta 1</option>
-                                <option value="querie2">Consulta 2</option>
-                                <option value="querie3">Consulta 3</option>
-                                <option value="querie4">Consulta 4</option>
+                                <option value="Compras x Mes">Compras x Mes</option>
+                                <option value="Ventas x Mes">Ventas x Mes</option>
+                                <option value="Producto más comprado">Producto más comprado</option>
+                                <option value="Producto más vendido">Producto más vendido</option>
                             </select>
                         </div>
                         <div class="btns">
@@ -145,6 +145,46 @@
                         </div>
                     </form>
                 </div>
+            </div>
+            <div id="informe-compra" class="list-box-4" style="display: none;">
+                <table class="table-box">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>FechaCompra</th>
+                            <th>Proveedor</th>
+                            <th>Empleado</th>
+                            <th>Producto</th>
+                            <th>CantidadxProducto</th>
+                            <th>CantidadTotal</th>
+                            <th>Total</th>
+                            <th>Pago</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-data">
+                    </tbody>
+                </table>
+            </div>
+            <div id="informe-venta" class="list-box-4" style="display: none;">
+                <table class="table-box">
+                    <thead>
+                        <tr>
+                            <th>IdTop</th>
+                            <th>FechaCompra</th>
+                            <th>Proveedor</th>
+                            <th>Empleado</th>
+                            <th>Producto</th>
+                            <th>CantidadxProducto</th>
+                            <th>CantidadTotal</th>
+                            <th>Total</th>
+                            <th>Pago</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-data">
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
@@ -174,6 +214,36 @@
                 selectedDiv.style.display = "block";
             }
         });
+
+        function showForm() {
+            const formBox = document.querySelector('.form-value');
+            const listBoxes = document.querySelectorAll('.list-box-4');
+
+            formBox.style.display = 'block';
+            listBoxes.forEach(function (listBox) {
+                listBox.style.display = 'block';
+            });
+        }
+
+        function showList(id) {
+            const listBoxToShow = document.getElementById(id);
+            const formBox = document.querySelector('.form-value');
+            const formBox2 = document.querySelector('.form-box-2');
+
+            // Cambiar el top de form-box-2 a 25%
+            formBox2.style.top = '25%';
+
+            formBox.style.display = 'none';
+
+            const listContainers = document.querySelectorAll('.list-box-4');
+            listContainers.forEach(function (container) {
+                if (container.id === id) {
+                    container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+            });
+        }
 
         const botonSiguiente = document.getElementById("boton-siguiente");
 
@@ -206,7 +276,8 @@
                             cancelButtonText: 'Cerrar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = './resultados.html';
+                                const selectedDivId = `${entidadSeleccionada}-${consultaSeleccionada.replace(/\s+/g, "-").toLowerCase()}`;
+                                showList(selectedDivId);
                             } else {
                                 const form = document.getElementById("myForm");
                                 form.reset();

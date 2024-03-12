@@ -514,6 +514,7 @@ select {
     width: 25%;
     padding: 8px;
     margin-top: 10px;
+    margin-bottom: 15px;
     color: #000;
     border: 2px solid #4CAF50;
     border-radius: 10px;
@@ -624,7 +625,7 @@ td {
 }
 
 .description-cell {
-    max-width: 300px;
+    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
 }
@@ -640,13 +641,15 @@ td {
 }
 
 .btn-edit,
-.btn-remove {
+.btn-remove,
+.btn-regresar {
     display: inline-block;
 }
 
 .btn-options,
 .btn-edit,
-.btn-remove {
+.btn-remove,
+.btn-regresar {
     padding: 8px 12px;
     border: 2px solid transparent;
     border-radius: 15px;
@@ -660,7 +663,8 @@ td {
 
 .btn-options,
 .btn-edit,
-.btn-remove ion-icon {
+.btn-remove,
+.btn-regresar ion-icon {
     font-size: 18px;
     display: flex;
     align-items: center;
@@ -682,9 +686,15 @@ td {
     color: #fff;
 }
 
+.btn-regresar {
+    background-color: #7F27FF;
+    color: #fff;
+}
+
 .btn-options:hover,
 .btn-edit:hover,
-.btn-remove:hover {
+.btn-remove:hover,
+.btn-regresar:hover {
     opacity: 0.8;
 }
 
@@ -721,4 +731,12 @@ td {
     .table-box {
         font-size: 12px;
     }
+}
+
+.more a {
+    text-decoration: none;
+}
+
+.btn-about {
+    margin-left: 115px;
 }
