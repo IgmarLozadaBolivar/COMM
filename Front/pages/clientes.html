@@ -80,7 +80,7 @@
         <div class="form-box" style="display: block;">
             <div class="form-box">
                 <div class="form-value">
-                    <form action="">
+                    <form id="myForm" action="">
                         <h3>Registro de clientes</h3>
                         <p>Llena el formulario</p>
                         <div class="inputbox">
@@ -206,8 +206,12 @@
                             icon: 'success',
                             confirmButtonText: 'Aceptar'
                         });
+                        const form = document.getElementById("myForm");
+                        form.reset();
                     } else {
                         console.error("La solicitud no fue exitosa. Estado:", response.status);
+                        const form = document.getElementById("myForm");
+                        form.reset();
                     }
                 } catch (error) {
                     console.error("Error de red: ", error);
@@ -233,7 +237,141 @@
             obtenerClientes();
         }
 
-        function obtenerClientes() {
+        async function editarCliente(id, nuevoNombre, nuevosApellidos, nuevaCedula, nuevoCorreo, nuevoTelefono) {
+            const urlEditar = `http://localhost:5033/Api/Persona/${id}`;
+
+            const clienteActual = await obtenerCliente(id);
+
+            const data = {
+                id: id,
+                nombre: nuevoNombre !== '' ? nuevoNombre : clienteActual.nombre,
+                apellidos: nuevosApellidos !== '' ? nuevosApellidos : clienteActual.apellidos,
+                cedula: nuevaCedula !== '' ? nuevaCedula : clienteActual.cedula,
+                correo: nuevoCorreo !== '' ? nuevoCorreo : clienteActual.correo,
+                telefono: nuevoTelefono !== '' ? nuevoTelefono : clienteActual.telefono
+            };
+
+            const headers = new Headers({ 'Content-Type': 'application/json' });
+            const config = {
+                method: 'PUT',
+                headers: headers,
+                body: JSON.stringify(data)
+            };
+
+            try {
+                const response = await fetch(urlEditar, config);
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: '¡Felicidades!',
+                        text: 'Se ha editado el cliente correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    obtenerClientes();
+                } else {
+                    console.error('Error al editar el cliente:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
+        function mostrarFormularioEdicion(id) {
+            Swal.fire({
+                title: 'Cargando formulario de edición',
+                text: 'Por favor espere mientras se carga el formulario de edición...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
+
+            setTimeout(function () {
+                Swal.close();
+
+                Swal.fire({
+                    title: 'Editar cliente',
+                    html: `
+                        <div class="form-grid">
+                            <div class="input-container-2">
+                                <label for="inputID" class="label-style">(Solo lectura)</label>
+                                <input type="text" value="${id}" id="inputID" class="input-style" readonly>
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoNombre" class="label-style">Nombres del cliente:</label>
+                                <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevos nombres del cliente">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevosApellidos" class="label-style">Apellidos del cliente:</label>
+                                <input type="text" id="inputNuevosApellidos" class="input-style" placeholder="Nuevos apellidos del cliente">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevaCedula" class="label-style">Cedula del cliente:</label>
+                                <input type="text" id="inputNuevaCedula" class="input-style" placeholder="Nueva cedula del cliente">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoCorreo" class="label-style">Correo del cliente:</label>
+                                <input type="text" id="inputNuevoCorreo" class="input-style" placeholder="Nuevo correo del cliente">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoTelefono" class="label-style">Telefono del cliente:</label>
+                                <input type="text" id="inputNuevoTelefono" class="input-style" placeholder="Nuevo telefono del cliente">
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        const clienteId = document.getElementById('inputID').value;
+                        const nuevoNombre = document.getElementById('inputNuevoNombre').value;
+                        const nuevosApellidos = document.getElementById('inputNuevosApellidos').value;
+                        const nuevaCedula = document.getElementById('inputNuevaCedula').value;
+                        const nuevoCorreo = document.getElementById('inputNuevoCorreo').value;
+                        const nuevoTelefono = document.getElementById('inputNuevoTelefono').value;
+                        editarCliente(clienteId, nuevoNombre, nuevosApellidos, nuevaCedula, nuevoCorreo, nuevoTelefono);
+                    }
+                });
+            }, 2000);
+        }
+
+        async function eliminarCliente(id) {
+            const urlEliminar = `http://localhost:5033/Api/Persona/${id}`;
+            const config = {
+                method: 'DELETE'
+            };
+
+            try {
+                const response = await fetch(urlEliminar, config);
+
+                if (response.ok) {
+                    obtenerClientes();
+                    console.log('Cliente eliminado exitosamente.');
+                } else {
+                    console.error('Error al eliminar el cliente:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
+        async function obtenerCliente(id) {
+            const urlCliente = `http://localhost:5033/Api/Persona/${id}`;
+            try {
+                const response = await fetch(urlCliente);
+                if (response.ok) {
+                    const cliente = await response.json();
+                    return cliente;
+                } else {
+                    throw new Error('Error al obtener datos del cliente');
+                }
+            } catch (error) {
+                console.error('Error al obtener datos del cliente:', error);
+            }
+        }
+
+        async function obtenerClientes() {
             fetch('http://localhost:5033/Api/Persona')
                 .then(response => response.json())
                 .then(data => {
@@ -254,8 +392,8 @@
                                 <ion-icon name="search-outline"></ion-icon>
                             </button>
                             <div class="btns-more-actions" style="display:none;">
-                                <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
-                                <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
+                                <button class="btn-edit" data-id="${persona.id}"><ion-icon name="build-outline"></ion-icon></button>
+                                <button class="btn-remove" data-id="${persona.id}"><ion-icon name="trash-outline"></ion-icon></button>
                                 <button class="btn-regresar"><ion-icon name="log-out-outline"></ion-icon></button>
                             </div>
                         </div>
@@ -272,6 +410,29 @@
                             } else {
                                 btnsMoreActions.style.display = 'none';
                             }
+                        });
+
+                        const btnsEditar = tableRow.querySelectorAll('.btn-edit');
+
+                        btnsEditar.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const clienteId = this.getAttribute('data-id');
+                                mostrarFormularioEdicion(clienteId);
+                            });
+                        });
+
+                        const btnsEliminar = document.querySelectorAll('.btn-remove');
+
+                        btnsEliminar.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const clienteId = this.getAttribute('data-id');
+
+                                const confirmacion = confirm('¿Estás seguro de que deseas eliminar este cliente?');
+
+                                if (confirmacion) {
+                                    eliminarCliente(clienteId);
+                                }
+                            });
                         });
 
                         const regresarFormularioBtn = tableRow.querySelector('.btn-regresar');

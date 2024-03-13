@@ -7,6 +7,7 @@
     <title>COMM: Proveedores</title>
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -79,7 +80,7 @@
         <div class="form-box">
             <div class="form-box">
                 <div class="form-value">
-                    <form action="">
+                    <form id="myForm" action="">
                         <h3>Registro de proveedores</h3>
                         <p>Llena el formulario</p>
                         <div class="inputbox">
@@ -124,21 +125,25 @@
             sidebar.classList.toggle("close");
         });
 
-        async function generarID() {
-            try {
-                const response = await fetch('http://localhost:5033/Api/Proveedor');
-                const data = await response.json();
+        async function generarID(editando) {
+            if (!editando) {
+                try {
+                    const response = await fetch('http://localhost:5033/Api/Proveedor');
+                    const data = await response.json();
 
-                const existingIDs = data.map(item => item.id);
+                    const existingIDs = data.map(item => item.id);
 
-                let nuevoID = 1;
-                while (existingIDs.includes(nuevoID)) {
-                    nuevoID++;
+                    let nuevoID = 1;
+                    while (existingIDs.includes(nuevoID)) {
+                        nuevoID++;
+                    }
+
+                    return nuevoID;
+                } catch (error) {
+                    console.error('Error obteniendo los IDs existentes:', error);
+                    return null;
                 }
-
-                return nuevoID;
-            } catch (error) {
-                console.error('Error obteniendo los IDs existentes:', error);
+            } else {
                 return null;
             }
         }
@@ -146,7 +151,7 @@
         async function registrarProveedor() {
             let inputNombres = document.getElementById('names').value;
 
-            const nuevoID = await generarID();
+            const nuevoID = await generarID(false);
 
             if (nuevoID !== null) {
                 let data = {
@@ -173,9 +178,12 @@
                             icon: 'success',
                             confirmButtonText: 'Aceptar'
                         });
+                        const form = document.getElementById("myForm");
+                        form.reset();
                     } else {
-                        // simple si no funciona pues console
                         console.error("La solicitud no fue exitosa. Estado:", response.status);
+                        const form = document.getElementById("myForm");
+                        form.reset();
                     }
                 } catch (error) {
                     console.error("Error de red: ", error);
@@ -201,6 +209,96 @@
             obtenerProveedores();
         }
 
+        async function editarProveedor(id, nuevoNombre) {
+            const urlEditar = `http://localhost:5033/Api/Proveedor/${id}`;
+            const data = {
+                id: id,
+                nombre: nuevoNombre
+            };
+
+            const headers = new Headers({ 'Content-Type': 'application/json' });
+            const config = {
+                method: 'PUT',
+                headers: headers,
+                body: JSON.stringify(data)
+            };
+
+            try {
+                const response = await fetch(urlEditar, config);
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: '¡Felicidades!',
+                        text: 'Se ha editado el proveedor correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    obtenerProveedores();
+                } else {
+                    console.error('Error al editar el proveedor:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
+        function mostrarFormularioEdicion(id) {
+            Swal.fire({
+                title: 'Cargando formulario de edición',
+                text: 'Por favor espere mientras se carga el formulario de edición...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
+
+            setTimeout(function () {
+                Swal.close();
+
+                Swal.fire({
+                    title: 'Editar proveedor',
+                    html: `
+                        <div class="input-container">
+                            <label for="inputID" class="label-style">(Solo lectura)</label>
+                            <input type="text" value="${id}" id="inputID" class="input-style" readonly>
+                        </div>
+                        <div class="input-container">
+                            <label for="inputNuevoNombre" class="label-style">Nombre del proveedor:</label>
+                            <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevo nombre del proveedor">
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        const proveedorId = document.getElementById('proveedorId').value;
+                        const nuevoNombre = document.getElementById('nuevoNombre').value;
+                        editarProveedor(proveedorId, nuevoNombre);
+                    }
+                });
+            }, 2000);
+        }
+
+        async function eliminarProveedor(id) {
+            const urlEliminar = `http://localhost:5033/Api/Proveedor/${id}`;
+            const config = {
+                method: 'DELETE'
+            };
+
+            try {
+                const response = await fetch(urlEliminar, config);
+
+                if (response.ok) {
+                    obtenerProveedores();
+                    console.log('Proveedor eliminado exitosamente.');
+                } else {
+                    console.error('Error al eliminar el proveedor:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
         function obtenerProveedores() {
             fetch('http://localhost:5033/Api/Proveedor')
                 .then(response => response.json())
@@ -218,7 +316,7 @@
                                 <ion-icon name="search-outline"></ion-icon>
                             </button>
                             <div class="btns-more-actions" style="display:none;">
-                                <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
+                                <button class="btn-edit" data-id="${persona.id}"><ion-icon name="build-outline"></ion-icon></button>
                                 <button class="btn-remove" data-id="${persona.id}"><ion-icon name="trash-outline"></ion-icon></button>
                                 <button class="btn-regresar"><ion-icon name="log-out-outline"></ion-icon></button>
                             </div>
@@ -238,6 +336,29 @@
                             }
                         });
 
+                        const btnsEditar = tableRow.querySelectorAll('.btn-edit');
+
+                        btnsEditar.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const proveedorId = this.getAttribute('data-id');
+                                mostrarFormularioEdicion(proveedorId);
+                            });
+                        });
+
+                        const btnsEliminar = document.querySelectorAll('.btn-remove');
+
+                        btnsEliminar.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const proveedorId = this.getAttribute('data-id');
+
+                                const confirmacion = confirm('¿Estás seguro de que deseas eliminar este proveedor?');
+
+                                if (confirmacion) {
+                                    eliminarProveedor(proveedorId);
+                                }
+                            });
+                        });
+
                         const regresarFormularioBtn = tableRow.querySelector('.btn-regresar');
                         regresarFormularioBtn.addEventListener('click', function () {
                             const formBox = document.querySelector('.form-box');
@@ -253,27 +374,6 @@
                 });
         }
         obtenerProveedores();
-
-        async function eliminarProveedor(id) {
-            const urlEliminar = `http://localhost:5033/Api/Proveedor/${id}`;
-            const config = {
-                method: 'DELETE'
-            };
-
-            try {
-                const response = await fetch(urlEliminar, config);
-
-                if (response.ok) {
-                    // Si la eliminación fue exitosa, actualiza la interfaz de usuario
-                    obtenerProveedores();
-                    console.log('Proveedor eliminado exitosamente.');
-                } else {
-                    console.error('Error al eliminar el proveedor:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error de red:', error);
-            }
-        }
     </script>
 </body>
 
