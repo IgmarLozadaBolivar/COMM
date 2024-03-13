@@ -58,7 +58,7 @@ namespace Persistencia.Data.Migrations
                     Presentacion = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true, comment: "Presentacion del producto, si es que incluye sea desde tallas, tamaños, unidades entre otros.", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TotalExistencias = table.Column<int>(type: "int", nullable: false, comment: "Cantidad o existencia total por producto"),
-                    Categoria = table.Column<string>(type: "longtext", precision: 10, scale: 2, nullable: true, comment: "Categoria de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
+                    Categoria = table.Column<string>(type: "varchar(50)", precision: 10, scale: 2, nullable: true, comment: "Categoria de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -130,7 +130,7 @@ namespace Persistencia.Data.Migrations
                     Cantidad = table.Column<int>(type: "int", nullable: false, comment: "Cantidad de productos"),
                     Iva = table.Column<int>(type: "int", nullable: false, comment: "IVA o comision por compra, establecido por el gobierno"),
                     PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, comment: "Precio total de la venta"),
-                    TipoPago = table.Column<string>(type: "longtext", precision: 10, scale: 2, nullable: true, comment: "TipoPago de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
+                    TipoPago = table.Column<string>(type: "varchar(25)", precision: 10, scale: 2, nullable: true, comment: "TipoPago de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -164,7 +164,7 @@ namespace Persistencia.Data.Migrations
                     CantidadxProducto = table.Column<int>(type: "int", nullable: false, comment: "Cantidad por productos"),
                     CantidadTotal = table.Column<int>(type: "int", nullable: false, comment: "Cantidad total de todos los productos"),
                     PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, comment: "Precio total de los productos en la factura"),
-                    TipoPago = table.Column<string>(type: "longtext", precision: 10, scale: 2, nullable: true, comment: "TipoPago de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
+                    TipoPago = table.Column<string>(type: "varchar(25)", precision: 10, scale: 2, nullable: true, comment: "TipoPago de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>

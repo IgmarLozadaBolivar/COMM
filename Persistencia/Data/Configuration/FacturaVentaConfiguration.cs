@@ -15,25 +15,34 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
 
         builder.HasIndex(e => e.IdProductoFk, "facturaventa_producto_FK");
 
-        builder.Property(e => e.Id).HasComment("Identificador de una factura de venta");
-        builder.Property(e => e.Cantidad).HasComment("Cantidad de productos");
+        builder.Property(e => e.Id)
+            .HasComment("Identificador de una factura de venta");
+
+        builder.Property(e => e.Cantidad)
+            .HasComment("Cantidad de productos");
+
         builder.Property(e => e.FechaVenta)
             .HasComment("Fecha de la venta")
             .HasColumnType("datetime");
+
         builder.Property(e => e.IdEmpleadoFk)
             .HasComment("Identificador de puenteo con la tabla de Empleado (Persona)")
             .HasColumnName("IdEmpleadoFK");
+
         builder.Property(e => e.IdProductoFk)
             .HasComment("Identificador de puenteo con la tabla de Producto")
             .HasColumnName("IdProductoFK");
-        builder.Property(e => e.Iva).HasComment("IVA o comision por compra, establecido por el gobierno");
+
+        builder.Property(e => e.Iva)
+            .HasComment("IVA o comisión por compra, establecido por el gobierno");
+
         builder.Property(e => e.PrecioTotal)
             .HasPrecision(10, 2)
             .HasComment("Precio total de la venta");
     
         builder.Property(e => e.TipoPago)
-            .HasPrecision(10, 2)
-            .HasComment("TipoPago de los productos en la factura");
+            .HasComment("Tipo de pago de los productos en la factura");
+
         builder.HasOne(d => d.IdEmpleadoFkNavigation).WithMany(p => p.FacturaVentas)
             .HasForeignKey(d => d.IdEmpleadoFk)
             .HasConstraintName("facturaventa_persona_FK");
