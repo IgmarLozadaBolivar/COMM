@@ -85,8 +85,10 @@
                         <div class="input-box-only">
                             <div class="inputbox">
                                 <ion-icon name="person-outline"></ion-icon>
-                                <input type="search" class="no-arrows" id="id_number" name="id_number" required />
-                                <label for="">Nombre del proveedor</label>
+                                <select id="proveedor" required>
+                                    <option value="" disabled selected>Seleccione el proveedor</option>
+                                </select>
+                                <label for="proveedor"></label>
                             </div>
                         </div>
                         <p style="font-size: 20px;">Datos del producto</p>
@@ -132,6 +134,42 @@
                                 <ion-icon name="text-outline"></ion-icon>
                                 <input id="description" type="text" required>
                                 <label for="">Descripción</label>
+                            </div>
+                        </div>
+                        <p style="font-size: 20px;">Datos de la compra</p>
+                        <div class="inputsboxs">
+                            <div class="inputbox">
+                                <ion-icon name="person-outline"></ion-icon>
+                                <input type="text" id="names" name="names" required />
+                                <label for="">Fecha de compra</label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="cash-outline"></ion-icon>
+                                <input type="number" class="no-arrows" id="price_number" name="price_number" min="0"
+                                    step="0.01" required />
+                                <label for="">Precio</label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="barcode-outline"></ion-icon>
+                                <input id="barcode" type="text" required>
+                                <label for="">Cantidad del producto</label>
+                            </div>
+                        </div>
+                        <div class="inputsboxs-2">
+                            <div class="inputbox">
+                                <ion-icon name="barcode-outline"></ion-icon>
+                                <input id="barcode" type="text" required>
+                                <label for="">Cantidad total<label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                                <input id="brand" type="text" required>
+                                <label for="">Precio Total</label>
+                            </div>
+                            <div class="inputbox">
+                                <ion-icon name="brush-outline"></ion-icon>
+                                <input id="presentation" type="text" required>
+                                <label for="">Tipo de pago</label>
                             </div>
                         </div>
                         <div class="btns">
@@ -199,6 +237,26 @@
                 }
             }
         }
+
+
+        function traerProveedores() {
+            fetch('http://localhost:5033/Api/Proveedor')
+                .then(response => response.json())
+                .then(data => {
+                    const selectProveedor = document.getElementById('proveedor');
+                    selectProveedor.innerHTML = '<option value="" disabled selected>Seleccione un proveedor</option>';
+                    data.forEach(proveedor => {
+                        const option = document.createElement('option');
+                        option.value = proveedor.id; 
+                        option.textContent = proveedor.nombre; 
+                        selectProveedor.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error al obtener la lista de proveedores:', error));
+        }
+
+        
+        traerProveedores();
     </script>
 </body>
 

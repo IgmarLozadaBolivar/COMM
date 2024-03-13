@@ -22,63 +22,6 @@ namespace Persistencia.Data.Migrations
 
             MySqlModelBuilderExtensions.HasCharSet(modelBuilder, "utf8mb4");
 
-            modelBuilder.Entity("Dominio.Entidades.Categoria", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasComment("Identificador de categoria");
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)")
-                        .HasComment("Descripción de la categoria");
-
-                    b.HasKey("Id")
-                        .HasName("PRIMARY");
-
-                    b.ToTable("Categoria", (string)null);
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Ciudad", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    b.Property<int>("IdDepartamentoFK")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nombre")
-                        .HasMaxLength(25)
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("Nombre");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdDepartamentoFK");
-
-                    b.ToTable("Ciudad", (string)null);
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Departamento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    b.Property<string>("Nombre")
-                        .HasMaxLength(25)
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("Nombre");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Departamento", (string)null);
-                });
-
             modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
                 {
                     b.Property<int>("Id")
@@ -98,11 +41,6 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("datetime")
                         .HasComment("Fecha de la compra");
 
-                    b.Property<int>("IdEmpleadoFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdEmpleadoFK")
-                        .HasComment("Identificador puenteo con la tabla de Empleado (Persona)");
-
                     b.Property<int>("IdProductoFk")
                         .HasColumnType("int")
                         .HasColumnName("IdProductoFK")
@@ -113,26 +51,22 @@ namespace Persistencia.Data.Migrations
                         .HasColumnName("IdProveedorFK")
                         .HasComment("Identificador de puenteo con la tabla de Proveedor");
 
-                    b.Property<int>("IdTipoPagoFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdTipoPagoFK")
-                        .HasComment("Identificador de puenteo con la tabla de Tipo Pago");
-
                     b.Property<decimal>("PrecioTotal")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)")
                         .HasComment("Precio total de los productos en la factura");
 
+                    b.Property<string>("TipoPago")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("longtext")
+                        .HasComment("TipoPago de los productos en la factura");
+
                     b.HasKey("Id")
                         .HasName("PRIMARY");
-
-                    b.HasIndex(new[] { "IdEmpleadoFk" }, "facturacompra_persona_FK");
 
                     b.HasIndex(new[] { "IdProductoFk" }, "facturacompra_producto_FK");
 
                     b.HasIndex(new[] { "IdProveedorFk" }, "facturacompra_proveedor_FK");
-
-                    b.HasIndex(new[] { "IdTipoPagoFk" }, "facturacompra_tipopago_FK");
 
                     b.ToTable("FacturaCompra", (string)null);
                 });
@@ -162,11 +96,6 @@ namespace Persistencia.Data.Migrations
                         .HasColumnName("IdProductoFK")
                         .HasComment("Identificador de puenteo con la tabla de Producto");
 
-                    b.Property<int>("IdTipoPagoFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdTipoPagoFK")
-                        .HasComment("Identificador de puenteo con la tabla de Tipo Pago");
-
                     b.Property<int>("Iva")
                         .HasColumnType("int")
                         .HasComment("IVA o comision por compra, establecido por el gobierno");
@@ -176,14 +105,17 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("decimal(10,2)")
                         .HasComment("Precio total de la venta");
 
+                    b.Property<string>("TipoPago")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("longtext")
+                        .HasComment("TipoPago de los productos en la factura");
+
                     b.HasKey("Id")
                         .HasName("PRIMARY");
 
                     b.HasIndex(new[] { "IdEmpleadoFk" }, "facturaventa_persona_FK");
 
                     b.HasIndex(new[] { "IdProductoFk" }, "facturaventa_producto_FK");
-
-                    b.HasIndex(new[] { "IdTipoPagoFk" }, "facturaventa_tipopago_FK");
 
                     b.ToTable("FacturaVenta", (string)null);
                 });
@@ -200,8 +132,8 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("varchar(25)")
                         .HasComment("Apellidos de la persona");
 
-                    b.Property<int>("Cedula")
-                        .HasColumnType("int")
+                    b.Property<string>("Cedula")
+                        .HasColumnType("varchar(255)")
                         .HasComment("Numero de identificacion");
 
                     b.Property<string>("Correo")
@@ -209,29 +141,17 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("varchar(50)")
                         .HasComment("Correo electronico de la persona");
 
-                    b.Property<int>("IdCiudadFK")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdTipoPersonaFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdTipoPersonaFK")
-                        .HasComment("Identificador de puente con la tabla de Tipo Persona");
-
                     b.Property<string>("Nombre")
                         .HasMaxLength(25)
                         .HasColumnType("varchar(25)")
                         .HasComment("Nombre de la persona");
 
-                    b.Property<int>("Telefono")
-                        .HasColumnType("int")
+                    b.Property<string>("Telefono")
+                        .HasColumnType("varchar(255)")
                         .HasComment("Telefono de la persona");
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
-
-                    b.HasIndex("IdCiudadFK");
-
-                    b.HasIndex(new[] { "IdTipoPersonaFk" }, "persona_tipopersona_FK");
 
                     b.HasIndex(new[] { "Cedula", "Correo", "Telefono" }, "persona_unique")
                         .IsUnique();
@@ -245,6 +165,11 @@ namespace Persistencia.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<string>("Categoria")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("longtext")
+                        .HasComment("Categoria de los productos en la factura");
+
                     b.Property<int>("CodigoBarras")
                         .HasColumnType("int")
                         .HasComment("Codigo de barras del producto");
@@ -253,11 +178,6 @@ namespace Persistencia.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasComment("Descripcion del producto");
-
-                    b.Property<int>("IdCategoriaFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdCategoriaFK")
-                        .HasComment("Identificador de puenteo con la tabla Categoria");
 
                     b.Property<string>("Marca")
                         .HasMaxLength(25)
@@ -288,8 +208,6 @@ namespace Persistencia.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
-
-                    b.HasIndex(new[] { "IdCategoriaFk" }, "producto_categoria_FK");
 
                     b.ToTable("Producto", (string)null);
                 });
@@ -356,41 +274,6 @@ namespace Persistencia.Data.Migrations
                     b.ToTable("Rol", (string)null);
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.TipoPago", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasComment("Identificador de tipo de pago");
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasComment("Descripcion del tipo de pago");
-
-                    b.HasKey("Id")
-                        .HasName("PRIMARY");
-
-                    b.ToTable("TipoPago", (string)null);
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.TipoPersona", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasComment("Identificador de tipo de persona");
-
-                    b.Property<string>("Nombre")
-                        .HasMaxLength(25)
-                        .HasColumnType("varchar(25)")
-                        .HasComment("Nombre del tipo de persona");
-
-                    b.HasKey("Id")
-                        .HasName("PRIMARY");
-
-                    b.ToTable("TipoPersona", (string)null);
-                });
-
             modelBuilder.Entity("Dominio.Entidades.User", b =>
                 {
                     b.Property<int>("Id")
@@ -429,26 +312,8 @@ namespace Persistencia.Data.Migrations
                     b.ToTable("user_rol", (string)null);
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.Ciudad", b =>
-                {
-                    b.HasOne("Dominio.Entidades.Departamento", "Departamento")
-                        .WithMany("Ciudades")
-                        .HasForeignKey("IdDepartamentoFK")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Departamento");
-                });
-
             modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
                 {
-                    b.HasOne("Dominio.Entidades.Persona", "IdEmpleadoFkNavigation")
-                        .WithMany("FacturaCompras")
-                        .HasForeignKey("IdEmpleadoFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("facturacompra_persona_FK");
-
                     b.HasOne("Dominio.Entidades.Producto", "IdProductoFkNavigation")
                         .WithMany("FacturaCompras")
                         .HasForeignKey("IdProductoFk")
@@ -463,20 +328,9 @@ namespace Persistencia.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("facturacompra_proveedor_FK");
 
-                    b.HasOne("Dominio.Entidades.TipoPago", "IdTipoPagoFkNavigation")
-                        .WithMany("FacturaCompras")
-                        .HasForeignKey("IdTipoPagoFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("facturacompra_tipopago_FK");
-
-                    b.Navigation("IdEmpleadoFkNavigation");
-
                     b.Navigation("IdProductoFkNavigation");
 
                     b.Navigation("IdProveedorFkNavigation");
-
-                    b.Navigation("IdTipoPagoFkNavigation");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.FacturaVenta", b =>
@@ -495,50 +349,9 @@ namespace Persistencia.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("facturaventa_producto_FK");
 
-                    b.HasOne("Dominio.Entidades.TipoPago", "IdTipoPagoFkNavigation")
-                        .WithMany("FacturaVentas")
-                        .HasForeignKey("IdTipoPagoFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("facturaventa_tipopago_FK");
-
                     b.Navigation("IdEmpleadoFkNavigation");
 
                     b.Navigation("IdProductoFkNavigation");
-
-                    b.Navigation("IdTipoPagoFkNavigation");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Persona", b =>
-                {
-                    b.HasOne("Dominio.Entidades.Ciudad", "Ciudad")
-                        .WithMany("Personas")
-                        .HasForeignKey("IdCiudadFK")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dominio.Entidades.TipoPersona", "IdTipoPersonaFkNavigation")
-                        .WithMany("Personas")
-                        .HasForeignKey("IdTipoPersonaFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("persona_tipopersona_FK");
-
-                    b.Navigation("Ciudad");
-
-                    b.Navigation("IdTipoPersonaFkNavigation");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Producto", b =>
-                {
-                    b.HasOne("Dominio.Entidades.Categoria", "IdCategoriaFkNavigation")
-                        .WithMany("Productos")
-                        .HasForeignKey("IdCategoriaFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("producto_categoria_FK");
-
-                    b.Navigation("IdCategoriaFkNavigation");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.RefreshToken", b =>
@@ -571,25 +384,8 @@ namespace Persistencia.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.Categoria", b =>
-                {
-                    b.Navigation("Productos");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Ciudad", b =>
-                {
-                    b.Navigation("Personas");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Departamento", b =>
-                {
-                    b.Navigation("Ciudades");
-                });
-
             modelBuilder.Entity("Dominio.Entidades.Persona", b =>
                 {
-                    b.Navigation("FacturaCompras");
-
                     b.Navigation("FacturaVentas");
                 });
 
@@ -608,18 +404,6 @@ namespace Persistencia.Data.Migrations
             modelBuilder.Entity("Dominio.Entidades.Rol", b =>
                 {
                     b.Navigation("UserRols");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.TipoPago", b =>
-                {
-                    b.Navigation("FacturaCompras");
-
-                    b.Navigation("FacturaVentas");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.TipoPersona", b =>
-                {
-                    b.Navigation("Personas");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.User", b =>

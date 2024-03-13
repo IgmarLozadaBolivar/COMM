@@ -11,7 +11,7 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
 
         builder.ToTable("FacturaCompra");
 
-        builder.HasIndex(e => e.IdEmpleadoFk, "facturacompra_persona_FK");
+        
 
         builder.HasIndex(e => e.IdProductoFk, "facturacompra_producto_FK");
 
@@ -23,9 +23,7 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
         builder.Property(e => e.FechaCompra)
             .HasComment("Fecha de la compra")
             .HasColumnType("datetime");
-        builder.Property(e => e.IdEmpleadoFk)
-            .HasComment("Identificador puenteo con la tabla de Empleado (Persona)")
-            .HasColumnName("IdEmpleadoFK");
+        
         builder.Property(e => e.IdProductoFk)
             .HasComment("Identificador de puenteo con la tabla de Producto")
             .HasColumnName("IdProductoFK");
@@ -36,9 +34,11 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
             .HasPrecision(10, 2)
             .HasComment("Precio total de los productos en la factura");
 
-        builder.HasOne(d => d.IdEmpleadoFkNavigation).WithMany(p => p.FacturaCompras)
-            .HasForeignKey(d => d.IdEmpleadoFk)
-            .HasConstraintName("facturacompra_persona_FK");
+        builder.Property(e => e.TipoPago)
+            .HasPrecision(10, 2)
+            .HasComment("TipoPago de los productos en la factura");
+
+       
 
         builder.HasOne(d => d.IdProductoFkNavigation).WithMany(p => p.FacturaCompras)
             .HasForeignKey(d => d.IdProductoFk)

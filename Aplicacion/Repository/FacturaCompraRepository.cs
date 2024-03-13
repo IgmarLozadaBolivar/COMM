@@ -16,7 +16,7 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
     public override async Task<IEnumerable<FacturaCompra>> GetAllAsync()
     {
         return await _context.FacturaCompras
-            .Include(p => p.IdEmpleadoFkNavigation)
+           
             .Include(p => p.IdProductoFkNavigation)
             .Include(p => p.IdProveedorFkNavigation)
             .ToListAsync();
@@ -25,7 +25,7 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
     public override async Task<FacturaCompra> GetByIdAsync(string id)
     {
         return await _context.FacturaCompras
-            .Include(p => p.IdEmpleadoFkNavigation)
+     
             .Include(p => p.IdProductoFkNavigation)
             .Include(p => p.IdProveedorFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
@@ -44,11 +44,11 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
           
             FechaCompra = factura.FechaCompra,
             IdProveedorFkNavigation = factura.IdProveedorFkNavigation,
-            IdEmpleadoFkNavigation = factura.IdEmpleadoFkNavigation,
             IdProductoFkNavigation = factura.IdProductoFkNavigation,
             CantidadxProducto = factura.CantidadxProducto,
             CantidadTotal = factura.CantidadTotal,
-            PrecioTotal = factura.PrecioTotal
+            PrecioTotal = factura.PrecioTotal,
+          
         })
         .ToListAsync();
     return factura;

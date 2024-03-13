@@ -5,7 +5,7 @@ public interface IUnitOfWork
     IUser Users { get; }
     IRol Roles { get; }
 
-    ICategoria Categorias { get; }
+   
     IFacturaCompra FacturaCompras { get; }
     IFacturaVenta FacturaVentas { get; }
     IPersona Personas { get; }

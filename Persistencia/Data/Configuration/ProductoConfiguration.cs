@@ -11,15 +11,15 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
 
         builder.ToTable("Producto");
 
-        builder.HasIndex(e => e.IdCategoriaFk, "producto_categoria_FK");
+       
 
         builder.Property(e => e.CodigoBarras).HasComment("Codigo de barras del producto");
         builder.Property(e => e.Descripcion)
             .HasMaxLength(100)
             .HasComment("Descripcion del producto");
-        builder.Property(e => e.IdCategoriaFk)
-            .HasComment("Identificador de puenteo con la tabla Categoria")
-            .HasColumnName("IdCategoriaFK");
+        builder.Property(e => e.Categoria)
+            .HasPrecision(10, 2)
+            .HasComment("Categoria de los productos en la factura");
         builder.Property(e => e.Marca)
             .HasMaxLength(25)
             .HasComment("Nombre de la marca del producto");
@@ -35,8 +35,6 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
         builder.Property(e => e.TotalExistencias).HasComment("Cantidad o existencia total por producto");
         builder.Property(e => e.UsoClinico).HasColumnType("enum('SI','NO')");
 
-        builder.HasOne(d => d.IdCategoriaFkNavigation).WithMany(p => p.Productos)
-            .HasForeignKey(d => d.IdCategoriaFk)
-            .HasConstraintName("producto_categoria_FK");
+        
     }
 }

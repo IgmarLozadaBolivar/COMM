@@ -30,7 +30,10 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
         builder.Property(e => e.PrecioTotal)
             .HasPrecision(10, 2)
             .HasComment("Precio total de la venta");
-
+    
+        builder.Property(e => e.TipoPago)
+            .HasPrecision(10, 2)
+            .HasComment("TipoPago de los productos en la factura");
         builder.HasOne(d => d.IdEmpleadoFkNavigation).WithMany(p => p.FacturaVentas)
             .HasForeignKey(d => d.IdEmpleadoFk)
             .HasConstraintName("facturaventa_persona_FK");

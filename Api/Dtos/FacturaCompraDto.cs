@@ -7,8 +7,9 @@ public class FacturaCompraDto
     public int CantidadxProducto { get; set; }
     public int CantidadTotal { get; set; }
     public decimal PrecioTotal { get; set; }
+    
     public ProveedorDto Proveedor { get; set; }
     public ProductoDto Producto { get; set; }
-    public PersonaDto Empleado { get; set; }
+    
 
 }

@@ -9,7 +9,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private UserRepository _usuarios;
     private RolRepository _roles;
     
-    private CategoriaRepository _categorias;
+   
     private FacturaCompraRepository _facturaCompras;
     private FacturaVentaRepository _facturaVentas;
     private PersonaRepository _personas;
@@ -45,17 +45,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         }
     }
 
-    public ICategoria Categorias
-    {
-        get
-        {
-            if (_categorias == null)
-            {
-                _categorias = new CategoriaRepository(context);
-            }
-            return _categorias;
-        }
-    }
+    
 
     public IFacturaCompra FacturaCompras
     {

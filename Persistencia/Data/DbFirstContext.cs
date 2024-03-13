@@ -12,7 +12,7 @@ public partial class DbFirstContext : DbContext
 
     public DbSet<UserRol> UserRols { get; set; }
 
-    public DbSet<Categoria> Categorias { get; set; }
+    
     public DbSet<FacturaCompra> FacturaCompras { get; set; }
     public DbSet<FacturaVenta> FacturaVentas { get; set; }
     public DbSet<Persona> Personas { get; set; }
