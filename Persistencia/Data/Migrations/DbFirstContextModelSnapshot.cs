@@ -84,9 +84,10 @@ namespace Persistencia.Data.Migrations
                         .HasComment("Identificador de puenteo con la tabla de Empleado (Persona)");
 
                     b.Property<int>("IdProductoFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdProductoFK")
-                        .HasComment("Identificador de puenteo con la tabla de Producto");
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdProductoFkNavigationId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Iva")
                         .HasColumnType("int")
@@ -103,6 +104,8 @@ namespace Persistencia.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
+
+                    b.HasIndex("IdProductoFkNavigationId");
 
                     b.HasIndex(new[] { "IdEmpleadoFk" }, "facturaventa_persona_FK");
 
@@ -172,7 +175,7 @@ namespace Persistencia.Data.Migrations
 
                     b.Property<int>("IdFacturaCompraFk")
                         .HasColumnType("int")
-                        .HasColumnName("IdProductoFK")
+                        .HasColumnName("IdFacturaCompraFk")
                         .HasComment("Identificador de puenteo con la tabla de Producto");
 
                     b.Property<string>("Marca")
@@ -333,10 +336,7 @@ namespace Persistencia.Data.Migrations
 
                     b.HasOne("Dominio.Entidades.Producto", "IdProductoFkNavigation")
                         .WithMany("FacturaVentas")
-                        .HasForeignKey("IdProductoFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("facturaventa_producto_FK");
+                        .HasForeignKey("IdProductoFkNavigationId");
 
                     b.Navigation("IdEmpleadoFkNavigation");
 

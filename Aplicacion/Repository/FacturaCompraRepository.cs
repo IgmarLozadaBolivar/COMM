@@ -16,8 +16,6 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
     public override async Task<IEnumerable<FacturaCompra>> GetAllAsync()
     {
         return await _context.FacturaCompras
-           
-            
             .Include(p => p.IdProveedorFkNavigation)
             .ToListAsync();
     }

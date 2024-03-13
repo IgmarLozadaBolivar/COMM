@@ -48,7 +48,7 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
 
         builder.Property(e => e.IdFacturaCompraFk)
             .HasComment("Identificador de puenteo con la tabla de Producto")
-            .HasColumnName("IdProductoFK");
+            .HasColumnName("IdFacturaCompraFk");
 
          builder.HasOne(d => d.IdFacturaCompraFkNavigation).WithMany(p => p.Productos)
             .HasForeignKey(d => d.IdFacturaCompraFk)

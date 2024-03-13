@@ -190,14 +190,14 @@ namespace Persistencia.Data.Migrations
                     TotalExistencias = table.Column<int>(type: "int", nullable: false, comment: "Cantidad o existencia total por producto"),
                     Categoria = table.Column<string>(type: "longtext", precision: 10, scale: 2, nullable: true, comment: "Categoría de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdProductoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Producto")
+                    IdFacturaCompraFk = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Producto")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PRIMARY", x => x.Id);
                     table.ForeignKey(
                         name: "facturacompra_producto_FK",
-                        column: x => x.IdProductoFK,
+                        column: x => x.IdFacturaCompraFk,
                         principalTable: "FacturaCompra",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -213,26 +213,26 @@ namespace Persistencia.Data.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     FechaVenta = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Fecha de la venta"),
                     IdEmpleadoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Empleado (Persona)"),
-                    IdProductoFK = table.Column<int>(type: "int", nullable: false, comment: "Identificador de puenteo con la tabla de Producto"),
+                    IdProductoFk = table.Column<int>(type: "int", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false, comment: "Cantidad de productos"),
                     Iva = table.Column<int>(type: "int", nullable: false, comment: "IVA o comisión por compra, establecido por el gobierno"),
                     PrecioTotal = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, comment: "Precio total de la venta"),
                     TipoPago = table.Column<string>(type: "longtext", nullable: true, comment: "Tipo de pago de los productos en la factura", collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdProductoFkNavigationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PRIMARY", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_FacturaVenta_Producto_IdProductoFkNavigationId",
+                        column: x => x.IdProductoFkNavigationId,
+                        principalTable: "Producto",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "facturaventa_persona_FK",
                         column: x => x.IdEmpleadoFK,
                         principalTable: "Persona",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "facturaventa_producto_FK",
-                        column: x => x.IdProductoFK,
-                        principalTable: "Producto",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -252,7 +252,12 @@ namespace Persistencia.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "facturaventa_producto_FK",
                 table: "FacturaVenta",
-                column: "IdProductoFK");
+                column: "IdProductoFk");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FacturaVenta_IdProductoFkNavigationId",
+                table: "FacturaVenta",
+                column: "IdProductoFkNavigationId");
 
             migrationBuilder.CreateIndex(
                 name: "persona_unique",
@@ -263,7 +268,7 @@ namespace Persistencia.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "facturacompra_producto_FK",
                 table: "Producto",
-                column: "IdProductoFK");
+                column: "IdFacturaCompraFk");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_IdUserFK",
@@ -289,10 +294,10 @@ namespace Persistencia.Data.Migrations
                 name: "user_rol");
 
             migrationBuilder.DropTable(
-                name: "Persona");
+                name: "Producto");
 
             migrationBuilder.DropTable(
-                name: "Producto");
+                name: "Persona");
 
             migrationBuilder.DropTable(
                 name: "Rol");

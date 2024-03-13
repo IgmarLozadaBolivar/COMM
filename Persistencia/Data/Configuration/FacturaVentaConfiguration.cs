@@ -29,9 +29,7 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
             .HasComment("Identificador de puenteo con la tabla de Empleado (Persona)")
             .HasColumnName("IdEmpleadoFK");
 
-        builder.Property(e => e.IdProductoFk)
-            .HasComment("Identificador de puenteo con la tabla de Producto")
-            .HasColumnName("IdProductoFK");
+       
 
         builder.Property(e => e.Iva)
             .HasComment("IVA o comisión por compra, establecido por el gobierno");
@@ -47,8 +45,5 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
             .HasForeignKey(d => d.IdEmpleadoFk)
             .HasConstraintName("facturaventa_persona_FK");
 
-        builder.HasOne(d => d.IdProductoFkNavigation).WithMany(p => p.FacturaVentas)
-            .HasForeignKey(d => d.IdProductoFk)
-            .HasConstraintName("facturaventa_producto_FK");
     }
 }

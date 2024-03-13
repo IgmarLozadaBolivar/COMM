@@ -16,6 +16,8 @@ public class ProductoRepository : GenericRepository<Producto>, IProducto
     public override async Task<IEnumerable<Producto>> GetAllAsync()
     {
         return await _context.Productos
+            .Include(p => p.IdFacturaCompraFkNavigation)
+            .Include(p => p.FacturaVentas)
             .ToListAsync();
     }
 
