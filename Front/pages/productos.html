@@ -7,6 +7,7 @@
     <title>COMM: Productos</title>
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -124,6 +125,164 @@
             });
         });
 
+        async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoUsoClinico, nuevoCódigoBarra, nuevaMarca, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria) {
+            const urlEditar = `http://localhost:5033/Api/Producto/${id}`;
+
+            const productoActual = await obtenerProducto(id);
+
+            const data = {
+                id: id,
+                nombre: nuevoNombre !== '' ? nuevoNombre : productoActual.nombre,
+                apellidos: nuevoPrecio !== '' ? nuevoPrecio : productoActual.precio,
+                cedula: nuevoUsoClinico !== '' ? nuevoUsoClinico : productoActual.usoClinico,
+                correo: nuevoCódigoBarra !== '' ? nuevoCódigoBarra : productoActual.codigoBarras,
+                marca: nuevaMarca !== '' ? nuevaMarca : productoActual.marca,
+                descripcion: nuevaDescripcion !== '' ? nuevaDescripcion : productoActual.descripcion,
+                presentacion: nuevaPresentacion !== '' ? nuevaPresentacion : productoActual.presentacion,
+                totalExistencias: nuevoTotalExistencias !== '' ? nuevoTotalExistencias : productoActual.totalExistencias,
+                categoria: nuevaCategoria !== '' ? nuevaCategoria : productoActual.categoria
+            };
+
+            const headers = new Headers({ 'Content-Type': 'application/json' });
+            const config = {
+                method: 'PUT',
+                headers: headers,
+                body: JSON.stringify(data)
+            };
+
+            try {
+                const response = await fetch(urlEditar, config);
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: '¡Felicidades!',
+                        text: 'Se ha editado el producto correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    obtenerProductos();
+                } else {
+                    console.error('Error al editar el producto:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
+        function mostrarFormularioEdicion(id) {
+            Swal.fire({
+                title: 'Cargando formulario de edición',
+                text: 'Por favor espere mientras se carga el formulario de edición...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
+
+            setTimeout(function () {
+                Swal.close();
+
+                Swal.fire({
+                    title: 'Editar producto',
+                    html: `
+                        <div class="form-grid">
+                            <div class="input-container-2">
+                                <label for="inputID" class="label-style">(Solo lectura)</label>
+                                <input type="text" value="${id}" id="inputID" class="input-style" readonly>
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoNombre" class="label-style">Nombre del producto:</label>
+                                <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevo nombre del producto">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoPrecio" class="label-style">Precio del producto:</label>
+                                <input type="number" min="0" step="0.01" id="inputNuevoPrecio" class="input-style" placeholder="Nuevo precio del producto">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoUsoClinico" class="label-style">Uso clínico:</label>
+                                <input type="text" id="inputNuevoUsoClinico" class="input-style" placeholder="Nuevo uso clínico">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoCódigoBarra" class="label-style">Código de barra:</label>
+                                <input type="number" inputmode="numeric" id="inputNuevoCódigoBarra" class="input-style" placeholder="Nuevo código de barra">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevaMarca" class="label-style">Marca del producto:</label>
+                                <input type="text" id="inputNuevaMarca" class="input-style" placeholder="Nueva marca del producto">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevaDescripcion" class="label-style">Descripción del producto:</label>
+                                <input type="text" id="inputNuevaDescripcion" class="input-style" placeholder="Nueva descripción del producto">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevaPresentacion" class="label-style">Presentación del producto:</label>
+                                <input type="text" id="inputNuevaPresentacion" class="input-style" placeholder="Nueva presentación del producto">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevoTotalExistencias" class="label-style">Total de existencias:</label>
+                                <input type="number" id="inputNuevoTotalExistencias" class="input-style" min="0" placeholder="Nuevo total de existencias del producto">
+                            </div>
+                            <div class="input-container-2">
+                                <label for="inputNuevaCategoria" class="label-style">Categoría del producto:</label>
+                                <input type="text" id="inputNuevaCategoria" class="input-style" placeholder="Nueva categoría del producto">
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        const productoId = document.getElementById('inputID').value;
+                        const nuevoNombre = document.getElementById('inputNuevoNombre').value;
+                        const nuevoPrecio = document.getElementById('inputNuevoPrecio').value;
+                        const nuevoUsoClinico = document.getElementById('inputNuevoUsoClinico').value;
+                        const nuevoCódigoBarra = document.getElementById('inputNuevoCódigoBarra').value;
+                        const nuevaMarca = document.getElementById('inputNuevaMarca').value;
+                        const nuevaDescripcion = document.getElementById('inputNuevaDescripcion').value;
+                        const nuevaPresentacion = document.getElementById('inputNuevaPresentacion').value;
+                        const nuevoTotalExistencias = document.getElementById('inputNuevoTotalExistencias').value;
+                        const nuevaCategoria = document.getElementById('inputNuevaCategoria').value;
+                        editarProducto(productoId, nuevoNombre, nuevoPrecio, nuevoUsoClinico, nuevoCódigoBarra, nuevaMarca, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria);
+                    }
+                });
+            }, 2000);
+        }
+
+        async function eliminarProducto(id) {
+            const urlEliminar = `http://localhost:5033/Api/Producto/${id}`;
+            const config = {
+                method: 'DELETE'
+            };
+
+            try {
+                const response = await fetch(urlEliminar, config);
+
+                if (response.ok) {
+                    obtenerProductos();
+                    console.log('Producto eliminado exitosamente.');
+                } else {
+                    console.error('Error al eliminar el producto:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
+        async function obtenerProducto(id) {
+            const urlProducto = `http://localhost:5033/Api/Producto/${id}`;
+            try {
+                const response = await fetch(urlProducto);
+                if (response.ok) {
+                    const producto = await response.json();
+                    return producto;
+                } else {
+                    throw new Error('Error al obtener datos del producto');
+                }
+            } catch (error) {
+                console.error('Error al obtener datos del producto:', error);
+            }
+        }
+
         function obtenerProductos() {
             fetch('http://localhost:5033/Api/Producto')
                 .then(response => response.json())
@@ -148,8 +307,9 @@
                                 <ion-icon name="search-outline"></ion-icon>
                             </button>
                             <div class="btns-more-actions" style="display:none;">
-                                <button class="btn-edit"><ion-icon name="build-outline"></ion-icon></button>
-                                <button class="btn-remove"><ion-icon name="trash-outline"></ion-icon></button>
+                                <button class="btn-edit" data-id="${producto.id}"><ion-icon name="build-outline"></ion-icon></button>
+                                <button class="btn-remove" data-id="${producto.id}"><ion-icon name="trash-outline"></ion-icon></button>
+                                <button class="btn-regresar"><ion-icon name="log-out-outline"></ion-icon></button>
                             </div>
                         </div>
                     </td>
@@ -165,6 +325,38 @@
                             } else {
                                 btnsMoreActions.style.display = 'none';
                             }
+                        });
+
+                        const btnsEditar = tableRow.querySelectorAll('.btn-edit');
+
+                        btnsEditar.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const productoId = this.getAttribute('data-id');
+                                mostrarFormularioEdicion(productoId);
+                            });
+                        });
+
+                        const btnsEliminar = document.querySelectorAll('.btn-remove');
+
+                        btnsEliminar.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const productoId = this.getAttribute('data-id');
+
+                                const confirmacion = confirm('¿Estás seguro de que deseas eliminar este producto?');
+
+                                if (confirmacion) {
+                                    eliminarProducto(productoId);
+                                }
+                            });
+                        });
+
+                        const regresarFormularioBtn = tableRow.querySelector('.btn-regresar');
+                        regresarFormularioBtn.addEventListener('click', function () {
+                            const formBox = document.querySelector('.form-box');
+                            const listBox = document.querySelector('.list-box-4');
+
+                            formBox.style.display = 'block';
+                            listBox.style.display = 'none';
                         });
                     });
                 })
