@@ -75,7 +75,6 @@
         </div>
     </nav>
     <section class="home">
-        <div class="text">Facturacion de compras!</div>
         <div class="form-box-2">
             <div class="form-box">
                 <div class="form-value">
@@ -84,7 +83,6 @@
                         <p style="font-size: 20px;">Datos del proveedor</p>
                         <div class="input-box-only">
                             <div class="inputbox">
-                                <ion-icon name="person-outline"></ion-icon>
                                 <select id="proveedor" required>
                                     <option value="" disabled selected>Seleccione el proveedor</option>
                                 </select>
@@ -96,13 +94,13 @@
                             <div class="inputbox">
                                 <ion-icon name="person-outline"></ion-icon>
                                 <input type="text" id="names" name="names" required />
-                                <label for="">Nombre</label>
+                                <label for="names">Nombre</label>
                             </div>
                             <div class="inputbox">
                                 <ion-icon name="cash-outline"></ion-icon>
                                 <input type="number" class="no-arrows" id="price_number" name="price_number" min="0"
                                     step="0.01" required />
-                                <label for="">Precio</label>
+                                <label for="price_number">Precio</label>
                             </div>
                             <div class="inputbox">
                                 <select class="form-select" id="usoclinico">
@@ -115,36 +113,33 @@
                         <div class="inputsboxs-2">
                             <div class="inputbox">
                                 <ion-icon name="barcode-outline"></ion-icon>
-                                <input id="barcode" type="text" required>
-                                <label for="">Codigo de barra</label>
+                                <input id="barcode" type="text" class="no-arrows" required>
+                                <label for="barcode">Codigo de barra</label>
                             </div>
                             <div class="inputbox">
                                 <ion-icon name="shield-checkmark-outline"></ion-icon>
                                 <input id="brand" type="text" required>
-                                <label for="">Marca</label>
+                                <label for="brand">Marca</label>
                             </div>
                             <div class="inputbox">
                                 <ion-icon name="brush-outline"></ion-icon>
                                 <input id="presentation" type="text" required>
-                                <label for="">Presentación</label>
+                                <label for="presentation">Presentación</label>
                             </div>
                         </div>
                         <div class="input-box-only">
                             <div class="inputbox">
                                 <ion-icon name="text-outline"></ion-icon>
                                 <input id="description" type="text" required>
-                                <label for="">Descripción</label>
+                                <label for="description">Descripción</label>
                             </div>
                         </div>
-
-
-                        
                         <p style="font-size: 20px;">Datos de la compra</p>
                         <div class="inputsboxs">
                             <div class="inputbox">
-                                <ion-icon name="person-outline"></ion-icon>
-                                <input type="date" id="fechaCompra" name="fechaCompra" required />
-                                <label for="">Fecha de compra</label>
+                                <ion-icon name="calendar-outline"></ion-icon>
+                                <input type="text" id="fechaCompra" name="fechaCompra" required />
+                                <label for="fechaCompra">Fecha de compra</label>
                             </div>
                             <div class="inputbox">
                                 <select class="form-select" id="tipoPago">
@@ -154,21 +149,19 @@
                                 </select>
                             </div>
                             <div class="inputbox">
-                                <ion-icon name="person-outline"></ion-icon>
-                                <input id="cantidadProducto" type="number" required>
-                                <label for="">Cantidad del producto</label>
+                                <input id="cantidadProducto" type="number" min="0" required>
+                                <label for="cantidadProducto">Cantidad del producto</label>
                             </div>
                         </div>
                         <div class="inputsboxs-2">
                             <div class="inputbox">
-                                <ion-icon name="barcode-outline"></ion-icon>
-                                <input id="cantidadTotal" type="number" required>
-                                <label for="">Cantidad total<label>
+                                <input id="cantidadTotal" type="number" min="0" required>
+                                <label for="cantidadTotal">Cantidad total<label>
                             </div>
                             <div class="inputbox">
                                 <ion-icon name="shield-checkmark-outline"></ion-icon>
-                                <input id="total" type="number" required>
-                                <label for="">Precio Total</label>
+                                <input id="total" type="number" class="no-arrows" required>
+                                <label for="total">Total</label>
                             </div>
                         </div>
                         <div class="btns">
@@ -191,7 +184,6 @@
             sidebar.classList.toggle("close");
         });
 
-        //Funcion para traer proveedores
         function traerProveedores() {
             fetch('http://localhost:5033/Api/Proveedor')
                 .then(response => response.json())
@@ -239,14 +231,14 @@
                 let inputTotal = document.getElementById('total').value;
 
                 if (nuevoIDFacturaCompra !== null) {
-                    
+
                     let data = {
-                        'idFacturaCompra' : nuevoIDFacturaCompra,
-                        'fechaCompra' : inputFechaCompra,
-                        'tipoPago' : inputTipoPago,
-                        'cantidadProducto' : inputCantidadProducto,
-                        'cantidadTotal' : inputCantidadTotal,
-                        'idProveedor' : proveedor.id
+                        'idFacturaCompra': nuevoIDFacturaCompra,
+                        'fechaCompra': inputFechaCompra,
+                        'tipoPago': inputTipoPago,
+                        'cantidadProducto': inputCantidadProducto,
+                        'cantidadTotal': inputCantidadTotal,
+                        'idProveedor': proveedor.id
 
                     };
 
@@ -269,7 +261,7 @@
 
         async function registrarProducto() {
             try {
-                
+
                 let inputNombre = document.getElementById('names').value;
                 let inputPrecio = document.getElementById('price_number').value;
                 let inputUsoClinico = document.getElementById('usoclinico').value;
@@ -278,13 +270,13 @@
                 let inputPresentacion = document.getElementById('presentation').value;
                 let inputDescripcion = document.getElementById('description').value;
 
-                
+
                 if (idFacturaCompra === undefined) {
                     console.error('No se ha creado la factura de compra.');
                     return;
                 }
 
-              
+
                 const nuevoIDProducto = await generarIDProducto();
 
                 if (nuevoIDProducto !== null) {
@@ -295,12 +287,12 @@
                         'precio': inputPrecio,
                         'usoClinico': inputUsoClinico,
                         'barCode': inputBarCode,
-                        'marca': inputMarca, 
+                        'marca': inputMarca,
                         'descripcion': inputDescripcion,
-                        'idFacturaCompraFk': idFacturaCompra 
+                        'idFacturaCompraFk': idFacturaCompra
                     };
 
-                    
+
                     const response = await fetch('http://localhost:5033/Api/Producto', {
                         method: 'POST',
                         headers: {
@@ -311,7 +303,7 @@
 
                     if (response.ok) {
                         console.log('Producto registrado exitosamente en la factura de compra.');
-                        
+
                     } else {
                         console.error('Error al registrar el producto en la factura de compra.');
                     }
@@ -323,7 +315,7 @@
             }
         }
 
-       
+
         registrarFacturaCompra();
 
     </script>
