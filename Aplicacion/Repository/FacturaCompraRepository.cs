@@ -17,7 +17,7 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
     {
         return await _context.FacturaCompras
            
-            .Include(p => p.IdProductoFkNavigation)
+            
             .Include(p => p.IdProveedorFkNavigation)
             .ToListAsync();
     }
@@ -26,7 +26,7 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
     {
         return await _context.FacturaCompras
      
-            .Include(p => p.IdProductoFkNavigation)
+            
             .Include(p => p.IdProveedorFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
     }
@@ -44,7 +44,6 @@ public class FacturaCompraRepository : GenericRepository<FacturaCompra>, IFactur
           
             FechaCompra = factura.FechaCompra,
             IdProveedorFkNavigation = factura.IdProveedorFkNavigation,
-            IdProductoFkNavigation = factura.IdProductoFkNavigation,
             CantidadxProducto = factura.CantidadxProducto,
             CantidadTotal = factura.CantidadTotal,
             PrecioTotal = factura.PrecioTotal,

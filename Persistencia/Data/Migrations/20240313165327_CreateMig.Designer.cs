@@ -11,7 +11,7 @@ using Persistencia.Data;
 namespace Persistencia.Data.Migrations
 {
     [DbContext(typeof(DbFirstContext))]
-    [Migration("20240313022932_CreateMig")]
+    [Migration("20240313165327_CreateMig")]
     partial class CreateMig
     {
         /// <inheritdoc />
@@ -44,11 +44,6 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("datetime")
                         .HasComment("Fecha de la compra");
 
-                    b.Property<int>("IdProductoFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdProductoFK")
-                        .HasComment("Identificador de puenteo con la tabla de Producto");
-
                     b.Property<int>("IdProveedorFk")
                         .HasColumnType("int")
                         .HasColumnName("IdProveedorFK")
@@ -60,14 +55,11 @@ namespace Persistencia.Data.Migrations
                         .HasComment("Precio total de los productos en la factura");
 
                     b.Property<string>("TipoPago")
-                        .HasPrecision(10, 2)
                         .HasColumnType("longtext")
-                        .HasComment("TipoPago de los productos en la factura");
+                        .HasComment("Tipo de pago de los productos en la factura");
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
-
-                    b.HasIndex(new[] { "IdProductoFk" }, "facturacompra_producto_FK");
 
                     b.HasIndex(new[] { "IdProveedorFk" }, "facturacompra_proveedor_FK");
 
@@ -101,7 +93,7 @@ namespace Persistencia.Data.Migrations
 
                     b.Property<int>("Iva")
                         .HasColumnType("int")
-                        .HasComment("IVA o comision por compra, establecido por el gobierno");
+                        .HasComment("IVA o comisión por compra, establecido por el gobierno");
 
                     b.Property<decimal>("PrecioTotal")
                         .HasPrecision(10, 2)
@@ -109,9 +101,8 @@ namespace Persistencia.Data.Migrations
                         .HasComment("Precio total de la venta");
 
                     b.Property<string>("TipoPago")
-                        .HasPrecision(10, 2)
                         .HasColumnType("longtext")
-                        .HasComment("TipoPago de los productos en la factura");
+                        .HasComment("Tipo de pago de los productos en la factura");
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
@@ -137,12 +128,12 @@ namespace Persistencia.Data.Migrations
 
                     b.Property<string>("Cedula")
                         .HasColumnType("varchar(255)")
-                        .HasComment("Numero de identificacion");
+                        .HasComment("Número de identificación");
 
                     b.Property<string>("Correo")
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
-                        .HasComment("Correo electronico de la persona");
+                        .HasComment("Correo electrónico de la persona");
 
                     b.Property<string>("Nombre")
                         .HasMaxLength(25)
@@ -151,7 +142,7 @@ namespace Persistencia.Data.Migrations
 
                     b.Property<string>("Telefono")
                         .HasColumnType("varchar(255)")
-                        .HasComment("Telefono de la persona");
+                        .HasComment("Teléfono de la persona");
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
@@ -171,16 +162,21 @@ namespace Persistencia.Data.Migrations
                     b.Property<string>("Categoria")
                         .HasPrecision(10, 2)
                         .HasColumnType("longtext")
-                        .HasComment("Categoria de los productos en la factura");
+                        .HasComment("Categoría de los productos en la factura");
 
-                    b.Property<int>("CodigoBarras")
-                        .HasColumnType("int")
-                        .HasComment("Codigo de barras del producto");
+                    b.Property<string>("CodigoBarras")
+                        .HasColumnType("longtext")
+                        .HasComment("Código de barras del producto");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
-                        .HasComment("Descripcion del producto");
+                        .HasComment("Descripción del producto");
+
+                    b.Property<int>("IdFacturaCompraFk")
+                        .HasColumnType("int")
+                        .HasColumnName("IdProductoFK")
+                        .HasComment("Identificador de puenteo con la tabla de Producto");
 
                     b.Property<string>("Marca")
                         .HasMaxLength(25)
@@ -200,7 +196,7 @@ namespace Persistencia.Data.Migrations
                     b.Property<string>("Presentacion")
                         .HasMaxLength(25)
                         .HasColumnType("varchar(25)")
-                        .HasComment("Presentacion del producto, si es que incluye sea desde tallas, tamaños, unidades entre otros.");
+                        .HasComment("Presentación del producto, si es que incluye sea desde tallas, tamaños, unidades entre otros");
 
                     b.Property<int>("TotalExistencias")
                         .HasColumnType("int")
@@ -211,6 +207,8 @@ namespace Persistencia.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "IdFacturaCompraFk" }, "facturacompra_producto_FK");
 
                     b.ToTable("Producto", (string)null);
                 });
@@ -317,21 +315,12 @@ namespace Persistencia.Data.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
                 {
-                    b.HasOne("Dominio.Entidades.Producto", "IdProductoFkNavigation")
-                        .WithMany("FacturaCompras")
-                        .HasForeignKey("IdProductoFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("facturacompra_producto_FK");
-
                     b.HasOne("Dominio.Entidades.Proveedor", "IdProveedorFkNavigation")
                         .WithMany("FacturaCompras")
                         .HasForeignKey("IdProveedorFk")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("facturacompra_proveedor_FK");
-
-                    b.Navigation("IdProductoFkNavigation");
 
                     b.Navigation("IdProveedorFkNavigation");
                 });
@@ -355,6 +344,18 @@ namespace Persistencia.Data.Migrations
                     b.Navigation("IdEmpleadoFkNavigation");
 
                     b.Navigation("IdProductoFkNavigation");
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.Producto", b =>
+                {
+                    b.HasOne("Dominio.Entidades.FacturaCompra", "IdFacturaCompraFkNavigation")
+                        .WithMany("Productos")
+                        .HasForeignKey("IdFacturaCompraFk")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("facturacompra_producto_FK");
+
+                    b.Navigation("IdFacturaCompraFkNavigation");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.RefreshToken", b =>
@@ -387,6 +388,11 @@ namespace Persistencia.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
+                {
+                    b.Navigation("Productos");
+                });
+
             modelBuilder.Entity("Dominio.Entidades.Persona", b =>
                 {
                     b.Navigation("FacturaVentas");
@@ -394,8 +400,6 @@ namespace Persistencia.Data.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.Producto", b =>
                 {
-                    b.Navigation("FacturaCompras");
-
                     b.Navigation("FacturaVentas");
                 });
 
