@@ -13,5 +13,4 @@ public class ProductoDto
     public int TotalExistencias { get; set; }
     public string Categoria {get; set;}
     public FacturaCompraDto FacturaCompraDto {get; set;}
-
 }

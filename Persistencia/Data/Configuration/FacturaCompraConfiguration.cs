@@ -11,24 +11,17 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
 
         builder.ToTable("FacturaCompra");
 
-     
-
         builder.HasIndex(e => e.IdProveedorFk, "facturacompra_proveedor_FK");
 
         builder.Property(e => e.Id)
-        .HasComment("Identificador de la factura de compra");
+            .HasComment("Identificador de la factura de compra");
 
         builder.Property(e => e.CantidadTotal)
             .HasComment("Cantidad total de todos los productos");
 
-        builder.Property(e => e.CantidadxProducto)
-            .HasComment("Cantidad por productos");
-
         builder.Property(e => e.FechaCompra)
             .HasComment("Fecha de la compra")
             .HasColumnType("datetime");
-        
-        
 
         builder.Property(e => e.IdProveedorFk)
             .HasComment("Identificador de puenteo con la tabla de Proveedor")
@@ -39,9 +32,7 @@ public class FacturaCompraConfiguration : IEntityTypeConfiguration<FacturaCompra
             .HasComment("Precio total de los productos en la factura");
 
         builder.Property(e => e.TipoPago)
-            .HasComment("Tipo de pago de los productos en la factura");
-
-        
+            .HasComment("Tipo de pago de los productos en la factura"); 
 
         builder.HasOne(d => d.IdProveedorFkNavigation).WithMany(p => p.FacturaCompras)
             .HasForeignKey(d => d.IdProveedorFk)

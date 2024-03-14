@@ -6,7 +6,6 @@ namespace Aplicacion.Repository;
 
 public class PersonaRepository : GenericRepository<Persona>, IPersona
 {
-
     protected readonly DbFirstContext _context;
 
     public PersonaRepository(DbFirstContext context) : base(context)

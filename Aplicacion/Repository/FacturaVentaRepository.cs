@@ -27,32 +27,29 @@ public class FacturaVentaRepository : GenericRepository<FacturaVenta>, IFacturaV
             .Include(p => p.IdEmpleadoFkNavigation)
             .Include(p => p.IdProductoFkNavigation)
             .FirstOrDefaultAsync(p => p.Id.ToString() == id);
- 
-   }
-
-       public async Task<IEnumerable<FacturaVenta>> MesXFacturaVenta(string FechaVentaStr)
-{
-    //convertir el datetime a fecha
-    if (!DateTime.TryParse(FechaVentaStr, out DateTime FechaVenta))
-    {
-    
-        throw new ArgumentException("Formato de fecha incorrecto. Utilice el formato adecuado.");
     }
 
-    var facturas = await _context.FacturaVentas
-        .Where(factura => factura.FechaVenta.Month == FechaVenta.Month && factura.FechaVenta.Year == FechaVenta.Year)
-        .Select(factura => new FacturaVenta
+    public async Task<IEnumerable<FacturaVenta>> MesXFacturaVenta(string FechaVentaStr)
+    {
+        if (!DateTime.TryParse(FechaVentaStr, out DateTime FechaVenta))
         {
-            FechaVenta = factura.FechaVenta,
-            IdEmpleadoFkNavigation = factura.IdEmpleadoFkNavigation,
-            IdProductoFkNavigation = factura.IdProductoFkNavigation,
-            Cantidad = factura.Cantidad,
-            PrecioTotal = factura.PrecioTotal,
-            Iva = factura.Iva
-        })
-        .ToListAsync();
 
-    return facturas;
-}
+            throw new ArgumentException("Formato de fecha incorrecto. Utilice el formato adecuado.");
+        }
 
+        var facturas = await _context.FacturaVentas
+            .Where(factura => factura.FechaVenta.Month == FechaVenta.Month && factura.FechaVenta.Year == FechaVenta.Year)
+            .Select(factura => new FacturaVenta
+            {
+                FechaVenta = factura.FechaVenta,
+                IdEmpleadoFkNavigation = factura.IdEmpleadoFkNavigation,
+                IdProductoFkNavigation = factura.IdProductoFkNavigation,
+                Cantidad = factura.Cantidad,
+                PrecioTotal = factura.PrecioTotal,
+                Iva = factura.Iva
+            })
+            .ToListAsync();
+
+        return facturas;
+    }
 }
