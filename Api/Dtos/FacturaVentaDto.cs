@@ -7,6 +7,6 @@ public class FacturaVentaDto
     public int Cantidad { get; set; }
     public int Iva { get; set; }
     public decimal PrecioTotal { get; set; }
-    public PersonaDto Empleado { get; set; }
-    public ProductoDto Producto { get; set; }
+    public int IdEmpleadoFk { get; set; }
+    public int IdProductoFk { get; set; }
 }

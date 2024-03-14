@@ -12,5 +12,5 @@ public class ProductoDto
     public string Presentacion { get; set; }
     public int TotalExistencias { get; set; }
     public string Categoria {get; set;}
-    public FacturaCompraDto FacturaCompraDto {get; set;}
+    public int IdFacturaCompraFk {get; set;}
 }

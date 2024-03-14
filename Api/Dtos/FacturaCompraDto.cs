@@ -6,5 +6,5 @@ public class FacturaCompraDto
     public DateTime FechaCompra { get; set; }
     public int CantidadTotal { get; set; }
     public decimal PrecioTotal { get; set; }
-    public ProveedorDto Proveedor { get; set; }
+    public int IdProveedorFk { get; set; }
 }

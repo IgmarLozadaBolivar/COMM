@@ -38,7 +38,7 @@ public class FacturaCompraController : BaseApiController
         }
         return mapper.Map<FacturaCompraDto>(data);
     }
-    
+
     [HttpGet("MesXFacturaCompra")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,6 +57,7 @@ public class FacturaCompraController : BaseApiController
 
         return Ok(facturasDto);
     }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

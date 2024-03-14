@@ -38,7 +38,7 @@ public class FacturaVentaController : BaseApiController
         }
         return mapper.Map<FacturaVentaDto>(data);
     }
- [HttpGet("MesXFacturaVenta")]
+    [HttpGet("MesXFacturaVenta")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

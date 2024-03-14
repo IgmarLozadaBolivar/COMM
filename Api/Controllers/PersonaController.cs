@@ -43,13 +43,14 @@ public class PersonaController : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PersonaDto>> GetNombreAsync(string Nombre)
     {
-       var data = await unitOfwork.Personas.GetNombreAsync(Nombre);
-       if (data == null){
+        var data = await unitOfwork.Personas.GetNombreAsync(Nombre);
+        if (data == null)
+        {
             return NotFound();
         }
-       return mapper.Map<PersonaDto>(data);
+        return mapper.Map<PersonaDto>(data);
     }
-    
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

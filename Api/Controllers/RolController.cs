@@ -47,12 +47,12 @@ public class RolController : BaseApiController
         var data = mapper.Map<Rol>(dataDto);
         unitOfWork.Roles.Add(data);
         await unitOfWork.SaveAsync();
-        if(data == null)
+        if (data == null)
         {
-        return BadRequest();
+            return BadRequest();
         }
         dataDto.Id = data.Id;
-        return CreatedAtAction(nameof(Post), new {id =dataDto.Id}, dataDto);
+        return CreatedAtAction(nameof(Post), new { id = dataDto.Id }, dataDto);
     }
 
     [HttpPut("{id}")]

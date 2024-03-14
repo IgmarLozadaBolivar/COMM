@@ -76,7 +76,7 @@
         </div>
     </nav>
     <section class="home">
-        <!-- <div class="form-box-3">
+        <div class="form-box-3">
             <div class="form-box">
                 <div class="form-value">
                     <form action="">
@@ -89,56 +89,6 @@
                                 </select>
                                 <label for="proveedor"></label>
                             </div>
-                        </div>
-                        <p style="font-size: 20px;">Listado de productos</p>
-                        <div class="inputs-container">
-                            <div class="inputbox">
-                                <ion-icon name="person-outline"></ion-icon>
-                                <input type="text" id="names" name="names" required />
-                                <label for="names">Nombre</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="cash-outline"></ion-icon>
-                                <input type="number" class="no-arrows" id="price_number" name="price_number" min="0"
-                                    step="0.01" required />
-                                <label for="price_number">Precio</label>
-                            </div>
-                            <div class="inputbox">
-                                <select class="form-select" id="usoclinico">
-                                    <option value="text">Uso clínico?</option>
-                                    <option value="yes">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="barcode-outline"></ion-icon>
-                                <input id="barcode" type="text" class="no-arrows" required>
-                                <label for="barcode">Codigo de barra</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="shield-checkmark-outline"></ion-icon>
-                                <input id="brand" type="text" required>
-                                <label for="brand">Marca</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="brush-outline"></ion-icon>
-                                <input id="presentation" type="text" required>
-                                <label for="presentation">Presentación</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="text-outline"></ion-icon>
-                                <input id="description" type="text" required>
-                                <label for="description">Descripción</label>
-                            </div>
-                            <div class="inputbox">
-                                <input id="cantidad" type="text" required>
-                                <label for="cantidad">Cantidad</label>
-                            </div>
-                        </div>
-                        <div class="btns">
-                            <button id="boton-producto">
-                                Agregar producto
-                            </button>
                         </div>
                         <p style="font-size: 20px;">Datos de la compra</p>
                         <div class="inputs-container">
@@ -172,7 +122,7 @@
                     </form>
                 </div>
             </div>
-        </div> -->
+        </div>
     </section>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -184,7 +134,7 @@
             sidebar.classList.toggle("close");
         });
 
-        let productos = [];
+        let proveedorSeleccionadoId = null;
 
         function traerProveedores() {
             fetch('http://localhost:5033/Api/Proveedor')
@@ -205,7 +155,7 @@
 
         Swal.fire({
             title: '¡Bienvenido!',
-            text: '¿Deseas continuar con el formulario?',
+            text: '¿Deseas continuar con la factura?',
             icon: 'info',
             showDenyButton: true,
             showCancelButton: false,
@@ -213,44 +163,72 @@
             denyButtonText: 'No'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('http://localhost:5033/Api/Proveedor')
-                    .then(response => response.json())
-                    .then(data => {
-                        const selectProveedor = document.getElementById('proveedor');
-                        selectProveedor.innerHTML = '<option value="" disabled selected>Seleccione un proveedor</option>';
-                        data.forEach(proveedor => {
-                            const option = document.createElement('option');
-                            option.value = proveedor.id;
-                            option.textContent = proveedor.nombre;
-                            selectProveedor.appendChild(option);
-                        });
+                Swal.fire({
+                    title: 'Cargando formulario de edición',
+                    text: 'Por favor espere mientras se carga el formulario de edición...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
 
-                        Swal.fire({
-                            title: 'Selecciona un proveedor',
-                            html: `
-                        <div style="display: flex; justify-content: center; align-items: center;">
-                            <div class="input-container-2">
-                                <select id="proveedorSeleccionado" required>
-                                    ${selectProveedor.innerHTML}
-                                </select>
+                setTimeout(function () {
+                    Swal.close();
+
+                    fetch('http://localhost:5033/Api/Proveedor')
+                        .then(response => response.json())
+                        .then(data => {
+                            const selectProveedor = document.getElementById('proveedor');
+                            selectProveedor.innerHTML = '<option value="" disabled selected>Seleccione un proveedor</option>';
+                            data.forEach(proveedor => {
+                                const option = document.createElement('option');
+                                option.value = proveedor.id;
+                                option.textContent = proveedor.nombre;
+                                selectProveedor.appendChild(option);
+                            });
+
+                            Swal.fire({
+                                title: 'Selecciona un proveedor',
+                                html: `
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <div class="input-container-2">
+                                    <select class="form-select" id="proveedorSeleccionado" required>
+                                        ${selectProveedor.innerHTML}
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                    `,
-                            showCancelButton: true,
-                            confirmButtonText: 'Confirmar',
-                            cancelButtonText: 'Cancelar',
-                            showLoaderOnConfirm: true,
-                            preConfirm: () => {
-                                const selectProveedor = document.getElementById('proveedorSeleccionado').value;
-                                ContinueForm(selectProveedor);
-                            }
+                        `,
+                                showCancelButton: true,
+                                confirmButtonText: 'Confirmar',
+                                cancelButtonText: 'Cancelar',
+                                showLoaderOnConfirm: true,
+                                allowOutsideClick: () => !Swal.isLoading(),
+                                preConfirm: () => {
+                                    const selectedProvider = document.getElementById('proveedorSeleccionado').value;
+                                    if (!selectedProvider) {
+                                        Swal.showValidationMessage('Por favor selecciona un proveedor');
+                                    } else {
+                                        return selectedProvider;
+                                    }
+                                }
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    ContinueForm(result.value);
+                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                    window.location.href = './facturacion.html';
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Error al obtener la lista de proveedores:', error))
+                        .finally(() => {
+                            Swal.hideLoading();
                         });
-                    })
-                    .catch(error => console.error('Error al obtener la lista de proveedores:', error));
+                }, 2000);
             } else if (result.isDenied) {
                 window.location.href = './facturacion.html';
             }
         });
+
+        let productos = {};
 
         function ContinueForm(selectProveedor) {
             Swal.fire({
@@ -293,6 +271,10 @@
                     <label for="inputCantidad" class="label-style-1">Cantidad:</label>
                     <input type="text" id="inputCantidad" class="input-style-1" placeholder="Cantidad del producto">
                 </div>
+                <div class="input-container-4">
+                    <label for="inputCategoria" class="label-style-1">Categoría:</label>
+                    <input type="text" id="inputCategoria" class="input-style-1" placeholder="Categoría del producto">
+                </div>
             </div>
         `,
                 showCancelButton: true,
@@ -300,23 +282,84 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Guardar los datos del producto en un objeto
                     const producto = {
                         proveedor: selectProveedor,
-                        nombre: document.getElementById('names').value,
-                        precio: document.getElementById('price_number').value,
+                        nombre: document.getElementById('inputNombre').value,
+                        precio: parseFloat(document.getElementById('inputPrecio').value),
                         usoClinico: document.getElementById('usoclinico').value,
-                        codigoBarra: document.getElementById('barcode').value,
-                        marca: document.getElementById('brand').value,
-                        presentacion: document.getElementById('presentation').value,
-                        descripcion: document.getElementById('description').value,
-                        cantidad: document.getElementById('cantidad').value
+                        codigoBarras: document.getElementById('inputBarcode').value,
+                        marca: document.getElementById('inputBrand').value,
+                        descripcion: document.getElementById('inputDescription').value,
+                        presentacion: document.getElementById('inputPresentation').value,
+                        totalExistencias: parseInt(document.getElementById('inputCantidad').value),
+                        categoria: document.getElementById('inputCategoria').value
                     };
-                    // Almacenar el producto en la lista de productos
-                    productos.push(producto);
+                    const nombreProducto = `Producto ${Object.keys(productos).length + 1}`;
+                    productos[nombreProducto] = producto;
 
-                    // Preguntar si desea agregar otro producto
+                    proveedorSeleccionadoId = selectProveedor;
+
                     askToAddAnotherProduct();
+                }
+            });
+        }
+
+        function askToAddAnotherProduct() {
+            Swal.fire({
+                title: '¿Desea agregar otro producto?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                denyButtonText: 'No',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    ContinueForm(proveedorSeleccionadoId);
+                } else if (result.isDenied) {
+                    continueForm2();
+                }
+            });
+        }
+
+        function continueForm2() {
+            let cantidadTotal = 0;
+            let valorTotal = 0;
+            for (const nombreProducto in productos) {
+                cantidadTotal += productos[nombreProducto].totalExistencias;
+                valorTotal += productos[nombreProducto].precio;
+            }
+
+            Swal.fire({
+                title: 'Datos de la compra',
+                html: `
+            <div class="inputs-container-2">
+                <div class="input-container-4">
+                    <label for="inputFecha" class="label-style-1">Fecha:</label>
+                    <input type="date" id="inputFecha" class="input-style-2">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputSelect" class="label-style-1">Escoge una opción:</label>
+                    <select class="form-select-1" id="tipoPago">
+                        <option value="text">Tipo de pago</option>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="transferencia">Transferencia</option>
+                    </select>
+                </div>
+                <div class="input-container-4">
+                    <label for="inputCantidadTotal" class="label-style-1">Cantidad total de los productos:</label>
+                    <input type="number" id="inputCantidadTotal" class="no-arrows input-style-2" readonly value="${cantidadTotal}">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputTotal" class="label-style-1">Precio total de los productos:</label>
+                    <input type="number" id="inputTotal" class="no-arrows input-style-2" readonly value="${valorTotal}">
+                </div>
+            </div>
+        `,
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
                 }
             });
         }
@@ -340,7 +383,9 @@
             }
         }
 
-        async function registrarFacturaCompra() {
+        console.log(productos);
+
+        /* async function registrarFacturaCompra() {
             try {
                 const nuevoIDFacturaCompra = await generarIDFacturaCompra();
                 let inputFechaCompra = document.getElementById('fechaCompra').value;
@@ -431,13 +476,13 @@
                 console.error('Error en el proceso de registro del producto:', error);
             }
         }
-        registrarFacturaCompra();
+        registrarFacturaCompra(); */
 
-        const botonRegister = document.getElementById('boton-producto');
+        /* const botonRegister = document.getElementById('boton-producto');
         botonRegister.addEventListener("click", function (e) {
             e.preventDefault();
             registrarProducto();
-        });
+        }); */
 
     </script>
 </body>
