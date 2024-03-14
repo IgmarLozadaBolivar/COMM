@@ -7,6 +7,7 @@
     <title>COMM: Compras</title>
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -75,7 +76,7 @@
         </div>
     </nav>
     <section class="home">
-        <div class="form-box-2">
+        <!-- <div class="form-box-3">
             <div class="form-box">
                 <div class="form-value">
                     <form action="">
@@ -89,8 +90,8 @@
                                 <label for="proveedor"></label>
                             </div>
                         </div>
-                        <p style="font-size: 20px;">Datos del producto</p>
-                        <div class="inputsboxs">
+                        <p style="font-size: 20px;">Listado de productos</p>
+                        <div class="inputs-container">
                             <div class="inputbox">
                                 <ion-icon name="person-outline"></ion-icon>
                                 <input type="text" id="names" name="names" required />
@@ -109,8 +110,6 @@
                                     <option value="no">No</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="inputsboxs-2">
                             <div class="inputbox">
                                 <ion-icon name="barcode-outline"></ion-icon>
                                 <input id="barcode" type="text" class="no-arrows" required>
@@ -126,16 +125,23 @@
                                 <input id="presentation" type="text" required>
                                 <label for="presentation">Presentación</label>
                             </div>
-                        </div>
-                        <div class="input-box-only">
                             <div class="inputbox">
                                 <ion-icon name="text-outline"></ion-icon>
                                 <input id="description" type="text" required>
                                 <label for="description">Descripción</label>
                             </div>
+                            <div class="inputbox">
+                                <input id="cantidad" type="text" required>
+                                <label for="cantidad">Cantidad</label>
+                            </div>
+                        </div>
+                        <div class="btns">
+                            <button id="boton-producto">
+                                Agregar producto
+                            </button>
                         </div>
                         <p style="font-size: 20px;">Datos de la compra</p>
-                        <div class="inputsboxs">
+                        <div class="inputs-container">
                             <div class="inputbox">
                                 <ion-icon name="calendar-outline"></ion-icon>
                                 <input type="text" id="fechaCompra" name="fechaCompra" required />
@@ -149,12 +155,6 @@
                                 </select>
                             </div>
                             <div class="inputbox">
-                                <input id="cantidadProducto" type="number" min="0" required>
-                                <label for="cantidadProducto">Cantidad del producto</label>
-                            </div>
-                        </div>
-                        <div class="inputsboxs-2">
-                            <div class="inputbox">
                                 <input id="cantidadTotal" type="number" min="0" required>
                                 <label for="cantidadTotal">Cantidad total<label>
                             </div>
@@ -165,14 +165,14 @@
                             </div>
                         </div>
                         <div class="btns">
-                            <button id="boton">
-                                Agregar
+                            <button id="boton-factura">
+                                Generar factura
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
+        </div> -->
     </section>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -183,6 +183,8 @@
         toggle.addEventListener("click", () => {
             sidebar.classList.toggle("close");
         });
+
+        let productos = [];
 
         function traerProveedores() {
             fetch('http://localhost:5033/Api/Proveedor')
@@ -199,8 +201,125 @@
                 })
                 .catch(error => console.error('Error al obtener la lista de proveedores:', error));
         }
-
         traerProveedores();
+
+        Swal.fire({
+            title: '¡Bienvenido!',
+            text: '¿Deseas continuar con el formulario?',
+            icon: 'info',
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: 'Sí',
+            denyButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('http://localhost:5033/Api/Proveedor')
+                    .then(response => response.json())
+                    .then(data => {
+                        const selectProveedor = document.getElementById('proveedor');
+                        selectProveedor.innerHTML = '<option value="" disabled selected>Seleccione un proveedor</option>';
+                        data.forEach(proveedor => {
+                            const option = document.createElement('option');
+                            option.value = proveedor.id;
+                            option.textContent = proveedor.nombre;
+                            selectProveedor.appendChild(option);
+                        });
+
+                        Swal.fire({
+                            title: 'Selecciona un proveedor',
+                            html: `
+                        <div style="display: flex; justify-content: center; align-items: center;">
+                            <div class="input-container-2">
+                                <select id="proveedorSeleccionado" required>
+                                    ${selectProveedor.innerHTML}
+                                </select>
+                            </div>
+                        </div>
+                    `,
+                            showCancelButton: true,
+                            confirmButtonText: 'Confirmar',
+                            cancelButtonText: 'Cancelar',
+                            showLoaderOnConfirm: true,
+                            preConfirm: () => {
+                                const selectProveedor = document.getElementById('proveedorSeleccionado').value;
+                                ContinueForm(selectProveedor);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error al obtener la lista de proveedores:', error));
+            } else if (result.isDenied) {
+                window.location.href = './facturacion.html';
+            }
+        });
+
+        function ContinueForm(selectProveedor) {
+            Swal.fire({
+                title: 'Datos del producto',
+                html: `
+            <div class="inputs-container-1">
+                <div class="input-container-4">
+                    <label for="inputNombre" class="label-style-1">Nombre:</label>
+                    <input type="text" id="inputNombre" class="input-style-1" placeholder="Nombre del producto">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputPrecio" class="label-style-1">Precio:</label>
+                    <input type="number" min="0" id="inputPrecio" class="no-arrows input-style-1" placeholder="Precio del producto">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputSelect" class="label-style-1">Escoge una opción:</label>
+                    <select class="form-select" id="usoclinico">
+                        <option value="text">Uso clínico?</option>
+                        <option value="yes">Sí</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="input-container-4">
+                    <label for="inputBarcode" class="label-style-1">Codigo de barra:</label>
+                    <input type="text" id="inputBarcode" class="input-style-1" placeholder="Codigo de barra">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputBrand" class="label-style-1">Marca:</label>
+                    <input type="text" id="inputBrand" class="input-style-1" placeholder="Marca del producto">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputPresentation" class="label-style-1">Presentación:</label>
+                    <input type="text" id="inputPresentation" class="input-style-1" placeholder="Presentación del producto">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputDescription" class="label-style-1">Descripción:</label>
+                    <input type="text" id="inputDescription" class="input-style-1" placeholder="Descripción del producto">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputCantidad" class="label-style-1">Cantidad:</label>
+                    <input type="text" id="inputCantidad" class="input-style-1" placeholder="Cantidad del producto">
+                </div>
+            </div>
+        `,
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Guardar los datos del producto en un objeto
+                    const producto = {
+                        proveedor: selectProveedor,
+                        nombre: document.getElementById('names').value,
+                        precio: document.getElementById('price_number').value,
+                        usoClinico: document.getElementById('usoclinico').value,
+                        codigoBarra: document.getElementById('barcode').value,
+                        marca: document.getElementById('brand').value,
+                        presentacion: document.getElementById('presentation').value,
+                        descripcion: document.getElementById('description').value,
+                        cantidad: document.getElementById('cantidad').value
+                    };
+                    // Almacenar el producto en la lista de productos
+                    productos.push(producto);
+
+                    // Preguntar si desea agregar otro producto
+                    askToAddAnotherProduct();
+                }
+            });
+        }
 
         async function generarIDFacturaCompra() {
             try {
@@ -261,7 +380,6 @@
 
         async function registrarProducto() {
             try {
-
                 let inputNombre = document.getElementById('names').value;
                 let inputPrecio = document.getElementById('price_number').value;
                 let inputUsoClinico = document.getElementById('usoclinico').value;
@@ -269,7 +387,6 @@
                 let inputMarca = document.getElementById('brand').value;
                 let inputPresentacion = document.getElementById('presentation').value;
                 let inputDescripcion = document.getElementById('description').value;
-
 
                 if (idFacturaCompra === undefined) {
                     console.error('No se ha creado la factura de compra.');
@@ -292,14 +409,14 @@
                         'idFacturaCompraFk': idFacturaCompra
                     };
 
+                    const headers = new Headers({ 'Content-Type': 'application/json' });
+                    const urlRegister = "http://localhost:5033/Api/Producto";
 
-                    const response = await fetch('http://localhost:5033/Api/Producto', {
+                    const config = {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: headers,
                         body: JSON.stringify(data)
-                    });
+                    };
 
                     if (response.ok) {
                         console.log('Producto registrado exitosamente en la factura de compra.');
@@ -314,9 +431,13 @@
                 console.error('Error en el proceso de registro del producto:', error);
             }
         }
-
-
         registrarFacturaCompra();
+
+        const botonRegister = document.getElementById('boton-producto');
+        botonRegister.addEventListener("click", function (e) {
+            e.preventDefault();
+            registrarProducto();
+        });
 
     </script>
 </body>

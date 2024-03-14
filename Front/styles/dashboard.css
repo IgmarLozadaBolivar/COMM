@@ -358,6 +358,17 @@ body.dark .home .text {
     padding-right: 8px;
 }
 
+.form-box-3 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(96, 96, 96, 0.462);
+}
+
 .form-value {
     padding: 20px;
     color: #000;
@@ -533,8 +544,59 @@ select {
     transition: background-color 0.3s ease;
 }
 
+#boton-producto {
+    width: 30%;
+    padding: 8px;
+    margin-bottom: 12px;
+    margin-top: 10px;
+    color: #000;
+    border: 2px solid #4CAF50;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#boton-show-producto {
+    width: 30%;
+    padding: 8px;
+    margin-bottom: 12px;
+    margin-top: 10px;
+    margin-left: 10px;
+    color: #000;
+    border: 2px solid #305da8;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#boton-factura {
+    width: 30%;
+    padding: 8px;
+    margin-top: 10px;
+    color: #000;
+    border: 2px solid #4CAF50;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
 #boton,
 #boton-siguiente:hover {
+    color: #fff;
+    border: 2px solid transparent;
+    background-color: #45a049;
+    padding: 8px;
+}
+
+#boton-show-producto {
+    color: #fff;
+    border: 2px solid transparent;
+    background-color: #305da8;
+    padding: 8px;
+}
+
+#boton-producto,
+#boton-factura {
     color: #fff;
     border: 2px solid transparent;
     background-color: #45a049;
@@ -712,15 +774,15 @@ td {
     width: 120px;
 }
 
-.inputsboxs,
-.inputsboxs-2 {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .input-box-only {
     display: flex;
     justify-content: center;
+}
+
+.inputs-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
 }
 
 @media (max-width: 1200px) {
@@ -800,4 +862,41 @@ td {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 10px;
+}
+
+.inputs-container-1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.input-container-4 {
+    flex: 1 1 45%;
+}
+
+.label-style-1 {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #000;
+}
+
+.input-style-1 {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.form-select {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .input-container-4 {
+        flex: 1 1 100%;
+    }
 }
