@@ -7,4 +7,5 @@ public class FacturaCompraDto
     public int CantidadTotal { get; set; }
     public decimal PrecioTotal { get; set; }
     public int IdProveedorFk { get; set; }
+    public string TipoPago { get; set; }
 }
