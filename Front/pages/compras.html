@@ -319,7 +319,8 @@
                         const productoExistenteConID = {
                             id: idExistente,
                             ...productoNuevo,
-                            totalExistencias: totalExistencias
+                            totalExistencias: totalExistencias,
+                            cantidadAAgregar: productoNuevo.cantidadAAgregar
                         };
 
                         const nombreProductoExistente = `Producto Existente ${Object.keys(productosExistentes).length + 1}`;
@@ -383,7 +384,7 @@
             try {
                 const idProductoExistente = productoExistente.id;
                 delete productoExistente.proveedor;
-                delete productoExistente.cantidadAAgregar;
+                /* delete productoExistente.cantidadAAgregar; */
                 console.log(idProductoExistente);
 
                 const response = await fetch(`http://localhost:5033/Api/Producto/${idProductoExistente}`, {
@@ -475,14 +476,16 @@
 
             for (const nombreProducto in productos) {
                 cantidadTotal += productos[nombreProducto].cantidadAAgregar;
-                valorTotal += productos[nombreProducto].precio;
+                let valorProducto = productos[nombreProducto].precio * productos[nombreProducto].cantidadAAgregar;
+                valorTotal += valorProducto;
             }
 
             for (const nombreProductoExistente in productosExistentes) {
                 const productosExistentesArray = productosExistentes[nombreProductoExistente];
                 for (const productoExistente of productosExistentesArray) {
                     cantidadTotal += productoExistente.cantidadAAgregar;
-                    valorTotal += productoExistente.precio;
+                    let valorProductoExistente = productoExistente.precio * productoExistente.cantidadAAgregar;
+                    valorTotal += valorProductoExistente;
                     await enviarProductoExistente(productoExistente);
                 }
             }
