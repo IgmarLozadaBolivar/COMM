@@ -11,6 +11,8 @@ public interface IUnitOfWork
     IPersona Personas { get; }
     IProducto Productos { get; }
     IProveedor Proveedores { get; }
+    IVentaProducto VentasProductos { get; }
+    ICompraProducto ComprasProductos { get; }
     
     Task<int> SaveAsync();
 }

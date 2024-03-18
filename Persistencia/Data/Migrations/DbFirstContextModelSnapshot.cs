@@ -22,6 +22,32 @@ namespace Persistencia.Data.Migrations
 
             MySqlModelBuilderExtensions.HasCharSet(modelBuilder, "utf8mb4");
 
+            modelBuilder.Entity("Dominio.Entidades.CompraProducto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdFacturaCompraFK")
+                        .HasColumnType("int")
+                        .HasColumnName("IdFacturaCompraFK")
+                        .HasComment("Identificador de puenteo con la tabla de FacturaCompra");
+
+                    b.Property<int>("IdProductoFK")
+                        .HasColumnType("int")
+                        .HasColumnName("IdProductoFK")
+                        .HasComment("Identificador de puenteo con la tabla de Producto");
+
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "IdFacturaCompraFK" }, "compraproducto_FacturaCompra_FK");
+
+                    b.HasIndex(new[] { "IdProductoFK" }, "compraproducto_producto_FK");
+
+                    b.ToTable("CompraProducto", (string)null);
+                });
+
             modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
                 {
                     b.Property<int>("Id")
@@ -32,10 +58,6 @@ namespace Persistencia.Data.Migrations
                     b.Property<int>("CantidadTotal")
                         .HasColumnType("int")
                         .HasComment("Cantidad total de todos los productos");
-
-                    b.Property<int>("CantidadxProducto")
-                        .HasColumnType("int")
-                        .HasComment("Cantidad por productos");
 
                     b.Property<DateTime>("FechaCompra")
                         .HasColumnType("datetime")
@@ -78,20 +100,10 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("datetime")
                         .HasComment("Fecha de la venta");
 
-                    b.Property<int>("IdEmpleadoFk")
+                    b.Property<int>("IdClienteFk")
                         .HasColumnType("int")
-                        .HasColumnName("IdEmpleadoFK")
-                        .HasComment("Identificador de puenteo con la tabla de Empleado (Persona)");
-
-                    b.Property<int>("IdProductoFk")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("IdProductoFkNavigationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Iva")
-                        .HasColumnType("int")
-                        .HasComment("IVA o comisión por compra, establecido por el gobierno");
+                        .HasColumnName("IdClienteFk")
+                        .HasComment("Identificador de puenteo con la tabla de Cliente (Persona)");
 
                     b.Property<decimal>("PrecioTotal")
                         .HasPrecision(10, 2)
@@ -105,11 +117,7 @@ namespace Persistencia.Data.Migrations
                     b.HasKey("Id")
                         .HasName("PRIMARY");
 
-                    b.HasIndex("IdProductoFkNavigationId");
-
-                    b.HasIndex(new[] { "IdEmpleadoFk" }, "facturaventa_persona_FK");
-
-                    b.HasIndex(new[] { "IdProductoFk" }, "facturaventa_producto_FK");
+                    b.HasIndex(new[] { "IdClienteFk" }, "facturaventa_persona_FK");
 
                     b.ToTable("FacturaVenta", (string)null);
                 });
@@ -173,11 +181,6 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("varchar(100)")
                         .HasComment("Descripción del producto");
 
-                    b.Property<int>("IdFacturaCompraFk")
-                        .HasColumnType("int")
-                        .HasColumnName("IdFacturaCompraFk")
-                        .HasComment("Identificador de puenteo con la tabla de Producto");
-
                     b.Property<string>("Marca")
                         .HasMaxLength(25)
                         .HasColumnType("varchar(25)")
@@ -207,8 +210,6 @@ namespace Persistencia.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
-
-                    b.HasIndex(new[] { "IdFacturaCompraFk" }, "facturacompra_producto_FK");
 
                     b.ToTable("Producto", (string)null);
                 });
@@ -313,6 +314,53 @@ namespace Persistencia.Data.Migrations
                     b.ToTable("user_rol", (string)null);
                 });
 
+            modelBuilder.Entity("Dominio.Entidades.VentaProducto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdFacturaVentaFK")
+                        .HasColumnType("int")
+                        .HasColumnName("IdFacturaVentaFK")
+                        .HasComment("Identificador de puenteo con la tabla de FacturaVenta");
+
+                    b.Property<int>("IdProductoFK")
+                        .HasColumnType("int")
+                        .HasColumnName("IdProductoFK")
+                        .HasComment("Identificador de puenteo con la tabla de Producto");
+
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "IdFacturaVentaFK" }, "ventaproducto_FacturaVenta_FK");
+
+                    b.HasIndex(new[] { "IdProductoFK" }, "ventaproducto_producto_FK");
+
+                    b.ToTable("VentaProducto", (string)null);
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.CompraProducto", b =>
+                {
+                    b.HasOne("Dominio.Entidades.FacturaCompra", "FacturaCompra")
+                        .WithMany("CompraProductos")
+                        .HasForeignKey("IdFacturaCompraFK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("compraproducto_facturacompra_FK");
+
+                    b.HasOne("Dominio.Entidades.Producto", "Producto")
+                        .WithMany("CompraProductos")
+                        .HasForeignKey("IdProductoFK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("compraproducto_producto_FK");
+
+                    b.Navigation("FacturaCompra");
+
+                    b.Navigation("Producto");
+                });
+
             modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
                 {
                     b.HasOne("Dominio.Entidades.Proveedor", "IdProveedorFkNavigation")
@@ -327,32 +375,14 @@ namespace Persistencia.Data.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.FacturaVenta", b =>
                 {
-                    b.HasOne("Dominio.Entidades.Persona", "IdEmpleadoFkNavigation")
+                    b.HasOne("Dominio.Entidades.Persona", "IdClienteFkNavigation")
                         .WithMany("FacturaVentas")
-                        .HasForeignKey("IdEmpleadoFk")
+                        .HasForeignKey("IdClienteFk")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("facturaventa_persona_FK");
 
-                    b.HasOne("Dominio.Entidades.Producto", "IdProductoFkNavigation")
-                        .WithMany("FacturaVentas")
-                        .HasForeignKey("IdProductoFkNavigationId");
-
-                    b.Navigation("IdEmpleadoFkNavigation");
-
-                    b.Navigation("IdProductoFkNavigation");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Producto", b =>
-                {
-                    b.HasOne("Dominio.Entidades.FacturaCompra", "IdFacturaCompraFkNavigation")
-                        .WithMany("Productos")
-                        .HasForeignKey("IdFacturaCompraFk")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("facturacompra_producto_FK");
-
-                    b.Navigation("IdFacturaCompraFkNavigation");
+                    b.Navigation("IdClienteFkNavigation");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.RefreshToken", b =>
@@ -385,9 +415,35 @@ namespace Persistencia.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dominio.Entidades.VentaProducto", b =>
+                {
+                    b.HasOne("Dominio.Entidades.FacturaVenta", "FacturaVenta")
+                        .WithMany("VentaProductos")
+                        .HasForeignKey("IdFacturaVentaFK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("ventaproducto_facturaventa_FK");
+
+                    b.HasOne("Dominio.Entidades.Producto", "Producto")
+                        .WithMany("VentaProductos")
+                        .HasForeignKey("IdProductoFK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("ventaproducto_producto_FK");
+
+                    b.Navigation("FacturaVenta");
+
+                    b.Navigation("Producto");
+                });
+
             modelBuilder.Entity("Dominio.Entidades.FacturaCompra", b =>
                 {
-                    b.Navigation("Productos");
+                    b.Navigation("CompraProductos");
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.FacturaVenta", b =>
+                {
+                    b.Navigation("VentaProductos");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Persona", b =>
@@ -397,7 +453,9 @@ namespace Persistencia.Data.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.Producto", b =>
                 {
-                    b.Navigation("FacturaVentas");
+                    b.Navigation("CompraProductos");
+
+                    b.Navigation("VentaProductos");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Proveedor", b =>

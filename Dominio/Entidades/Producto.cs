@@ -11,7 +11,6 @@ public class Producto : BaseEntity
     public string Presentacion { get; set; }
     public int TotalExistencias { get; set; }
     public string Categoria { get; set; }
-    public int IdFacturaCompraFk {get; set;}
-    public virtual FacturaCompra IdFacturaCompraFkNavigation { get; set; }
-    public virtual ICollection<FacturaVenta> FacturaVentas { get; set; } = new List<FacturaVenta>();
+    public virtual ICollection<CompraProducto> CompraProductos { get; set; } = new List<CompraProducto>();
+    public virtual ICollection<VentaProducto> VentaProductos { get; set; } = new List<VentaProducto>();
 }

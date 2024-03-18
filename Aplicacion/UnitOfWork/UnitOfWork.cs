@@ -15,6 +15,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private PersonaRepository _personas;
     private ProductoRepository _productos;
     private ProveedorRepository _proveedores;
+    private VentaProductoRepository _ventaProductos;
+    private CompraProductoRepository _compraProductos;
     
     public UnitOfWork(DbFirstContext _context)
     {
@@ -104,6 +106,30 @@ public class UnitOfWork : IUnitOfWork, IDisposable
                 _proveedores = new ProveedorRepository(context);
             }
             return _proveedores;
+        }
+    }
+
+    public IVentaProducto VentasProductos
+    {
+        get
+        {
+            if (_ventaProductos == null)
+            {
+                _ventaProductos = new VentaProductoRepository(context);
+            }
+            return _ventaProductos;
+        }
+    }
+
+    public ICompraProducto ComprasProductos
+    {
+        get
+        {
+            if (_compraProductos == null)
+            {
+                _compraProductos = new CompraProductoRepository(context);
+            }
+            return _compraProductos;
         }
     }
     

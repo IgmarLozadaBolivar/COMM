@@ -7,6 +7,6 @@ public class FacturaCompra : BaseEntity
     public int CantidadTotal { get; set; }
     public decimal PrecioTotal { get; set; }
     public string TipoPago { get; set; }
-    public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
     public virtual Proveedor IdProveedorFkNavigation { get; set; }
+    public virtual ICollection<CompraProducto> CompraProductos { get; set; } = new List<CompraProducto>();
 }

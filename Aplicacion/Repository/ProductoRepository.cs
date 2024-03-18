@@ -16,8 +16,6 @@ public class ProductoRepository : GenericRepository<Producto>, IProducto
     public override async Task<IEnumerable<Producto>> GetAllAsync()
     {
         return await _context.Productos
-            .Include(p => p.IdFacturaCompraFkNavigation)
-            .Include(p => p.FacturaVentas)
             .ToListAsync();
     }
 
@@ -30,8 +28,6 @@ public class ProductoRepository : GenericRepository<Producto>, IProducto
     public override async Task<Producto> GetNombreAsync(string Nombre)
     {
         return await _context.Productos
-            .Include(p => p.IdFacturaCompraFkNavigation)
-            .Include(p => p.FacturaVentas)
             .FirstOrDefaultAsync(p => p.Nombre == Nombre);
     }
 }

@@ -43,15 +43,5 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
 
         builder.Property(e => e.UsoClinico)
             .HasColumnType("enum('SI','NO')");
-
-           builder.HasIndex(e => e.IdFacturaCompraFk, "facturacompra_producto_FK");
-
-        builder.Property(e => e.IdFacturaCompraFk)
-            .HasComment("Identificador de puenteo con la tabla de Producto")
-            .HasColumnName("IdFacturaCompraFk");
-
-         builder.HasOne(d => d.IdFacturaCompraFkNavigation).WithMany(p => p.Productos)
-            .HasForeignKey(d => d.IdFacturaCompraFk)
-            .HasConstraintName("facturacompra_producto_FK");
     }
 }

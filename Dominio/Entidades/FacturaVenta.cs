@@ -3,12 +3,10 @@
 public class FacturaVenta : BaseEntity
 {
     public DateTime FechaVenta { get; set; }
-    public int IdEmpleadoFk { get; set; }
-    public int IdProductoFk { get; set; }
+    public int IdClienteFk { get; set; }
     public int Cantidad { get; set; }
-    public int Iva { get; set; }
     public decimal PrecioTotal { get; set; }
     public string TipoPago { get; set; }
-    public virtual Persona IdEmpleadoFkNavigation { get; set; }
-    public virtual Producto IdProductoFkNavigation { get; set; }
+    public virtual Persona IdClienteFkNavigation { get; set; }
+    public virtual ICollection<VentaProducto> VentaProductos { get; set; } = new List<VentaProducto>();
 }

@@ -21,6 +21,8 @@ public partial class DbFirstContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Rol> Rols { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<VentaProducto> VentaProductos { get; set; }
+    public DbSet<CompraProducto> CompraProductos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

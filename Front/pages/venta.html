@@ -76,8 +76,8 @@
         </div>
     </nav>
     <section class="home">
-        <div class="text">Facturacion de ventas!</div>
-        <div class="form-box-2">
+        <div class="text" style="display: flex; justify-content: center;">Facturacion de ventas!</div>
+        <!-- <div class="form-box-2" style="display: none;">
             <div class="form-box">
                 <div class="form-value">
                     <form action="">
@@ -91,51 +91,6 @@
                                 <label for="cliente"></label>
                             </div>
                         </div>
-                        <p style="font-size: 20px;">Datos del producto(s)</p>
-                        <div class="inputsboxs">
-                            <div class="inputbox">
-                                <ion-icon name="person-outline"></ion-icon>
-                                <input type="text" id="names" name="names" required />
-                                <label for="">Nombre</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="cash-outline"></ion-icon>
-                                <input type="number" class="no-arrows" id="price_number" name="price_number" min="0"
-                                    step="0.01" required />
-                                <label for="">Precio</label>
-                            </div>
-                            <div class="inputbox">
-                                <select class="form-select" id="usoclinico">
-                                    <option value="text">Uso clínico?</option>
-                                    <option value="yes">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="inputsboxs-2">
-                            <div class="inputbox">
-                                <ion-icon name="barcode-outline"></ion-icon>
-                                <input id="barcode" type="text" required>
-                                <label for="">Codigo de barra</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="shield-checkmark-outline"></ion-icon>
-                                <input id="brand" type="text" required>
-                                <label for="">Marca</label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="brush-outline"></ion-icon>
-                                <input id="presentation" type="text" required>
-                                <label for="">Presentación</label>
-                            </div>
-                        </div>
-                        <div class="input-box-only">
-                            <div class="inputbox">
-                                <ion-icon name="text-outline"></ion-icon>
-                                <input id="description" type="text" required>
-                                <label for="">Descripción</label>
-                            </div>
-                        </div>
                         <div class="btns">
                             <button id="boton">
                                 Agregar
@@ -144,8 +99,10 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </div> -->
     </section>
+    <script src="../node_modules/pdfmake/build/pdfmake.min.js"></script>
+    <script src="../node_modules/pdfmake/build/vfs_fonts.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
@@ -156,15 +113,42 @@
             sidebar.classList.toggle("close");
         });
 
+        function startMarquee(element) {
+            clearInterval(element.dataset.marqueeId);
+            element.scrollLeft = 0;
+
+            setTimeout(() => {
+                element.dataset.marqueeId = setInterval(() => {
+                    if (element.scrollWidth > element.offsetWidth) {
+                        element.scrollLeft += 1;
+                        if (element.scrollLeft >= element.scrollWidth - element.offsetWidth) {
+                            element.scrollLeft = 0;
+                        }
+                    }
+                }, 50);
+            }, 2000);
+        }
+
+        function stopMarquee(element) {
+            clearInterval(element.dataset.marqueeId);
+            delete element.dataset.marqueeId;
+            element.scrollLeft = 0;
+
+            setTimeout(() => {
+                element.scrollLeft = 0;
+            }, 2000);
+        }
+
+        let clienteId;
 
         Swal.fire({
             title: '¡Bienvenido!',
-            text: '¿Deseas continuar con la venta?',
-            icon: 'info',
+            text: '¿Qué deseas hacer?',
+            icon: 'question',
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: 'Sí',
-            denyButtonText: 'No'
+            confirmButtonText: 'Generar factura',
+            denyButtonText: 'Example PDF'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
@@ -180,44 +164,89 @@
                     fetch('http://localhost:5033/Api/Persona')
                         .then(response => response.json())
                         .then(data => {
-                            const selectCliente = document.getElementById('cliente');
-                            selectCliente.innerHTML = '<option value="" disabled selected>Seleccione un cliente</option>';
-                            data.forEach(cliente => {
-                                const option = document.createElement('option');
-                                option.value = cliente.id;
-                                option.textContent = cliente.cedula;
-                                selectCliente.appendChild(option);
-                            });
+                            const inputCliente = document.createElement('input');
+                            inputCliente.setAttribute('type', 'text');
+                            inputCliente.setAttribute('placeholder', 'Buscar cliente por nombre o cédula');
+                            inputCliente.classList.add('swal2-input');
 
                             Swal.fire({
-                                title: 'Selecciona un cliente',
-                                html: `
-                        <div style="display: flex; justify-content: center; align-items: center;">
-                        <div class="input-container-2">
-                            <select class="form-select" id="clienteSeleccionado" required>
-                                ${selectCliente.innerHTML}
-                            </select>
-                        </div>
-                    </div>
-                        `,
+                                title: 'Busca un cliente',
+                                html: inputCliente,
                                 showCancelButton: true,
                                 confirmButtonText: 'Confirmar',
                                 cancelButtonText: 'Cancelar',
                                 showLoaderOnConfirm: true,
                                 allowOutsideClick: () => !Swal.isLoading(),
                                 preConfirm: () => {
-                                    const selectedCliente = document.getElementById('clienteSeleccionado').value;
-                                    if (!selectedCliente) {
-                                        Swal.showValidationMessage('Por favor selecciona un cliente');
-                                    } else {
-                                        return selectedCliente;
+                                    const inputValue = inputCliente.value.trim().toLowerCase();
+
+                                    if (!inputValue) {
+                                        Swal.showValidationMessage('Por favor, ingresa el nombre o la cédula del cliente.');
+                                        return false;
                                     }
-                                }
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    ContinueForm(result.value);
-                                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                    window.location.href = './venta.html';
+
+                                    const selectedCliente = data.find(cliente =>
+                                        cliente.nombre.toLowerCase().includes(inputValue) ||
+                                        cliente.cedula.toLowerCase().includes(inputValue)
+                                    );
+
+                                    if (!selectedCliente) {
+                                        Swal.showValidationMessage('Cliente no encontrado. Por favor, intenta de nuevo.');
+                                    } else {
+
+                                        const correoLength = selectedCliente.correo.length;
+                                        const marqueeEffect = correoLength >= 24 ? 'scroll' : 'none';
+
+                                        Swal.fire({
+                                            title: 'Información del cliente',
+                                            html: `
+                                            <div class="inputs-container-1">
+                                                <div class="input-container-4">
+                                                    <label for="inputNombre" class="label-style-1">Nombre:</label>
+                                                    <input type="text" id="inputNombre" class="input-style-1" readonly value="${selectedCliente.nombre + ' ' + selectedCliente.apellidos}">
+                                                </div>
+                                                <div class="input-container-4">
+                                                    <label for="inputTelefono" class="label-style-1">Telefono:</label>
+                                                    <input type="text" id="inputTelefono" class="input-style-1" readonly value="${selectedCliente.telefono}">
+                                                </div>
+                                                <div class="input-container-4">
+                                                    <label for="inputCorreo" class="label-style-1">Correo:</label>
+                                                    <input type="text" id="inputCorreo" class="input-style-1" readonly value="${selectedCliente.correo}">
+                                                </div>
+                                                <div class="input-container-4">
+                                                    <label for="inputCedula" class="label-style-1">Cedula:</label>
+                                                    <input type="text" id="inputCedula" class="input-style-1" readonly value="${selectedCliente.cedula}">
+                                                </div>
+                                            </div>
+                                            `,
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Continuar',
+                                            cancelButtonText: 'Volver',
+                                            allowOutsideClick: false,
+                                            didOpen: () => {
+                                                if (marqueeEffect === 'scroll') {
+                                                    const inputCorreo = document.getElementById('inputCorreo');
+                                                    startMarquee(inputCorreo);
+                                                }
+                                            },
+                                            willClose: () => {
+                                                if (marqueeEffect === 'scroll') {
+                                                    const inputCorreo = document.getElementById('inputCorreo');
+                                                    stopMarquee(inputCorreo);
+                                                }
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                ContinueForm(selectedCliente.id);
+                                                clienteId = selectedCliente.id;
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                setTimeout(() => {
+                                                    Swal.close();
+                                                }, 100);
+                                                window.location.href = './venta.html';
+                                            }
+                                        });
+                                    }
                                 }
                             });
                         })
@@ -234,183 +263,253 @@
                         });
                 }, 2000);
             } else if (result.isDenied) {
-                window.location.href = './facturacion.html';
+                generarContenidoPDF();
             }
         });
 
+        let productos = {};
+        let contadorProductos = 0;
+        let datosVentas = [];
+        let datoVentaProducto = [];
 
-
-        const productos = {};
-
-
-        function llenarSelectProductos() {
-            const selectProducto = document.getElementById('inputNombre');
-
-            selectProducto.innerHTML = '';
-
-
-            for (const nombreProducto in productos) {
-                const option = document.createElement('option');
-                option.value = nombreProducto;
-                option.textContent = nombreProducto;
-                selectProducto.appendChild(option);
-            }
-        }
-
-
-        async function obtenerDatosProductos() {
+        async function obtenerCategorias() {
             try {
                 const response = await fetch('http://localhost:5033/Api/Producto');
                 if (!response.ok) {
                     throw new Error('Error al obtener los datos de los productos');
                 }
                 const data = await response.json();
-                return data;
+                const categorias = [...new Set(data.map(producto => producto.categoria))];
+                return categorias;
             } catch (error) {
-                console.error('Error al obtener los datos de los productos:', error);
+                console.error('Error al obtener las categorías de los productos:', error);
                 return null;
             }
         }
 
-
-        async function llenarProductosDesdeAPI() {
-            const datosProductos = await obtenerDatosProductos();
-            if (datosProductos) {
-
-                for (const producto of datosProductos) {
-                    productos[producto.nombre] = producto;
+        async function obtenerUsoClinico(categoria) {
+            try {
+                const response = await fetch('http://localhost:5033/Api/Producto');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos de los productos');
                 }
-
-                llenarSelectProductos();
+                const data = await response.json();
+                const usoClinico = [...new Set(data.filter(producto => producto.categoria === categoria).map(producto => producto.usoClinico))];
+                return usoClinico;
+            } catch (error) {
+                console.error('Error al obtener los usos clínicos de los productos:', error);
+                return null;
             }
         }
 
-
-        llenarProductosDesdeAPI();
-
-
-        document.getElementById('inputNombre').addEventListener('change', function () {
-            const nombreProducto = this.value;
-            traerProducto(nombreProducto);
-        });
-
-
-        function traerProducto(nombreProducto) {
-            const productoSeleccionado = productos[nombreProducto];
-
-
-            document.getElementById('inputPrecio').value = productoSeleccionado.precio;
-            document.getElementById('usoclinico').value = productoSeleccionado.usoClinico;
-            document.getElementById('inputBarcode').value = productoSeleccionado.codigoBarras;
-            document.getElementById('inputMarca').value = productoSeleccionado.marca;
-            document.getElementById('inputDescription').value = productoSeleccionado.descripcion;
-            document.getElementById('inputPresentation').value = productoSeleccionado.presentacion;
-            document.getElementById('inputCantidad').value = productoSeleccionado.totalExistencias;
-            document.getElementById('inputCategoria').value = productoSeleccionado.categoria;
+        async function obtenerNombre(categoria, usoClinico) {
+            try {
+                const response = await fetch('http://localhost:5033/Api/Producto');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos de los productos');
+                }
+                const data = await response.json();
+                const nombres = [...new Set(data.filter(producto => producto.categoria === categoria && producto.usoClinico === usoClinico).map(producto => producto.nombre))];
+                return nombres;
+            } catch (error) {
+                console.error('Error al obtener los nombres de los productos:', error);
+                return null;
+            }
         }
 
+        async function obtenerPresentacion(categoria, usoClinico, nombre) {
+            try {
+                const response = await fetch('http://localhost:5033/Api/Producto');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos de los productos');
+                }
+                const data = await response.json();
+                const presentaciones = [...new Set(data.filter(producto => producto.categoria === categoria && producto.usoClinico === usoClinico && producto.nombre === nombre).map(producto => producto.presentacion))];
+                return presentaciones;
+            } catch (error) {
+                console.error('Error al obtener las presentaciones de los productos:', error);
+                return null;
+            }
+        }
 
+        async function obtenerMasDetalles(categoria, usoClinico, nombre, presentacion) {
+            try {
+                const response = await fetch('http://localhost:5033/Api/Producto');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos de los productos');
+                }
+                const data = await response.json();
+                const detalles = data.filter(producto => producto.categoria === categoria && producto.usoClinico === usoClinico && producto.nombre === nombre && producto.presentacion === presentacion);
+                return detalles;
+            } catch (error) {
+                console.error('Error al obtener mas detalles de los productos:', error);
+                return null;
+            }
+        }
 
-        function ContinueForm(selectProducto) {
-            Swal.fire({
-                title: 'Datos del producto',
-                html: `
-            <div class="inputs-container-1">
-                <div class="input-container-4">
-                    <label for="inputNombre" class="label-style-1">Nombre:</label>
-                    <select id="inputNombre" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputPrecio" class="label-style-1">Precio:</label>
-                    <select id="inputPrecio" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputclinico" class="label-style-1">Uso clinico:</label>
-                    <select id="inputclinico" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputbarcode" class="label-style-1">Codigo de barra:</label>
-                    <select id="inputbarcode" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputMarca" class="label-style-1">Marca:</label>
-                    <select id="inputMarca" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputPresentation" class="label-style-1">Presentación:</label>
-                    <select id="inputPresentation" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputDescription" class="label-style-1">Descripción:</label>
-                    <select id="inputNombre" class="input-style-1">
-                        id="ProductoDescripcion" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputCantidad" class="label-style-1">Cantidad:</label>
-                    <select id="inputCantidad" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-                <div class="input-container-4">
-                    <label for="inputCategoria" class="label-style-1">Categoría:</label>
-                    <select id="inputCategoria" class="input-style-1">
-                        id="ProductoSeleccionado" required>
-                                ${selectProducto.innerHTML}
-                    </select>
-                </div>
-            </div>
-        `,
-                showCancelButton: true,
-                confirmButtonText: 'Confirmar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const producto = {
-                        proveedor: selectProducto,
-                        nombre: document.getElementById('inputNombre').value,
-                        precio: parseFloat(document.getElementById('inputPrecio').value),
-                        usoClinico: document.getElementById('usoclinico').value,
-                        codigoBarras: document.getElementById('inputBarcode').value,
-                        marca: document.getElementById('inputBrand').value,
-                        descripcion: document.getElementById('inputDescription').value,
-                        presentacion: document.getElementById('inputPresentation').value,
-                        totalExistencias: parseInt(document.getElementById('inputCantidad').value),
-                        categoria: document.getElementById('inputCategoria').value
+        async function mostrarDetallesProducto(datosSeleccionados, detallesProductos) {
+            try {
+                const productoEncontrado = detallesProductos.find(producto =>
+                    producto.categoria === datosSeleccionados.categoria &&
+                    producto.usoClinico === datosSeleccionados.usoClinico &&
+                    producto.nombre === datosSeleccionados.nombre &&
+                    producto.presentacion === datosSeleccionados.presentacion
+                );
+
+                if (!productoEncontrado) {
+                    throw new Error('No se encontró el producto');
+                }
+
+                const confirmationResult = await Swal.fire({
+                    title: 'Detalles del producto',
+                    html: `
+                        <div class="inputs-container-1">
+                            <div class="input-container-4">
+                                <label for="inputNombre" class="label-style-1">Nombre:</label>
+                                <input type="text" id="inputNombre" class="input-style-1" readonly value="${datosSeleccionados.nombre}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputPrecio" class="label-style-1">Precio:</label>
+                                <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precio}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputUsoClinico" class="label-style-1">Uso clinico:</label>
+                                <input type="text" id="inputUsoClinico" class="no-arrows input-style-1" readonly value="${datosSeleccionados.usoClinico}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputCodigoBarras" class="label-style-1">Codigo de barra:</label>
+                                <input type="text" id="inputCodigoBarras" class="input-style-1" readonly value="${productoEncontrado.codigoBarras}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputMarca" class="label-style-1">Marca:</label>
+                                <input type="text" id="inputMarca" class="input-style-1" readonly value="${productoEncontrado.marca}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputDescripcion" class="label-style-1">Descripción:</label>
+                                <input type="text" id="inputDescripcion" class="input-style-1" readonly value="${productoEncontrado.descripcion}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputPresentacion" class="label-style-1">Presentación:</label>
+                                <input type="text" id="inputPresentacion" class="input-style-1" readonly value="${datosSeleccionados.presentacion}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputCantidadDisponible" class="label-style-1">Cantidad disponible:</label>
+                                <input type="text" id="inputCantidadDisponible" class="no-arrows input-style-1" readonly value="${productoEncontrado.totalExistencias}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputCategoria" class="label-style-1">Categoría:</label>
+                                <input type="text" id="inputCategoria" class="no-arrows input-style-1"  readonly value="${datosSeleccionados.categoria}">
+                            </div>
+                            <div class="input-container-4">
+                                <label for="inputCantidad" class="label-style-1">Cantidad a vender:</label>
+                                <input type="number" id="inputCantidad" class="no-arrows input-style-1" min="0">
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: false,
+                    confirmButtonText: 'Continuar',
+                    didOpen: () => {
+                        const inputDescripcion = document.getElementById('inputDescripcion');
+                        startMarquee(inputDescripcion);
+                    },
+                    willClose: () => {
+                        const inputDescripcion = document.getElementById('inputDescripcion');
+                        stopMarquee(inputDescripcion);
+                    }
+                });
+
+                if (confirmationResult.isConfirmed) {
+                    contadorProductos++;
+                    const idProducto = `Producto ${contadorProductos}`;
+                    const idProductoExistente = productoEncontrado.id || null;
+                    const cantidad = document.getElementById('inputCantidad').value;
+                    const cantidadAVender = parseInt(cantidad, 10);
+
+                    const cantidadDisponible = productoEncontrado.totalExistencias;
+                    const cantidadRestante = cantidadDisponible - cantidadAVender;
+
+                    await Swal.fire({
+                        title: 'Cantidad disponible restante',
+                        html: `
+                        <div class="inputs-container-1">
+                            <div class="input-container-4">
+                                <label for="input" class="label-style-1">Resultado:</label>
+                                <input type="text" id="input" class="no-arrows input-style-2"  readonly value="${cantidadRestante}">
+                            </div>
+                        </div>
+                    `,
+                        confirmButtonText: 'Aceptar'
+                    });
+
+                    productos[idProducto] = {
+                        id: idProductoExistente,
+                        nombre: datosSeleccionados.nombre,
+                        precio: productoEncontrado.precio,
+                        usoClinico: datosSeleccionados.usoClinico,
+                        codigoBarras: productoEncontrado.codigoBarras,
+                        marca: productoEncontrado.marca,
+                        descripcion: productoEncontrado.descripcion,
+                        presentacion: datosSeleccionados.presentacion,
+                        categoria: datosSeleccionados.categoria,
+                        cantidadAVender: cantidadAVender,
+                        idFacturaCompraFk: productoEncontrado.idFacturaCompraFk,
+                        totalExistencias: cantidadRestante
                     };
 
-                    if (productos[producto.nombre && producto.precio && producto.usoClinico && producto.codigoBarras && producto.marca && producto.descripcion && producto.presentacion && producto.categoria]) {
-                        productos[producto.nombre].totalExistencias += producto.totalExistencias;
-                    } else {
-                        productos[producto.nombre] = producto;
-                    }
-
-                    const nombreProducto = `Producto ${Object.keys(productos).length + 1}`;
-                    productos[nombreProducto] = producto;
-
                     askToAddAnotherProduct();
+                } else {
+                    continueForm2();
                 }
-            });
+
+            } catch (error) {
+                console.error('Error al mostrar detalles del producto:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al mostrar los detalles del producto. Por favor, inténtalo de nuevo más tarde.'
+                });
+            }
+        }
+
+        async function actualizarProductoEnBaseDeDatos(cantidadAVender) {
+            try {
+                for (const id in productos) {
+                    const producto = productos[id];
+
+                    const nuevaCantidadDisponible = producto.totalExistencias;
+                    const data = {
+                        id: producto.id,
+                        nombre: producto.nombre,
+                        precio: producto.precio,
+                        usoClinico: producto.usoClinico,
+                        codigoBarras: producto.codigoBarras,
+                        marca: producto.marca,
+                        descripcion: producto.descripcion,
+                        presentacion: producto.presentacion,
+                        totalExistencias: nuevaCantidadDisponible,
+                        categoria: producto.categoria,
+                        idFacturaCompraFk: producto.idFacturaCompraFk
+                    };
+
+                    console.log(data);
+
+                    const headers = new Headers({ 'Content-Type': 'application/json' });
+                    const config = {
+                        method: 'PUT',
+                        headers: headers,
+                        body: JSON.stringify(data)
+                    };
+
+                    const urlEditar = `http://localhost:5033/Api/Producto/${producto.id}`;
+                    const response = await fetch(urlEditar, config);
+
+                    if (!response.ok) {
+                        throw new Error('Error al actualizar el producto en la base de datos');
+                    }
+                }
+            } catch (error) {
+                console.error('Error al actualizar el producto en la base de datos:', error);
+            }
         }
 
         function askToAddAnotherProduct() {
@@ -423,23 +522,188 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    ContinueForm(proveedorSeleccionadoId);
+                    ContinueForm();
                 } else if (result.isDenied) {
                     continueForm2();
                 }
             });
         }
 
+        async function ContinueForm() {
+            try {
+                const categorias = await obtenerCategorias();
+                if (categorias.length === 0) {
+                    throw new Error('No se encontraron categorías de productos');
+                }
+
+                const categoriaResult = await Swal.fire({
+                    title: 'Datos del producto',
+                    text: 'Seleccione la categoría del producto',
+                    input: 'select',
+                    inputOptions: categorias.reduce((obj, categoria) => {
+                        obj[categoria] = categoria;
+                        return obj;
+                    }, {}),
+                    inputPlaceholder: 'Seleccione una categoría',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Volver',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Debes seleccionar una categoría';
+                        }
+                    },
+                    customClass: {
+                        input: 'form-select centered-select'
+                    },
+                    inputAttributes: {
+                        style: 'width: 50%;'
+                    }
+                });
+
+                if (categoriaResult.isConfirmed) {
+                    const categoriaSeleccionada = categoriaResult.value;
+                    const datosSeleccionados = {
+                        categoria: categoriaSeleccionada
+                    };
+
+                    const usoClinico = await obtenerUsoClinico(categoriaSeleccionada);
+                    if (usoClinico.length === 0) {
+                        throw new Error('No se encontraron opciones de uso clínico para la categoría seleccionada');
+                    }
+
+                    const usoClinicoResult = await Swal.fire({
+                        title: 'Datos del producto',
+                        text: 'Seleccione el uso clínico del producto',
+                        input: 'select',
+                        inputOptions: usoClinico.reduce((obj, uso) => {
+                            obj[uso] = uso;
+                            return obj;
+                        }, {}),
+                        inputPlaceholder: 'Seleccione el uso clínico',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                        cancelButtonText: 'Volver',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Debes seleccionar un uso clínico';
+                            }
+                        },
+                        customClass: {
+                            input: 'form-select centered-select'
+                        },
+                        inputAttributes: {
+                            style: 'width: 50%;'
+                        }
+                    });
+
+                    if (usoClinicoResult.isConfirmed) {
+                        const usoClinicoSeleccionado = usoClinicoResult.value;
+                        datosSeleccionados.usoClinico = usoClinicoSeleccionado;
+
+                        const nombres = await obtenerNombre(categoriaSeleccionada, usoClinicoSeleccionado);
+                        if (nombres.length === 0) {
+                            throw new Error('No se encontraron nombres de productos para la categoría y uso clínico seleccionados');
+                        }
+
+                        const nombreResult = await Swal.fire({
+                            title: 'Datos del producto',
+                            text: 'Seleccione el nombre del producto',
+                            input: 'select',
+                            inputOptions: nombres.reduce((obj, nombre) => {
+                                obj[nombre] = nombre;
+                                return obj;
+                            }, {}),
+                            inputPlaceholder: 'Nombre del producto',
+                            showCancelButton: true,
+                            confirmButtonText: 'Confirmar',
+                            cancelButtonText: 'Volver',
+                            inputValidator: (value) => {
+                                if (!value) {
+                                    return 'Debes seleccionar un nombre de producto';
+                                }
+                            },
+                            customClass: {
+                                input: 'form-select centered-select'
+                            },
+                            inputAttributes: {
+                                style: 'width: 50%;'
+                            }
+                        });
+
+                        if (nombreResult.isConfirmed) {
+                            const nombreSeleccionado = nombreResult.value;
+                            datosSeleccionados.nombre = nombreSeleccionado;
+
+                            const presentaciones = await obtenerPresentacion(categoriaSeleccionada, usoClinicoSeleccionado, nombreSeleccionado);
+                            if (presentaciones.length === 0) {
+                                throw new Error('No se encontraron opciones de presentación para el producto seleccionado');
+                            }
+
+                            const presentacionResult = await Swal.fire({
+                                title: 'Datos del producto',
+                                text: 'Seleccione la presentación del producto',
+                                input: 'select',
+                                inputOptions: presentaciones.reduce((obj, presentacion) => {
+                                    obj[presentacion] = presentacion;
+                                    return obj;
+                                }, {}),
+                                inputPlaceholder: 'Seleccione la presentación',
+                                showCancelButton: true,
+                                confirmButtonText: 'Confirmar',
+                                cancelButtonText: 'Volver',
+                                inputValidator: (value) => {
+                                    if (!value) {
+                                        return 'Debes seleccionar una presentación';
+                                    }
+                                },
+                                customClass: {
+                                    input: 'form-select centered-select'
+                                },
+                                inputAttributes: {
+                                    style: 'width: 50%;'
+                                }
+                            });
+
+                            if (presentacionResult.isConfirmed) {
+                                const presentacionSeleccionada = presentacionResult.value;
+                                datosSeleccionados.presentacion = presentacionSeleccionada;
+
+                                const detallesProductos = await obtenerMasDetalles(categoriaSeleccionada, usoClinicoSeleccionado, nombreSeleccionado, presentacionSeleccionada);
+                                if (!detallesProductos || detallesProductos.length === 0) {
+                                    throw new Error('No se encontraron detalles de productos');
+                                }
+                                await mostrarDetallesProducto(datosSeleccionados, detallesProductos);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error en ContinueForm:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al continuar con el formulario. Por favor, inténtalo de nuevo más tarde.'
+                });
+            }
+        }
+
+        async function enviarFacturaPDF() {
+            Swal.fire({
+                title: 'En desarrollo!',
+                icon: 'warning',
+                confirmButtonText: 'Cool'
+            })
+        }
 
         async function enviarFacturaVenta(datoVenta) {
             try {
                 const facturaVenta = {
                     fechaVenta: datoVenta.fechaVenta,
-                    cantidad: datoVenta.cantidad,
-                    iva: datoVenta.iva,
+                    cantidad: datoVenta.cantidadTotal,
                     precioTotal: datoVenta.precioTotal,
                     tipoPago: datoVenta.tipoPago,
-                    idEmpleadoFk: clienteSeleccionadoId
+                    idClienteFK: datoVenta.idClienteFK
                 };
 
                 const response = await fetch('http://localhost:5033/Api/FacturaVenta', {
@@ -450,13 +714,16 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    Swal.fire({
+                    const confirmationResult = await Swal.fire({
                         title: '¡Felicidades!',
                         text: 'Factura de venta enviada con éxito',
                         icon: 'success',
-                        confirmButtonText: 'Aceptar'
+                        confirmButtonText: 'Descargar factura'
                     });
-                    console.log('Factura de venta enviada con éxito:', facturaCompra);
+                    if (confirmationResult.isConfirmed) {
+                        generarFacturaPDF();
+                    }
+                    console.log('Factura de venta enviada con éxito:', facturaVenta);
                     return data.id;
                 } else {
                     console.error('Error al enviar la factura de venta:', response.statusText);
@@ -466,9 +733,151 @@
             }
         }
 
+        async function ventaProducto(idFacturaVenta, idProducto) {
+            try {
+                const detalleFactura = {
+                    idFacturaVentaFK: idFacturaVenta,
+                    idProductoFK: idProducto
+                };
 
+                const response = await fetch('http://localhost:5033/Api/VentaProducto', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(detalleFactura)
+                });
 
+                if (response.ok) {
+                    const data = await response.json();
+                    Swal.fire({
+                        title: '¡Felicidades!',
+                        text: 'Detalles de factura enviada con éxito',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    console.log('Detalles de factura enviada con éxito:', detalleFactura);
+                    return data.id;
+                } else {
+                    console.error('Error al enviar los detalles de factura:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error al enviar los detalles de factura a ventaProducto:', error);
+            }
+        }
 
+        async function continueForm2(cantidadAVender) {
+            let cantidadTotal = 0;
+            let valorTotal = 0;
+            for (const nombreProducto in productos) {
+                cantidadTotal += productos[nombreProducto].cantidadAVender;
+                valorTotal += productos[nombreProducto].precio;
+            }
+
+            Swal.fire({
+                title: 'Datos de la factura',
+                html: `
+            <div class="inputs-container-2">
+                <div class="input-container-4">
+                    <label for="inputFecha" class="label-style-1">Fecha:</label>
+                    <input type="date" id="inputFecha" class="input-style-2">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputCantidadTotal" class="label-style-1">Cantidad total de los productos:</label>
+                    <input type="text" id="inputCantidadTotal" class="no-arrows input-style-2" readonly value="${cantidadTotal}">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputTotal" class="label-style-1">Precio total de los productos:</label>
+                    <input type="text" id="inputTotal" class="no-arrows input-style-2" readonly value="${valorTotal}">
+                </div>
+                <div class="input-container-4">
+                    <label for="inputSelect" class="label-style-1">Escoge una opción:</label>
+                    <select class="form-select-1" id="tipopago">
+                        <option value="text">Tipo de pago</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                </div>
+            </div>
+        `,
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    const datoVenta = {
+                        fechaVenta: document.getElementById('inputFecha').value,
+                        tipoPago: document.getElementById('tipopago').value,
+                        cantidadTotal: parseInt(document.getElementById('inputCantidadTotal').value),
+                        precioTotal: parseFloat(valorTotal),
+                        idClienteFK: parseInt(clienteId)
+                    };
+
+                    datosVentas.push(datoVenta);
+                    await actualizarProductoEnBaseDeDatos(cantidadAVender);
+                    const idFacturaVenta = await enviarFacturaVenta(datoVenta);
+
+                    const idsProductos = Object.values(productos).map(producto => producto.id);
+                    idsProductos.forEach(async idProducto => {
+                        await ventaProducto(idFacturaVenta, idProducto);
+                    });
+                }
+            });
+        }
+
+        function generarContenidoPDF(data) {
+            fetch('http://localhost:5033/Api/Producto')
+                .then(response => response.json())
+                .then(data => {
+                    const contenido = generarContenidoPDF(data);
+
+                    const pdfDoc = pdfMake.createPdf(contenido);
+
+                    pdfDoc.getBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        window.open(url, '_blank');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener los datos:', error);
+                });
+
+            const contenido = {
+                content: [
+                    // Título centrado
+                    {
+                        text: 'Factura de Venta',
+                        style: 'titulo'
+                    },
+                    // Espacio en blanco
+                    '\n',
+                    // Tabla de detalles de la factura
+                    {
+                        table: {
+                            headerRows: 1,
+                            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                            body: [
+                                ['Id', 'Producto', 'Precio', 'Clínico', 'Presentación', 'Existencias', 'Categoría'],
+                                ...data.map(item => [item.id, item.nombre, item.precio, item.usoClinico, item.presentacion, item.totalExistencias, item.categoria])
+                            ]
+                        }
+                    }
+                ],
+                // Estilos para el título
+                styles: {
+                    titulo: {
+                        alignment: 'center',
+                        fontSize: 18,
+                        bold: true,
+                        margin: [0, 0, 0, 10] // Añadir espacio en la parte inferior
+                    }
+                }
+            };
+
+            return contenido;
+        }
+
+        console.log(productos)
+        console.log(datosVentas)
     </script>
 </body>
 

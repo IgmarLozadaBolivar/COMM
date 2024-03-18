@@ -918,6 +918,11 @@ td {
     justify-content: center;
 }
 
+.centered-select {
+    margin: auto;
+    display: block;
+}
+
 @media (max-width: 768px) {
     .input-container-4 {
         flex: 1 1 100%;

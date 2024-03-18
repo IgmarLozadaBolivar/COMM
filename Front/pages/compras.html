@@ -76,7 +76,7 @@
         </div>
     </nav>
     <section class="home">
-        <div class="form-box-3">
+        <div class="form-box-3" style="display: none;">
             <div class="form-box">
                 <div class="form-value">
                     <form action="">
@@ -89,35 +89,6 @@
                                 </select>
                                 <label for="proveedor"></label>
                             </div>
-                        </div>
-                        <p style="font-size: 20px;">Datos de la compra</p>
-                        <div class="inputs-container">
-                            <div class="inputbox">
-                                <ion-icon name="calendar-outline"></ion-icon>
-                                <input type="text" id="fechaCompra" name="fechaCompra" required />
-                                <label for="fechaCompra">Fecha de compra</label>
-                            </div>
-                            <div class="inputbox">
-                                <select class="form-select" id="tipoPago">
-                                    <option value="text">Tipo Pago</option>
-                                    <option value="yes">Efectivo</option>
-                                    <option value="no">Trasferencia</option>
-                                </select>
-                            </div>
-                            <div class="inputbox">
-                                <input id="cantidadTotal" type="number" min="0" required>
-                                <label for="cantidadTotal">Cantidad total<label>
-                            </div>
-                            <div class="inputbox">
-                                <ion-icon name="shield-checkmark-outline"></ion-icon>
-                                <input id="total" type="number" class="no-arrows" required>
-                                <label for="total">Total</label>
-                            </div>
-                        </div>
-                        <div class="btns">
-                            <button id="boton-factura">
-                                Generar factura
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -134,7 +105,7 @@
             sidebar.classList.toggle("close");
         });
 
-        let proveedorSeleccionadoId = null;
+        let proveedorId;
 
         function traerProveedores() {
             fetch('http://localhost:5033/Api/Proveedor')
@@ -155,12 +126,12 @@
 
         Swal.fire({
             title: '¡Bienvenido!',
-            text: '¿Deseas continuar con la factura?',
+            text: '¿Qué desea hacer?',
             icon: 'info',
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: 'Sí',
-            denyButtonText: 'No'
+            confirmButtonText: 'Generar factura',
+            denyButtonText: 'Volver a facturación'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
@@ -212,7 +183,8 @@
                                 }
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    ContinueForm(result.value);
+                                    proveedorId = result.value;
+                                    ContinueForm(proveedorId);
                                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                                     window.location.href = './facturacion.html';
                                 }
@@ -230,20 +202,35 @@
 
         let productos = {};
         let datosCompras = [];
+        let productosExistentes = {};
 
-        async function obtenerSiguienteId() {
+        async function obtenerProductosExistentes() {
             try {
                 const response = await fetch('http://localhost:5033/Api/Producto');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los productos');
+                }
                 const data = await response.json();
-                const maxId = Math.max(...data.map(producto => producto.id));
-                return maxId + 1;
+                return data;
             } catch (error) {
-                console.error('Error al obtener el siguiente ID:', error);
+                console.error('Error al obtener los productos:', error);
                 return null;
             }
         }
 
-        function ContinueForm(selectProveedor) {
+        async function obtenerUltimoIDOcupado() {
+            try {
+                const productosExistentes = await obtenerProductosExistentes();
+                const idsUtilizados = productosExistentes.map(producto => producto.id);
+                const ultimoID = Math.max(...idsUtilizados);
+                return ultimoID;
+            } catch (error) {
+                console.error('Error al obtener el último ID ocupado:', error);
+                return null;
+            }
+        }
+
+        async function ContinueForm(proveedorId) {
             Swal.fire({
                 title: 'Datos del producto',
                 html: `
@@ -293,31 +280,55 @@
                 showCancelButton: true,
                 confirmButtonText: 'Confirmar',
                 cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const producto = {
-                        proveedor: selectProveedor,
+
+                    const obtenerProductoExistente = await obtenerProductosExistentes();
+
+                    const productoNuevo = {
+                        proveedor: proveedorId,
                         nombre: document.getElementById('inputNombre').value,
                         precio: parseFloat(document.getElementById('inputPrecio').value),
                         usoClinico: document.getElementById('usoclinico').value,
-                        codigoBarras: document.getElementById('inputBarcode').value,
-                        marca: document.getElementById('inputBrand').value,
-                        descripcion: document.getElementById('inputDescription').value,
+                        codigoBarras: document.getElementById('inputBarcode').value || null,
+                        marca: document.getElementById('inputBrand').value || null,
+                        descripcion: document.getElementById('inputDescription').value || null,
                         presentacion: document.getElementById('inputPresentation').value,
-                        totalExistencias: parseInt(document.getElementById('inputCantidad').value),
+                        cantidadAAgregar: parseInt(document.getElementById('inputCantidad').value),
                         categoria: document.getElementById('inputCategoria').value
                     };
 
-                    if (productos[producto.nombre && producto.precio && producto.usoClinico && producto.codigoBarras && producto.marca && producto.descripcion && producto.presentacion && producto.categoria]) {
-                        productos[producto.nombre].totalExistencias += producto.totalExistencias;
+                    productoNuevo.totalExistencias = productoNuevo.cantidadAAgregar;
+
+                    let productoExistente = obtenerProductoExistente.find(producto =>
+                        producto.nombre === productoNuevo.nombre &&
+                        producto.precio === productoNuevo.precio &&
+                        producto.usoClinico === productoNuevo.usoClinico &&
+                        producto.codigoBarras === productoNuevo.codigoBarras &&
+                        producto.marca === productoNuevo.marca &&
+                        producto.descripcion === productoNuevo.descripcion &&
+                        producto.presentacion === productoNuevo.presentacion &&
+                        producto.categoria === productoNuevo.categoria
+                    );
+
+                    if (productoExistente) {
+                        const totalExistencias = productoExistente.totalExistencias + productoNuevo.cantidadAAgregar;
+                        const idExistente = productoExistente.id
+                        const productoExistenteConID = {
+                            id: idExistente,
+                            ...productoNuevo,
+                            totalExistencias: totalExistencias
+                        };
+
+                        const nombreProductoExistente = `Producto Existente ${Object.keys(productosExistentes).length + 1}`;
+                        if (!productosExistentes[nombreProductoExistente]) {
+                            productosExistentes[nombreProductoExistente] = [];
+                        }
+                        productosExistentes[nombreProductoExistente].push(productoExistenteConID);
                     } else {
-                        productos[producto.nombre] = producto;
+                        const nombreProducto = `Producto Nuevo ${Object.keys(productos).length + 1}`;
+                        productos[nombreProducto] = productoNuevo;
                     }
-
-                    const nombreProducto = `Producto ${Object.keys(productos).length + 1}`;
-                    productos[nombreProducto] = producto;
-
-                    proveedorSeleccionadoId = selectProveedor;
 
                     askToAddAnotherProduct();
                 }
@@ -334,7 +345,7 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    ContinueForm(proveedorSeleccionadoId);
+                    ContinueForm(proveedorId);
                 } else if (result.isDenied) {
                     continueForm2();
                 }
@@ -343,9 +354,12 @@
 
         async function enviarProducto(producto) {
             try {
-                const nextId = await obtenerSiguienteId();
-                producto.id = nextId;
+                const ultimoIDOcupado = await obtenerUltimoIDOcupado();
+                const id = ultimoIDOcupado + 1;
+
                 delete producto.proveedor;
+
+                producto.id = id;
 
                 const response = await fetch('http://localhost:5033/Api/Producto', {
                     method: 'POST',
@@ -363,6 +377,29 @@
             }
         }
 
+        async function enviarProductoExistente(productoExistente) {
+            try {
+                const idProductoExistente = productoExistente.id;
+                delete productoExistente.proveedor;
+                delete productoExistente.cantidadAAgregar;
+                console.log(idProductoExistente);
+
+                const response = await fetch(`http://localhost:5033/Api/Producto/${idProductoExistente}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productoExistente)
+                });
+
+                if (response.ok) {
+                    console.log('Producto existente enviado con éxito:', productoExistente);
+                } else {
+                    console.error('Error al enviar el producto existente:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error al enviar el producto existente:', error);
+            }
+        }
+
         async function enviarFacturaCompra(datoCompra) {
             try {
                 const facturaCompra = {
@@ -370,7 +407,7 @@
                     cantidadTotal: datoCompra.cantidadTotal,
                     precioTotal: datoCompra.precioTotal,
                     tipoPago: datoCompra.tipoPago,
-                    idProveedorFk: proveedorSeleccionadoId
+                    idProveedorFk: parseInt(proveedorId)
                 };
 
                 const response = await fetch('http://localhost:5033/Api/FacturaCompra', {
@@ -397,15 +434,58 @@
             }
         }
 
+        let detallesCompra = [];
+
+        async function compraProducto(idFacturaCompra, idProducto) {
+            try {
+                const detalleCompra = {
+                    idFacturaCompraFK: idFacturaCompra,
+                    idProductoFK: idProducto
+                };
+
+                const response = await fetch('http://localhost:5033/Api/CompraProducto', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(detalleCompra)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    Swal.fire({
+                        title: '¡Felicidades!',
+                        text: 'Detalles de factura de enviada con éxito',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    console.log('Detalles de factura enviada con éxito:', detalleCompra);
+                    return data.id;
+                } else {
+                    console.error('Error al enviar los detalles de factura:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error al enviar los detalles de factura a CompraProducto:', error);
+            }
+        }
+
         async function continueForm2() {
             let cantidadTotal = 0;
             let valorTotal = 0;
+
             for (const nombreProducto in productos) {
-                cantidadTotal += productos[nombreProducto].totalExistencias;
+                cantidadTotal += productos[nombreProducto].cantidadAAgregar;
                 valorTotal += productos[nombreProducto].precio;
             }
 
-            Swal.fire({
+            for (const nombreProductoExistente in productosExistentes) {
+                const productosExistentesArray = productosExistentes[nombreProductoExistente];
+                for (const productoExistente of productosExistentesArray) {
+                    cantidadTotal += productoExistente.cantidadAAgregar;
+                    valorTotal += productoExistente.precio;
+                    await enviarProductoExistente(productoExistente);
+                }
+            }
+
+            const { value: formValues } = await Swal.fire({
                 title: 'Datos de la compra',
                 html: `
             <div class="inputs-container-2">
@@ -416,7 +496,7 @@
                 <div class="input-container-4">
                     <label for="inputSelect" class="label-style-1">Escoge una opción:</label>
                     <select class="form-select-1" id="tipopago">
-                        <option value="text">Tipo de pago</option>
+                        <option value="" disabled>Tipo de pago</option>
                         <option value="Efectivo">Efectivo</option>
                         <option value="Transferencia">Transferencia</option>
                     </select>
@@ -429,39 +509,61 @@
                     <label for="inputTotal" class="label-style-1">Precio total de los productos:</label>
                     <input type="text" id="inputTotal" class="no-arrows input-style-2" readonly value="${valorTotal}">
                 </div>
-            </div>
-        `,
-                showCancelButton: true,
-                confirmButtonText: 'Confirmar',
-                cancelButtonText: 'Cancelar'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    if (result.isConfirmed) {
-
-                        const datoCompra = {
-                            fechaCompra: document.getElementById('inputFecha').value,
-                            tipoPago: document.getElementById('tipopago').value,
-                            cantidadTotal: parseInt(document.getElementById('inputCantidadTotal').value),
-                            precioTotal: parseFloat(document.getElementById('inputTotal').value)
-                        };
-
-                        const facturaId = await enviarFacturaCompra(datoCompra);
-
-                        for (const nombreProducto in productos) {
-                            productos[nombreProducto].idFacturaCompraFk = facturaId;
-                        }
-
-                        for (const nombreProducto in productos) {
-                            await enviarProducto(productos[nombreProducto]);
-                        }
-                        datosCompras.push(datoCompra);
+            </div>`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const inputFecha = document.getElementById('inputFecha').value;
+                    const inputTipoPago = document.getElementById('tipopago').value;
+                    if (!inputFecha || !inputTipoPago) {
+                        Swal.showValidationMessage('Por favor, seleccione una fecha y tipo de pago');
                     }
+                    return { inputFecha, inputTipoPago };
                 }
             });
+
+            if (formValues) {
+                const { inputFecha, inputTipoPago } = formValues;
+
+                const datoCompra = {
+                    fechaCompra: inputFecha,
+                    tipoPago: inputTipoPago,
+                    cantidadTotal: cantidadTotal,
+                    precioTotal: valorTotal
+                };
+
+                datosCompras.push(datoCompra);
+                const idFacturaCompra = await enviarFacturaCompra(datoCompra);
+                console.log('ID de factura de compra:', idFacturaCompra);
+
+                for (const nombreProducto in productos) {
+                    const producto = productos[nombreProducto];
+                    await enviarProducto(producto);
+                    const idProductoNuevo = producto.id;
+                    detallesCompra.push({
+                        idFacturaCompra: idFacturaCompra,
+                        idProducto: idProductoNuevo
+                    });
+                    await compraProducto(idFacturaCompra, idProductoNuevo);
+                }
+
+                for (const nombreProductoExistente in productosExistentes) {
+                    const productosExistentesArray = productosExistentes[nombreProductoExistente];
+                    for (const productoExistente of productosExistentesArray) {
+                        const idProductoExistente = productoExistente.id;
+                        detallesCompra.push({
+                            idFacturaCompra: idFacturaCompra,
+                            idProducto: idProductoExistente
+                        });
+                        await compraProducto(idFacturaCompra, idProductoExistente);
+                    }
+                }
+            }
         }
 
         console.log(productos);
         console.log(datosCompras);
+        console.log(productosExistentes);
+        console.log(detallesCompra);
     </script>
 </body>
 
