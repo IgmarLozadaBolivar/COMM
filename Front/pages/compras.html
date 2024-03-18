@@ -95,6 +95,8 @@
             </div>
         </div>
     </section>
+    <script src="../node_modules/pdfmake/build/pdfmake.min.js"></script>
+    <script src="../node_modules/pdfmake/build/vfs_fonts.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
@@ -196,7 +198,7 @@
                         });
                 }, 2000);
             } else if (result.isDenied) {
-                window.location.href = './facturacion.html';
+                generarCompraPDF();
             }
         });
 
@@ -557,6 +559,52 @@
                         await compraProducto(idFacturaCompra, idProductoExistente);
                     }
                 }
+
+                /* const confirmarCompra = await Swal.fire({
+                    title: 'Confirmar Compra',
+                    text: '¿Estás seguro de que deseas confirmar la compra?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Confirmar'
+                });
+
+                if (confirmarCompra.isConfirmed) {
+                    await generarCompraPDF();
+
+                    Swal.fire(
+                        'Compra Confirmada',
+                        'La compra se ha confirmado correctamente.',
+                        'success'
+                    );
+                } */
+            }
+        }
+
+        async function generarCompraPDF() {
+            try {
+                const response = await fetch('http://localhost:5033/Api/CompraProducto');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los productos');
+                }
+                const data = await response.json();
+
+                const docDefinition = {
+                    content: [
+                        'Productos:',
+                        {
+                            ul: data.map(producto => producto.idFacturaCompraFK)
+                        }
+                    ]
+                };
+
+                pdfMake.createPdf(docDefinition).download('compra.pdf');
+
+                return data;
+            } catch (error) {
+                console.error('Error al obtener los productos:', error);
+                return null;
             }
         }
 
