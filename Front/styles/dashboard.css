@@ -664,7 +664,7 @@ input:valid~label {
 
 .list-box-4 {
     position: absolute;
-    top: 30%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: #f4f4f4;
@@ -673,11 +673,44 @@ input:valid~label {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
     color: #333;
+    max-height: 70%;
 }
 
 .table-box {
     width: 100%;
     border-collapse: collapse;
+}
+
+.table-box tbody {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.table-box thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+::-webkit-scrollbar {
+    width: 16px;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; 
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 td,

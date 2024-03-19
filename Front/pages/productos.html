@@ -191,10 +191,6 @@
                                 <input type="text" value="${id}" id="inputID" class="input-style" readonly>
                             </div>
                             <div class="input-container-3">
-                                <label for="inputID" class="label-style">(Solo lectura)</label>
-                                <input type="text" value="${IdFacturaCompraFk}" id="inputID" class="input-style" readonly>
-                            </div>
-                            <div class="input-container-3">
                                 <label for="inputNuevoNombre" class="label-style">Nombre:</label>
                                 <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevo nombre del producto">
                             </div>
@@ -298,6 +294,9 @@
                 .then(data => {
                     const tablaData = document.getElementById('tabla-data');
                     tablaData.innerHTML = '';
+
+                    const limiteProductosPorPagina = 7; // Define el límite de productos por página
+                    const productosPagina = data.slice(0, limiteProductosPorPagina);
 
                     data.forEach(producto => {
                         const tableRow = document.createElement('tr');
