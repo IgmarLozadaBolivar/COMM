@@ -57,6 +57,9 @@ async function autorizarUsuario() {
         const response = await fetch(urlAuth, config);
 
         if (response.ok) {
+            const responseData = await response.json();
+            const token = responseData.token;
+            localStorage.setItem('token', token);
             window.location.href = "./dashboard.html";
         } else {
             alert("Autenticación fallida. Verifique sus credenciales o regístrese.");

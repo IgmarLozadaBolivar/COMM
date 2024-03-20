@@ -269,7 +269,11 @@
         async function eliminarProducto(id) {
             const urlEliminar = `http://localhost:5033/Api/Producto/${id}`;
             const config = {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             };
 
             try {
@@ -302,13 +306,27 @@
         }
 
         function obtenerProductos() {
-            fetch('http://localhost:5033/Api/Producto')
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No se ha encontrado un token en localStorage.');
+                return;
+            }
+
+            const apiUrl = 'http://localhost:5033/Api/Producto';
+
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     const tablaData = document.getElementById('tabla-data');
                     tablaData.innerHTML = '';
 
-                    const limiteProductosPorPagina = 7; // Define el límite de productos por página
+                    const limiteProductosPorPagina = 7;
                     const productosPagina = data.slice(0, limiteProductosPorPagina);
 
                     data.forEach(producto => {
