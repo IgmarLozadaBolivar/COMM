@@ -2,6 +2,7 @@ using Api.Dtos;
 using AutoMapper;
 using Dominio.Entidades;
 using Dominio.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers;
 
@@ -58,6 +59,8 @@ public class ProductoController : BaseApiController
         return Ok(facturasDto);
     }
 
+
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,6 +77,7 @@ public class ProductoController : BaseApiController
         return CreatedAtAction(nameof(Post), new { id = dataDto.Id }, dataDto);
     }
 
+    [Authorize(Roles = "Administrador")]
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -90,7 +94,7 @@ public class ProductoController : BaseApiController
         return dataDto;
     }
 
-
+    [Authorize(Roles = "Administrador")]
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

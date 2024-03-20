@@ -23,7 +23,6 @@ public class VentaProductoRepository : GenericRepository<VentaProducto>, IVentaP
                        {
                            Nombre = p.Nombre,
                            Precio = p.Precio,
-                           UsoClinico = p.UsoClinico,
                            CodigoDeBarras = p.CodigoBarras,
                            Marca = p.Marca,
                            Descripcion = p.Descripcion,

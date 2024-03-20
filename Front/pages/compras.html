@@ -9,6 +9,10 @@
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+<style>
+    #presentacionOptions option {
+        font-size: 26px; }
+</style>
 
 <body>
     <nav class="sidebar close">
@@ -27,12 +31,6 @@
         <div class="menu-bar">
             <div class="menu">
                 <ul class="menu-links">
-                    <li class="nav-link">
-                        <a href="./dashboard.html">
-                            <i class='bx bx-home-alt icon'></i>
-                            <span class="text nav-text">Tablero</span>
-                        </a>
-                    </li>
                     <li class="nav-link">
                         <a href="./clientes.html">
                             <i class='bx bx-group icon'></i>
@@ -61,7 +59,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="../index.html">
+                    <a href="#" onclick="cerrarSesion()">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -100,6 +98,9 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        function cerrarSesion() {
+            window.location.replace("../index.html");
+        }
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")
@@ -128,12 +129,12 @@
 
         Swal.fire({
             title: '¡Bienvenido!',
-            text: '¿Qué desea hacer?',
+            text: 'Por favor, seleccione una opción para continuar.',
             icon: 'info',
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Generar factura',
-            denyButtonText: 'Volver a facturación'
+            denyButtonText: 'Volver'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
@@ -198,7 +199,7 @@
                         });
                 }, 2000);
             } else if (result.isDenied) {
-                generarCompraPDF();
+                window.location.href = './facturacion.html';
             }
         });
 
@@ -246,24 +247,26 @@
                     <input type="number" min="0" id="inputPrecio" class="no-arrows input-style-1" placeholder="Precio del producto">
                 </div>
                 <div class="input-container-4">
-                    <label for="inputSelect" class="label-style-1">Escoge una opción:</label>
-                    <select class="form-select" id="usoclinico">
-                        <option value="text">Uso clínico?</option>
-                        <option value="SI">Sí</option>
-                        <option value="NO">No</option>
-                    </select>
-                </div>
-                <div class="input-container-4">
                     <label for="inputBarcode" class="label-style-1">Codigo de barra:</label>
                     <input type="text" id="inputBarcode" class="input-style-1" placeholder="Codigo de barra">
                 </div>
                 <div class="input-container-4">
-                    <label for="inputBrand" class="label-style-1">Marca:</label>
-                    <input type="text" id="inputBrand" class="input-style-1" placeholder="Marca del producto">
-                </div>
-                <div class="input-container-4">
-                    <label for="inputPresentation" class="label-style-1">Presentación:</label>
-                    <input type="text" id="inputPresentation" class="input-style-1" placeholder="Presentación del producto">
+                    <label for="inputPresentation" class="label-style-1">Talla</label>
+                    <input list="presentacionOptions" id="inputPresentation" class="input-style" placeholder="Talla del producto">
+                    <datalist id="presentacionOptions">
+                        <option value="XS">XS</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                        <option value="6">6</option>
+                        <option value="10">10</option>
+                        <option value="12">12</option>
+                        <option value="16">16</option>
+                        <option value="20">20</option>
+                        <option value="24">24</option>     
+                    </datalist>
                 </div>
                 <div class="input-container-4">
                     <label for="inputDescription" class="label-style-1">Descripción:</label>
@@ -274,8 +277,8 @@
                     <input type="text" id="inputCantidad" class="input-style-1" placeholder="Cantidad del producto">
                 </div>
                 <div class="input-container-4">
-                    <label for="inputCategoria" class="label-style-1">Categoría:</label>
-                    <input type="text" id="inputCategoria" class="input-style-1" placeholder="Categoría del producto">
+                    <label for="inputCategoria" class="label-style-1">Elemento:</label>
+                    <input type="text" id="inputCategoria" class="input-style-1" placeholder="Elemento">
                 </div>
             </div>
         `,
@@ -291,9 +294,7 @@
                         proveedor: proveedorId,
                         nombre: document.getElementById('inputNombre').value,
                         precio: parseFloat(document.getElementById('inputPrecio').value),
-                        usoClinico: document.getElementById('usoclinico').value,
                         codigoBarras: document.getElementById('inputBarcode').value || null,
-                        marca: document.getElementById('inputBrand').value || null,
                         descripcion: document.getElementById('inputDescription').value || null,
                         presentacion: document.getElementById('inputPresentation').value,
                         cantidadAAgregar: parseInt(document.getElementById('inputCantidad').value),
@@ -305,9 +306,7 @@
                     let productoExistente = obtenerProductoExistente.find(producto =>
                         producto.nombre === productoNuevo.nombre &&
                         producto.precio === productoNuevo.precio &&
-                        producto.usoClinico === productoNuevo.usoClinico &&
                         producto.codigoBarras === productoNuevo.codigoBarras &&
-                        producto.marca === productoNuevo.marca &&
                         producto.descripcion === productoNuevo.descripcion &&
                         producto.presentacion === productoNuevo.presentacion &&
                         producto.categoria === productoNuevo.categoria
@@ -384,7 +383,7 @@
             try {
                 const idProductoExistente = productoExistente.id;
                 delete productoExistente.proveedor;
-                /* delete productoExistente.cantidadAAgregar; */
+
                 console.log(idProductoExistente);
 
                 const response = await fetch(`http://localhost:5033/Api/Producto/${idProductoExistente}`, {
@@ -585,31 +584,59 @@
             }
         }
 
-        async function generarCompraPDF() {
-            try {
-                const response = await fetch('http://localhost:5033/Api/CompraProducto');
-                if (!response.ok) {
-                    throw new Error('Error al obtener los productos');
-                }
-                const data = await response.json();
+        //         function generarContenidoPDF(data) {
+        //     const contenido = {
+        //         content: [
+        //             // Título centrado
+        //             {
+        //                 text: 'Factura de Venta',
+        //                 style: 'titulo'
+        //             },
+        //             // Espacio en blanco
+        //             '\n',
+        //             // Tabla de detalles de la factura
+        //             {
+        //                 table: {
+        //                     headerRows: 1,
+        //                     widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+        //                     body: [
+        //                         ['Id', 'Producto', 'Precio', 'Clínico', 'Presentación', 'Existencias', 'Categoría', 'Fecha Compra', 'Id Proveedor', 'Cantidad Total', 'Precio Total', 'Tipo Pago', 'Nombre', 'Código Barras', 'Marca', 'Descripción'],
+        //                         ...data.map(item => [
+        //                             item.id, 
+        //                             item.nombre, 
+        //                             item.precio,
+        //                             item.presentacion, 
+        //                             item.totalExistencias, 
+        //                             item.categoria, 
+        //                             item.fechaCompra, 
+        //                             item.idProveedorFk, 
+        //                             item.cantidadTotal, 
+        //                             item.precioTotal, 
+        //                             item.tipoPago, 
+        //                             item.nombre, 
+        //                             item.codigoBarras, 
+        //                             item.marca, 
+        //                             item.descripcion
+        //                         ])
+        //                     ]
+        //                 }
+        //             }
+        //         ],
+        //         // Estilos para el título
+        //         styles: {
+        //             titulo: {
+        //                 alignment: 'center',
+        //                 fontSize: 18,
+        //                 bold: true,
+        //                 margin: [0, 0, 0, 10] // Añadir espacio en la parte inferior
+        //             }
+        //         }
+        //     };
 
-                const docDefinition = {
-                    content: [
-                        'Productos:',
-                        {
-                            ul: data.map(producto => producto.idFacturaCompraFK)
-                        }
-                    ]
-                };
+        //     return contenido;
+        // }
 
-                pdfMake.createPdf(docDefinition).download('compra.pdf');
 
-                return data;
-            } catch (error) {
-                console.error('Error al obtener los productos:', error);
-                return null;
-            }
-        }
 
         console.log(productos);
         console.log(datosCompras);

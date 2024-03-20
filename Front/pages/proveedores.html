@@ -28,12 +28,6 @@
             <div class="menu">
                 <ul class="menu-links">
                     <li class="nav-link">
-                        <a href="./dashboard.html">
-                            <i class='bx bx-home-alt icon'></i>
-                            <span class="text nav-text">Tablero</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
                         <a href="./clientes.html">
                             <i class='bx bx-group icon'></i>
                             <span class="text nav-text">Clientes</span>
@@ -61,7 +55,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="../index.html">
+                    <a href="#" onclick="cerrarSesion()">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -76,7 +70,7 @@
         </div>
     </nav>
     <section class="home">
-        <div class="text">Bienvenido a la sección de proveedores!</div>
+        <div class="text">Sección de proveedores!</div>
         <div class="form-box">
             <div class="form-box">
                 <div class="form-value">
@@ -94,7 +88,7 @@
                             </button>
                         </div>
                         <div class="more">
-                            <p>Visualizar proveedores</p>
+                            <h3>Visualizar proveedores</h3>
                             <p>👇</p>
                             <a href="#" class="btn-about" onclick="showFormAndFetchClientes()">Mostrar</a>
                         </div>
@@ -118,6 +112,9 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        function cerrarSesion() {
+            window.location.replace("../index.html");
+        }
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")
@@ -171,7 +168,7 @@
                 try {
                     const response = await fetch(urlRegister, config);
 
-                    if (response.status === 200) {
+                    if (response.status === 200 || response.status === 201) {
                         Swal.fire({
                             title: '¡Felicidades!',
                             text: 'Se ha registrado el proveedor',
@@ -257,27 +254,27 @@
                 Swal.fire({
                     title: 'Editar proveedor',
                     html: `
-                        <div class="input-container">
-                            <label for="inputID" class="label-style">(Solo lectura)</label>
-                            <input type="text" value="${id}" id="inputID" class="input-style" readonly>
-                        </div>
-                        <div class="input-container">
-                            <label for="inputNuevoNombre" class="label-style">Nombre del proveedor:</label>
-                            <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevo nombre del proveedor">
-                        </div>
-                    `,
+                <div class="input-container">
+                    <label for="inputID" class="label-style">(Solo lectura)</label>
+                    <input type="text" value="${id}" id="inputID" class="input-style" readonly>
+                </div>
+                <div class="input-container">
+                    <label for="inputNuevoNombre" class="label-style">Nombre del proveedor:</label>
+                    <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevo nombre del proveedor">
+                </div>
+            `,
                     showCancelButton: true,
                     confirmButtonText: 'Confirmar',
                     cancelButtonText: 'Cancelar',
                     showLoaderOnConfirm: true,
                     preConfirm: () => {
-                        const proveedorId = document.getElementById('proveedorId').value;
-                        const nuevoNombre = document.getElementById('nuevoNombre').value;
-                        editarProveedor(proveedorId, nuevoNombre);
+                        const nuevoNombre = document.getElementById('inputNuevoNombre').value;
+                        editarProveedor(id, nuevoNombre);
                     }
                 });
             }, 2000);
         }
+
 
         async function eliminarProveedor(id) {
             const urlEliminar = `http://localhost:5033/Api/Proveedor/${id}`;

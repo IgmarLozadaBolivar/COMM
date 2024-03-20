@@ -9,6 +9,22 @@
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+<style>
+    .search-container {
+        display: flex;
+        align-items: center;
+        margin: 10px 20px 10px 20px;
+    }
+
+    #searchInput {
+        flex: 1;
+        padding: 12px;
+        border-radius: 30px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        outline: none;
+    }
+</style>
 
 <body>
     <nav class="sidebar close">
@@ -27,12 +43,6 @@
         <div class="menu-bar">
             <div class="menu">
                 <ul class="menu-links">
-                    <li class="nav-link">
-                        <a href="./dashboard.html">
-                            <i class='bx bx-home-alt icon'></i>
-                            <span class="text nav-text">Tablero</span>
-                        </a>
-                    </li>
                     <li class="nav-link">
                         <a href="./clientes.html">
                             <i class='bx bx-group icon'></i>
@@ -61,7 +71,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="../index.html">
+                    <a href="#" onclick="cerrarSesion()">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -76,7 +86,7 @@
         </div>
     </nav>
     <section class="home">
-        <div class="text">Bienvenido!</div>
+        <div class="text">Sección de cliente!</div>
         <div class="form-box" style="display: block;">
             <div class="form-box">
                 <div class="form-value">
@@ -96,7 +106,7 @@
                         <div class="inputbox">
                             <ion-icon name="id-card-outline"></ion-icon>
                             <input type="text" class="no-arrows" id="id_number" name="id_number" required />
-                            <label for="">Cedula</label>
+                            <label for="">Cédula</label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="mail-outline"></ion-icon>
@@ -114,7 +124,7 @@
                             </button>
                         </div>
                         <div class="more">
-                            <p>Visualizar clientes</p>
+                            <h3>Visualizar clientes</h3>
                             <p>👇</p>
                             <a href="#" class="btn-about" onclick="showFormAndFetchClientes()">Mostrar</a>
                         </div>
@@ -123,6 +133,9 @@
             </div>
         </div>
         <div class="list-box-4" style="display: none;">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar cliente por nombre...">
+            </div>
             <table class="table-box">
                 <thead>
                     <tr>
@@ -142,6 +155,10 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        function cerrarSesion() {
+            window.location.replace("../index.html");
+        }
+
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")
@@ -370,7 +387,6 @@
                 console.error('Error al obtener datos del cliente:', error);
             }
         }
-
         async function obtenerClientes() {
             fetch('http://localhost:5033/Api/Persona')
                 .then(response => response.json())
@@ -467,6 +483,21 @@
             delete element.dataset.marqueeId;
             element.scrollLeft = 0;
         }
+
+        document.getElementById("searchInput").addEventListener("input", function () {
+            const searchTerm = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll("#tabla-data tr");
+
+            rows.forEach(function (row) {
+                const name = row.cells[0].innerText.toLowerCase();
+                if (name.includes(searchTerm) || searchTerm === "") {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+
     </script>
 </body>
 

@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .search-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 20px 10px 20px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 12px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,12 +43,6 @@
         <div class="menu-bar">
             <div class="menu">
                 <ul class="menu-links">
-                    <li class="nav-link">
-                        <a href="./dashboard.html">
-                            <i class='bx bx-home-alt icon'></i>
-                            <span class="text nav-text">Tablero</span>
-                        </a>
-                    </li>
                     <li class="nav-link">
                         <a href="./clientes.html">
                             <i class='bx bx-group icon'></i>
@@ -61,7 +71,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="../index.html">
+                    <a href="#" onclick="cerrarSesion()">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -76,20 +86,21 @@
         </div>
     </nav>
     <section class="home">
-        <div class="text">Bienvenido!</div>
+        <div class="text">Sección de productos!</div>
         <div class="list-box-4">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar producto por nombre...">
+            </div>
             <table class="table-box">
                 <thead>
                     <tr>
                         <th>Nombre</th>
                         <th>Precio</th>
-                        <th>Clínico</th>
                         <th>Barcode</th>
-                        <th>Marca</th>
                         <th>Descripción</th>
-                        <th>Presentación</th>
+                        <th>Talla</th>
                         <th>Existencias</th>
-                        <th>Categoría</th>
+                        <th>Elemento</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -101,6 +112,9 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        function cerrarSesion() {
+            window.location.replace("../index.html");
+        }
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")
@@ -126,7 +140,7 @@
             });
         });
 
-        async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoUsoClinico, nuevoCódigoBarra, nuevaMarca, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria) {
+        async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria) {
             const urlEditar = `http://localhost:5033/Api/Producto/${id}`;
 
             const productoActual = await obtenerProducto(id);
@@ -135,9 +149,7 @@
                 id: id,
                 nombre: nuevoNombre !== '' ? nuevoNombre : productoActual.nombre,
                 precio: nuevoPrecio !== '' ? nuevoPrecio : productoActual.precio,
-                usoClinico: nuevoUsoClinico !== '' ? nuevoUsoClinico : productoActual.usoClinico,
                 codigoBarras: nuevoCódigoBarra !== '' ? nuevoCódigoBarra : productoActual.codigoBarras,
-                marca: nuevaMarca !== '' ? nuevaMarca : productoActual.marca,
                 descripcion: nuevaDescripcion !== '' ? nuevaDescripcion : productoActual.descripcion,
                 presentacion: nuevaPresentacion !== '' ? nuevaPresentacion : productoActual.presentacion,
                 totalExistencias: nuevoTotalExistencias !== '' ? nuevoTotalExistencias : productoActual.totalExistencias,
@@ -198,37 +210,40 @@
                                 <label for="inputNuevoPrecio" class="label-style">Precio:</label>
                                 <input type="number" class="no-arrows input-style" min="0" id="inputNuevoPrecio" placeholder="Nuevo precio del producto">
                             </div>
-                            <div class="input-container-3">
-                                <label for="inputNuevoUsoClinico" class="label-style">Uso clínico:</label>
-                                <input list="usoClinicoOptions" id="inputNuevoUsoClinico" class="input-style" placeholder="Nuevo uso clínico">
-                                <datalist id="usoClinicoOptions">
-                                        <option value="SI">
-                                        <option value="NO">
-                                </datalist>
-                            </div>
+                            
                             <div class="input-container-3">
                                 <label for="inputNuevoCódigoBarra" class="label-style">Barcode:</label>
                                 <input type="text" id="inputNuevoCódigoBarra" class="no-arrows input-style" placeholder="Nuevo código de barra">
                             </div>
                             <div class="input-container-3">
-                                <label for="inputNuevaMarca" class="label-style">Marca:</label>
-                                <input type="text" id="inputNuevaMarca" class="input-style" placeholder="Nueva marca del producto">
-                            </div>
-                            <div class="input-container-3">
-                                <label for="inputNuevaDescripcion" class="label-style">Descripción:</label>
-                                <input type="text" id="inputNuevaDescripcion" class="input-style" placeholder="Nueva descripción del producto">
-                            </div>
-                            <div class="input-container-3">
-                                <label for="inputNuevaPresentacion" class="label-style">Presentación:</label>
-                                <input type="text" id="inputNuevaPresentacion" class="input-style" placeholder="Nueva presentación del producto">
+                                <label for="inputNuevaPresentacion" class="label-style">Talla</label>
+                                <input list="presentacionOptions" id="inputNuevaPresentacion" class="input-style" placeholder="Nueva talla">
+                                <datalist id="presentacionOptions">
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="6">6</option>
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="16">16</option>
+                                <option value="20">20</option>
+                                <option value="24">24</option>     
+                                </datalist>
                             </div>
                             <div class="input-container-3">
                                 <label for="inputNuevoTotalExistencias" class="label-style">Existencias:</label>
                                 <input type="number" id="inputNuevoTotalExistencias" class="input-style" min="0" placeholder="Nuevo total de existencias del producto">
                             </div>
+                            <div class="input-container-3">
+                                <label for="inputNuevaDescripcion" class="label-style">Descripcion:</label>
+                                <input type="text" id="inputNuevaDescripcion" class="input-style" placeholder="Nueva descripcion">
+                            </div>
                             <div class="input-container-3 last-input">
-                                <label for="inputNuevaCategoria" class="label-style">Categoría:</label>
-                                <input type="text" id="inputNuevaCategoria" class="input-style" placeholder="Nueva categoría del producto">
+                                <label for="inputNuevaCategoria" class="label-style">Elemento:</label>
+                                <input type="text" id="inputNuevaCategoria" class="input-style" placeholder="Nuevo elemento del producto">
                             </div>
                         </div>
                     `,
@@ -240,14 +255,12 @@
                         const productoId = document.getElementById('inputID').value;
                         const nuevoNombre = document.getElementById('inputNuevoNombre').value;
                         const nuevoPrecio = document.getElementById('inputNuevoPrecio').value;
-                        const nuevoUsoClinico = document.getElementById('inputNuevoUsoClinico').value;
                         const nuevoCódigoBarra = document.getElementById('inputNuevoCódigoBarra').value;
-                        const nuevaMarca = document.getElementById('inputNuevaMarca').value;
                         const nuevaDescripcion = document.getElementById('inputNuevaDescripcion').value;
                         const nuevaPresentacion = document.getElementById('inputNuevaPresentacion').value;
                         const nuevoTotalExistencias = document.getElementById('inputNuevoTotalExistencias').value;
                         const nuevaCategoria = document.getElementById('inputNuevaCategoria').value;
-                        editarProducto(productoId, nuevoNombre, nuevoPrecio, nuevoUsoClinico, nuevoCódigoBarra, nuevaMarca, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria);
+                        editarProducto(productoId, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria);
                     }
                 });
             }, 2000);
@@ -303,11 +316,9 @@
                         tableRow.innerHTML = `
                     <td>${producto.nombre}</td>
                     <td>${producto.precio}</td>
-                    <td>${producto.usoClinico}</td>
-                    <td>${producto.codigoBarras}</td>
-                    <td>${producto.marca}</td>
-                    <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${producto.descripcion}</td>
                     <td>${producto.presentacion}</td>
+                    <td>${producto.codigoBarras}</td>
+                    <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${producto.descripcion}</td>
                     <td>${producto.totalExistencias}</td>
                     <td>${producto.categoria}</td>
                     <td>
@@ -376,9 +387,21 @@
             }, 25);
         }
 
-        function stopMarquee(element) {
-            clearInterval(element.dataset.marqueeId);
-        }
+        document.getElementById("searchInput").addEventListener("input", function () {
+            const searchTerm = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll("#tabla-data tr");
+
+            rows.forEach(function (row) {
+                const name = row.cells[0].innerText.toLowerCase();
+                if (name.includes(searchTerm) || searchTerm === "") {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+
+
 
     </script>
 </body>

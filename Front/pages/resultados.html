@@ -27,12 +27,6 @@
             <div class="menu">
                 <ul class="menu-links">
                     <li class="nav-link">
-                        <a href="./dashboard.html">
-                            <i class='bx bx-home-alt icon'></i>
-                            <span class="text nav-text">Tablero</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
                         <a href="./clientes.html">
                             <i class='bx bx-group icon'></i>
                             <span class="text nav-text">Clientes</span>
@@ -60,7 +54,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="../index.html">
+                    <a href="#" onclick="cerrarSesion()">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -100,6 +94,9 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        function cerrarSesion() {
+            window.location.replace("../index.html");
+        }
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")

@@ -41,7 +41,6 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
         builder.Property(e => e.TotalExistencias)
             .HasComment("Cantidad o existencia total por producto");
 
-        builder.Property(e => e.UsoClinico)
-            .HasColumnType("enum('SI','NO')");
+        
     }
 }
