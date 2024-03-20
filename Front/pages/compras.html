@@ -11,7 +11,8 @@
 </head>
 <style>
     #presentacionOptions option {
-        font-size: 26px; }
+        font-size: 26px;
+    }
 </style>
 
 <body>
@@ -109,6 +110,7 @@
         });
 
         let proveedorId;
+        let proveedorNombre;
 
         function traerProveedores() {
             fetch('http://localhost:5033/Api/Proveedor')
@@ -120,6 +122,7 @@
                         const option = document.createElement('option');
                         option.value = proveedor.id;
                         option.textContent = proveedor.nombre;
+                        proveedorNombre = proveedor.nombre;
                         selectProveedor.appendChild(option);
                     });
                 })
@@ -134,7 +137,7 @@
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Generar factura',
-            denyButtonText: 'Volver'
+            denyButtonText: 'Volver a facturación'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
@@ -187,6 +190,7 @@
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     proveedorId = result.value;
+                                    /* proveedorNombre = result.value.nombre; */
                                     ContinueForm(proveedorId);
                                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                                     window.location.href = './facturacion.html';
@@ -438,7 +442,7 @@
 
         let detallesCompra = [];
 
-        async function compraProducto(idFacturaCompra, idProducto) {
+        async function compraProducto(idFacturaCompra, idProducto, datoCompra) {
             try {
                 const detalleCompra = {
                     idFacturaCompraFK: idFacturaCompra,
@@ -457,7 +461,11 @@
                         title: '¡Felicidades!',
                         text: 'Detalles de factura de enviada con éxito',
                         icon: 'success',
-                        confirmButtonText: 'Aceptar'
+                        confirmButtonText: 'Descargar factura'
+                    }).then((confirmationResult) => {
+                        if (confirmationResult.isConfirmed) {
+                            generarFacturaPDF(datoCompra);
+                        }
                     });
                     console.log('Detalles de factura enviada con éxito:', detalleCompra);
                     return data.id;
@@ -547,7 +555,7 @@
                         idFacturaCompra: idFacturaCompra,
                         idProducto: idProductoNuevo
                     });
-                    await compraProducto(idFacturaCompra, idProductoNuevo);
+                    await compraProducto(idFacturaCompra, idProductoNuevo, datoCompra);
                 }
 
                 for (const nombreProductoExistente in productosExistentes) {
@@ -558,85 +566,202 @@
                             idFacturaCompra: idFacturaCompra,
                             idProducto: idProductoExistente
                         });
-                        await compraProducto(idFacturaCompra, idProductoExistente);
+                        await compraProducto(idFacturaCompra, idProductoExistente, datoCompra);
                     }
                 }
-
-                /* const confirmarCompra = await Swal.fire({
-                    title: 'Confirmar Compra',
-                    text: '¿Estás seguro de que deseas confirmar la compra?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Confirmar'
-                });
-
-                if (confirmarCompra.isConfirmed) {
-                    await generarCompraPDF();
-
-                    Swal.fire(
-                        'Compra Confirmada',
-                        'La compra se ha confirmado correctamente.',
-                        'success'
-                    );
-                } */
             }
         }
 
-        //         function generarContenidoPDF(data) {
-        //     const contenido = {
-        //         content: [
-        //             // Título centrado
-        //             {
-        //                 text: 'Factura de Venta',
-        //                 style: 'titulo'
-        //             },
-        //             // Espacio en blanco
-        //             '\n',
-        //             // Tabla de detalles de la factura
-        //             {
-        //                 table: {
-        //                     headerRows: 1,
-        //                     widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-        //                     body: [
-        //                         ['Id', 'Producto', 'Precio', 'Clínico', 'Presentación', 'Existencias', 'Categoría', 'Fecha Compra', 'Id Proveedor', 'Cantidad Total', 'Precio Total', 'Tipo Pago', 'Nombre', 'Código Barras', 'Marca', 'Descripción'],
-        //                         ...data.map(item => [
-        //                             item.id, 
-        //                             item.nombre, 
-        //                             item.precio,
-        //                             item.presentacion, 
-        //                             item.totalExistencias, 
-        //                             item.categoria, 
-        //                             item.fechaCompra, 
-        //                             item.idProveedorFk, 
-        //                             item.cantidadTotal, 
-        //                             item.precioTotal, 
-        //                             item.tipoPago, 
-        //                             item.nombre, 
-        //                             item.codigoBarras, 
-        //                             item.marca, 
-        //                             item.descripcion
-        //                         ])
-        //                     ]
-        //                 }
-        //             }
-        //         ],
-        //         // Estilos para el título
-        //         styles: {
-        //             titulo: {
-        //                 alignment: 'center',
-        //                 fontSize: 18,
-        //                 bold: true,
-        //                 margin: [0, 0, 0, 10] // Añadir espacio en la parte inferior
-        //             }
-        //         }
-        //     };
+        async function generarFacturaPDF(datoCompra) {
+            try {
+                let detallesProductos = [];
 
-        //     return contenido;
-        // }
+                if (Object.keys(productos).length > 0) {
+                    Object.values(productos).forEach(producto => {
+                        if (producto.nombre !== undefined && producto.cantidadAAgregar !== undefined && producto.precio !== undefined) {
+                            detallesProductos.push([
+                                producto.nombre,
+                                producto.cantidadAAgregar,
+                                `$${producto.precio * producto.cantidadAAgregar}`
+                            ]);
+                        }
+                    });
+                }
 
+                if (Object.keys(productosExistentes).length > 0) {
+                    Object.values(productosExistentes).forEach(arrayProductos => {
+                        arrayProductos.forEach(producto => {
+                            if (producto.nombre !== undefined && producto.cantidadAAgregar !== undefined && producto.precio !== undefined) {
+                                detallesProductos.push([
+                                    producto.nombre,
+                                    producto.cantidadAAgregar,
+                                    `$${producto.precio * producto.cantidadAAgregar}`
+                                ]);
+                            }
+                        });
+                    });
+                }
 
+                const pdfDocDefinition = {
+                    content: [
+                        {
+                            canvas: [
+                                {
+                                    type: 'rect',
+                                    x: 0,
+                                    y: 0,
+                                    w: 595.28,
+                                    h: 100,
+                                    color: '#305da8',
+                                }
+                            ],
+                            absolutePosition: { x: 0, y: 0 },
+                            zIndex: -1
+                        },
+                        {
+                            columns: [
+                                {
+                                    width: 'auto',
+                                    text: 'Factura',
+                                    fontSize: 30,
+                                    color: '#ffffff',
+                                    bold: true,
+                                    alignment: 'left',
+                                    margin: [10, 0, 0, 10],
+                                },
+                                {
+                                    width: '*',
+                                    text: [
+                                        { text: 'Fecha: ', bold: true },
+                                        { text: datoCompra.fechaCompra }
+                                    ],
+                                    fontSize: 16,
+                                    color: '#ffffff',
+                                    alignment: 'right',
+                                    margin: [0, 0, 10, 10],
+                                },
+                            ],
+                            layout: 'noBorders',
+                            margin: [0, 10, 0, 20]
+                        },
+                        {
+                            text: [
+                                { text: 'PROVEEDOR:\n', bold: true, fontSize: 18, color: '#305da8' },
+                                `${proveedorNombre}\n\n`,
+                            ],
+                            margin: [0, 0, 10, 10],
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', 'auto', 'auto'],
+                                body: [
+                                    [
+                                        { text: 'Producto', style: 'tableHeader' },
+                                        { text: 'Cantidad', style: 'tableHeader' },
+                                        { text: 'Precio', style: 'tableHeader' }
+                                    ]
+                                ].concat(detallesProductos),
+                                layout: {
+                                    fillColor: function (i, node) {
+                                        return i % 2 === 0 ? '#f2f2f2' : null;
+                                    },
+                                    hLineWidth: function (i, node) {
+                                        return (i === 0 || i === node.table.body.length) ? 2 : 1;
+                                    },
+                                    vLineWidth: function (i) {
+                                        return 0;
+                                    },
+                                    hLineColor: function (i) {
+                                        return i === 0 ? '#305da8' : '#e3e3e3';
+                                    },
+                                    vLineColor: function (i) {
+                                        return '#ffffff';
+                                    },
+                                },
+                                style: 'tableContent'
+                            },
+                            margin: [0, 10, 0, 10],
+                        },
+                        {
+                            columns: [
+                                { width: '*', text: '' },
+                                {
+                                    width: 'auto',
+                                    stack: [
+                                        { text: 'Medio de pago:', bold: true },
+                                        { text: `${datoCompra.tipoPago}`, bold: false },
+                                        { text: 'Total:', bold: true },
+                                        { text: `$${datoCompra.precioTotal}`, bold: false }
+                                    ],
+                                    margin: [0, 10, 10, 0]
+                                }
+                            ],
+                            margin: [0, 10, 0, 10]
+                        },
+                        {
+                            text: 'Gracias por elegirnos, esperamos que disfrute de su compra.',
+                            margin: [0, 30, 0, 0],
+                            fontSize: 16,
+                            alignment: 'center',
+                            color: '#305da8'
+                        },
+                    ],
+                    styles: {
+                        tableHeader: {
+                            fillColor: '#305da8',
+                            color: '#ffffff',
+                            bold: true,
+                            alignment: 'center',
+                            fontSize: 20
+                        },
+                        tableContent: {
+                            color: '#000000',
+                            alignment: 'center',
+                            fontSize: 14
+                        }
+                    }
+                };
+
+                const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
+
+                pdfDoc.getBlob(blob => {
+                    const downloadPDF = (filename) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
+
+                    const checkAndDownload = (filename, count) => {
+                        const finalFilename = count > 0 ? `factura_compra_${count}.pdf` : 'factura_compra.pdf';
+                        fetch(finalFilename)
+                            .then(response => {
+                                if (!response.ok) {
+                                    downloadPDF(finalFilename);
+                                } else {
+                                    checkAndDownload('factura_compra.pdf', count + 1);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error al verificar la existencia del archivo:', error);
+                                downloadPDF('factura_compra.pdf');
+                            });
+                    };
+                    checkAndDownload('factura_compra.pdf', 0);
+                });
+            } catch (error) {
+                console.error('Error al generar factura de venta:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al generar la factura de venta. Por favor, inténtalo de nuevo más tarde.'
+                });
+            }
+        }
 
         console.log(productos);
         console.log(datosCompras);

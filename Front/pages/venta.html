@@ -58,7 +58,7 @@
                     <a href="#" onclick="cerrarSesion()">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
-                    </a>  
+                    </a>
                 </li>
                 <li class="nav-link">
                     <a href="#">
@@ -71,7 +71,7 @@
     </nav>
     <section class="home">
         <div class="text" style="display: flex; justify-content: center;">Facturacion de ventas!</div>
-        
+
     </section>
     <script src="../node_modules/pdfmake/build/pdfmake.min.js"></script>
     <script src="../node_modules/pdfmake/build/vfs_fonts.js"></script>
@@ -81,6 +81,7 @@
         function cerrarSesion() {
             window.location.replace("../index.html");
         }
+
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")
@@ -116,15 +117,19 @@
 
         let clienteId;
         let clienteNombre;
+        let clienteApellidos;
+        let clienteCedula;
+        let clienteTelefono;
+        let clienteCorreo;
 
         Swal.fire({
             title: '¡Bienvenido!',
-            text: 'Por favor, seleccione una opción para continuar.',
+            text: '¿Qué deseas hacer?',
             icon: 'question',
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Generar factura',
-            denyButtonText: 'Volver'
+            denyButtonText: 'Example PDF'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
@@ -216,6 +221,10 @@
                                                 ContinueForm(selectedCliente.id);
                                                 clienteId = selectedCliente.id;
                                                 clienteNombre = selectedCliente.nombre;
+                                                clienteApellidos = selectedCliente.apellidos;
+                                                clienteCorreo = selectedCliente.correo;
+                                                clienteTelefono = selectedCliente.telefono;
+                                                clienteCedula = selectedCliente.cedula;
                                             } else if (result.dismiss === Swal.DismissReason.cancel) {
                                                 setTimeout(() => {
                                                     Swal.close();
@@ -240,7 +249,7 @@
                         });
                 }, 2000);
             } else if (result.isDenied) {
-                window.location.href = './facturacion.html';
+                generarContenidoPDF();
             }
         });
 
@@ -264,8 +273,6 @@
             }
         }
 
-       
-
         async function obtenerNombre(categoria) {
             try {
                 const response = await fetch('http://localhost:5033/Api/Producto');
@@ -281,7 +288,7 @@
             }
         }
 
-        async function obtenerPresentacion(categoria,nombre) {
+        async function obtenerPresentacion(categoria, nombre) {
             try {
                 const response = await fetch('http://localhost:5033/Api/Producto');
                 if (!response.ok) {
@@ -339,7 +346,10 @@
                                 <label for="inputCodigoBarras" class="label-style-1">Codigo de barra:</label>
                                 <input type="text" id="inputCodigoBarras" class="input-style-1" readonly value="${productoEncontrado.codigoBarras}">
                             </div>
-                           
+                            <div class="input-container-4">
+                                <label for="inputMarca" class="label-style-1">Marca:</label>
+                                <input type="text" id="inputMarca" class="input-style-1" readonly value="${productoEncontrado.marca}">
+                            </div>
                             <div class="input-container-4">
                                 <label for="inputDescripcion" class="label-style-1">Descripción:</label>
                                 <input type="text" id="inputDescripcion" class="input-style-1" readonly value="${productoEncontrado.descripcion}">
@@ -484,97 +494,27 @@
         }
 
         async function ContinueForm() {
-    try {
-        const categorias = await obtenerCategorias();
-        if (categorias.length === 0) {
-            throw new Error('No se encontraron categorías de productos');
-        }
-
-        const categoriaResult = await Swal.fire({
-            title: 'Datos del producto',
-            text: 'Seleccione la categoría del producto',
-            input: 'select',
-            inputOptions: categorias.reduce((obj, categoria) => {
-                obj[categoria] = categoria;
-                return obj;
-            }, {}),
-            inputPlaceholder: 'Seleccione una categoría',
-            showCancelButton: true,
-            confirmButtonText: 'Confirmar',
-            cancelButtonText: 'Volver',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Debes seleccionar una categoría';
-                }
-            },
-            customClass: {
-                input: 'form-select centered-select'
-            },
-            inputAttributes: {
-                style: 'width: 50%;'
-            }
-        });
-
-        if (categoriaResult.isConfirmed) {
-            const categoriaSeleccionada = categoriaResult.value;
-            const datosSeleccionados = {
-                categoria: categoriaSeleccionada
-            };
-
-            const nombres = await obtenerNombre(categoriaSeleccionada);
-            if (nombres.length === 0) {
-                throw new Error('No se encontraron nombres de productos para la categoría seleccionada');
-            }
-
-            const nombreResult = await Swal.fire({
-                title: 'Datos del producto',
-                text: 'Seleccione el nombre del producto',
-                input: 'select',
-                inputOptions: nombres.reduce((obj, nombre) => {
-                    obj[nombre] = nombre;
-                    return obj;
-                }, {}),
-                inputPlaceholder: 'Nombre del producto',
-                showCancelButton: true,
-                confirmButtonText: 'Confirmar',
-                cancelButtonText: 'Volver',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Debes seleccionar un nombre de producto';
-                    }
-                },
-                customClass: {
-                    input: 'form-select centered-select'
-                },
-                inputAttributes: {
-                    style: 'width: 50%;'
-                }
-            });
-
-            if (nombreResult.isConfirmed) {
-                const nombreSeleccionado = nombreResult.value;
-                datosSeleccionados.nombre = nombreSeleccionado;
-
-                const presentaciones = await obtenerPresentacion(categoriaSeleccionada, nombreSeleccionado);
-                if (presentaciones.length === 0) {
-                    throw new Error('No se encontraron opciones de presentación para el producto seleccionado');
+            try {
+                const categorias = await obtenerCategorias();
+                if (categorias.length === 0) {
+                    throw new Error('No se encontraron categorías de productos');
                 }
 
-                const presentacionResult = await Swal.fire({
+                const categoriaResult = await Swal.fire({
                     title: 'Datos del producto',
-                    text: 'Seleccione la presentación del producto',
+                    text: 'Seleccione la categoría del producto',
                     input: 'select',
-                    inputOptions: presentaciones.reduce((obj, presentacion) => {
-                        obj[presentacion] = presentacion;
+                    inputOptions: categorias.reduce((obj, categoria) => {
+                        obj[categoria] = categoria;
                         return obj;
                     }, {}),
-                    inputPlaceholder: 'Seleccione la presentación',
+                    inputPlaceholder: 'Seleccione una categoría',
                     showCancelButton: true,
                     confirmButtonText: 'Confirmar',
                     cancelButtonText: 'Volver',
                     inputValidator: (value) => {
                         if (!value) {
-                            return 'Debes seleccionar una presentación';
+                            return 'Debes seleccionar una categoría';
                         }
                     },
                     customClass: {
@@ -585,27 +525,97 @@
                     }
                 });
 
-                if (presentacionResult.isConfirmed) {
-                    const presentacionSeleccionada = presentacionResult.value;
-                    datosSeleccionados.presentacion = presentacionSeleccionada;
+                if (categoriaResult.isConfirmed) {
+                    const categoriaSeleccionada = categoriaResult.value;
+                    const datosSeleccionados = {
+                        categoria: categoriaSeleccionada
+                    };
 
-                    const detallesProductos = await obtenerMasDetalles(categoriaSeleccionada, nombreSeleccionado, presentacionSeleccionada);
-                    if (!detallesProductos || detallesProductos.length === 0) {
-                        throw new Error('No se encontraron detalles de productos');
+                    const nombres = await obtenerNombre(categoriaSeleccionada);
+                    if (nombres.length === 0) {
+                        throw new Error('No se encontraron nombres de productos para la categoría seleccionada');
                     }
-                    await mostrarDetallesProducto(datosSeleccionados, detallesProductos);
+
+                    const nombreResult = await Swal.fire({
+                        title: 'Datos del producto',
+                        text: 'Seleccione el nombre del producto',
+                        input: 'select',
+                        inputOptions: nombres.reduce((obj, nombre) => {
+                            obj[nombre] = nombre;
+                            return obj;
+                        }, {}),
+                        inputPlaceholder: 'Nombre del producto',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                        cancelButtonText: 'Volver',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Debes seleccionar un nombre de producto';
+                            }
+                        },
+                        customClass: {
+                            input: 'form-select centered-select'
+                        },
+                        inputAttributes: {
+                            style: 'width: 50%;'
+                        }
+                    });
+
+                    if (nombreResult.isConfirmed) {
+                        const nombreSeleccionado = nombreResult.value;
+                        datosSeleccionados.nombre = nombreSeleccionado;
+
+                        const presentaciones = await obtenerPresentacion(categoriaSeleccionada, nombreSeleccionado);
+                        if (presentaciones.length === 0) {
+                            throw new Error('No se encontraron opciones de presentación para el producto seleccionado');
+                        }
+
+                        const presentacionResult = await Swal.fire({
+                            title: 'Datos del producto',
+                            text: 'Seleccione la presentación del producto',
+                            input: 'select',
+                            inputOptions: presentaciones.reduce((obj, presentacion) => {
+                                obj[presentacion] = presentacion;
+                                return obj;
+                            }, {}),
+                            inputPlaceholder: 'Seleccione la presentación',
+                            showCancelButton: true,
+                            confirmButtonText: 'Confirmar',
+                            cancelButtonText: 'Volver',
+                            inputValidator: (value) => {
+                                if (!value) {
+                                    return 'Debes seleccionar una presentación';
+                                }
+                            },
+                            customClass: {
+                                input: 'form-select centered-select'
+                            },
+                            inputAttributes: {
+                                style: 'width: 50%;'
+                            }
+                        });
+
+                        if (presentacionResult.isConfirmed) {
+                            const presentacionSeleccionada = presentacionResult.value;
+                            datosSeleccionados.presentacion = presentacionSeleccionada;
+
+                            const detallesProductos = await obtenerMasDetalles(categoriaSeleccionada, nombreSeleccionado, presentacionSeleccionada);
+                            if (!detallesProductos || detallesProductos.length === 0) {
+                                throw new Error('No se encontraron detalles de productos');
+                            }
+                            await mostrarDetallesProducto(datosSeleccionados, detallesProductos);
+                        }
+                    }
                 }
+            } catch (error) {
+                console.error('Error en ContinueForm:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al continuar con el formulario. Por favor, inténtalo de nuevo más tarde.'
+                });
             }
         }
-    } catch (error) {
-        console.error('Error en ContinueForm:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Hubo un error al continuar con el formulario. Por favor, inténtalo de nuevo más tarde.'
-        });
-    }
-}
 
         async function enviarFacturaPDF() {
             Swal.fire({
@@ -637,11 +647,8 @@
                         title: '¡Felicidades!',
                         text: 'Factura de venta enviada con éxito',
                         icon: 'success',
-                        confirmButtonText: 'Descargar factura'
+                        confirmButtonText: 'Aceptar'
                     });
-                    if (confirmationResult.isConfirmed) {
-                        generarContenidoPDF();
-                    }
                     console.log('Factura de venta enviada con éxito:', facturaVenta);
                     return data.id;
                 } else {
@@ -652,7 +659,7 @@
             }
         }
 
-        async function ventaProducto(idFacturaVenta, idProducto) {
+        async function ventaProducto(idFacturaVenta, idProducto, datoVenta) {
             try {
                 const detalleFactura = {
                     idFacturaVentaFK: idFacturaVenta,
@@ -671,7 +678,11 @@
                         title: '¡Felicidades!',
                         text: 'Detalles de factura enviada con éxito',
                         icon: 'success',
-                        confirmButtonText: 'Aceptar'
+                        confirmButtonText: 'Descargar factura'
+                    }).then((confirmationResult) => {
+                        if (confirmationResult.isConfirmed) {
+                            generarFacturaPDF(datoVenta);
+                        }
                     });
                     console.log('Detalles de factura enviada con éxito:', detalleFactura);
                     return data.id;
@@ -737,97 +748,155 @@
 
                     const idsProductos = Object.values(productos).map(producto => producto.id);
                     idsProductos.forEach(async idProducto => {
-                        await ventaProducto(idFacturaVenta, idProducto);
+                        await ventaProducto(idFacturaVenta, idProducto, datoVenta);
                     });
                 }
             });
         }
 
-       
+        async function generarFacturaPDF(datoVenta) {
+            try {
+                const detallesProductos = Object.values(productos);
 
+                const tableBody = detallesProductos.map(producto => [
+                    producto.nombre,
+                    producto.cantidadAVender,
+                    `$${producto.precio * producto.cantidadAVender}`
+                ]);
 
-    function generarContenidoPDF() {
-            
-    const datosVentas = datoVenta;
-    const productos = productos;
-    const datosClientes = clienteNombre;
-
-   
-    const datoVentaActual = datosVentas[0];
-    const nombreCliente = datoVentaActual.clienteNombre;
-    const datosCliente = datosClientes[nombreCliente];
-
-    // Contenido del PDF
-    const contenido = {
-        content: [
-            // Encabezado
-            {
-                text: 'Factura de Venta',
-                style: 'encabezado'
-            },
-            // Información de la factura
-            {
-                columns: [
-                    {
-                        width: '*',
-                        text: [
-                            { text: `Fecha de Venta: ${datoVentaActual.FechaVenta}\n`, bold: true },
-                            { text: `Precio Total: ${datoVentaActual.PrecioTotal}\n`, bold: true },
-                            { text: `Tipo de Pago: ${datoVentaActual.TipoPago}\n`, bold: true }
-                        ]
-                    },
-                    {
-                        width: '*',
-                        text: [
-                            { text: 'Datos del Cliente\n', bold: true },
-                            { text: `Nombre: ${datosCliente.Nombre}\n` },
-                            { text: `Apellido: ${datosCliente.Apellido}\n` },
-                            { text: `Cédula: ${datosCliente.Cedula}\n` },
-                            { text: `Teléfono: ${datosCliente.Telefono}\n` },
-                            { text: `Correo: ${datosCliente.Correo}\n` }
-                        ]
+                const pdfDocDefinition = {
+                    content: [
+                        {
+                            canvas: [
+                                {
+                                    type: 'rect',
+                                    x: 0,
+                                    y: 0,
+                                    w: 595.28,
+                                    h: 100,
+                                    color: '#305da8',
+                                }
+                            ],
+                            absolutePosition: { x: 0, y: 0 },
+                            zIndex: -1
+                        },
+                        {
+                            columns: [
+                                {
+                                    width: 'auto',
+                                    text: 'Factura',
+                                    fontSize: 22,
+                                    color: '#ffffff',
+                                    alignment: 'left',
+                                    margin: [10, 5, 0, 0],
+                                }
+                                /* {
+                                    width: 'auto',
+                                    image: 'link-img-server-web',
+                                    fit: [20, 20],
+                                    alignment: 'left',
+                                    margin: [10, 5, 0, 0],
+                                } */,
+                                {
+                                    width: '*',
+                                    height: 30,
+                                    text: [
+                                        { text: 'Fecha: ', bold: true },
+                                        { text: datoVenta.fechaVenta }
+                                    ],
+                                    fontSize: 14,
+                                    color: '#ffffff',
+                                    alignment: 'right',
+                                    margin: [0, 10, 10, 0],
+                                },
+                            ],
+                            layout: 'noBorders',
+                            margin: [0, 0, 0, 10]
+                        },
+                        {
+                            text: [
+                                { text: 'Datos del cliente\n', bold: true },
+                                `${clienteNombre} ${clienteApellidos}\n`,
+                                `Doc: ${clienteCedula}\n`,
+                                `Tel: ${clienteTelefono}\n`,
+                            ],
+                            fontSize: 14,
+                            margin: [0, 30, 10, 10],
+                        },
+                        {
+                            text: `Tipo de Pago: ${datoVenta.tipoPago}`,
+                            style: 'subheader'
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', 'auto', 'auto'],
+                                body: [
+                                    ['Producto', 'Cantidad', 'Precio']
+                                ].concat(tableBody)
+                            }
+                        },
+                        {
+                            columns: [
+                                { width: '*', text: '' },
+                                {
+                                    width: 'auto',
+                                    text: [
+                                        { text: 'Total: ', bold: true },
+                                        { text: `$${datoVenta.precioTotal}`, bold: true }
+                                    ]
+                                }
+                            ],
+                            margin: [0, 20, 0, 0]
+                        }
+                    ],
+                    styles: {
+                        subheader: {
+                            fontSize: 14,
+                            margin: [0, 5, 0, 5]
+                        }
                     }
-                ]
-            },
-            // Espacio en blanco
-            '\n',
-            // Tabla de detalles de los productos
-            {
-                table: {
-                    headerRows: 1,
-                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                    body: [
-                        [{ text: 'ID', style: 'tableHeader' }, { text: 'Producto', style: 'tableHeader' }, { text: 'Precio', style: 'tableHeader' }, { text: 'Clínico', style: 'tableHeader' }, { text: 'Presentación', style: 'tableHeader' }, { text: 'Existencias', style: 'tableHeader' }, { text: 'Categoría', style: 'tableHeader' }],
-                        ...(Object.values(productos).map(item => [item.id, item.nombre, item.precio, item.presentacion, item.totalExistencias, item.categoria]))
-                    ]
-                }
-            }
-        ],
-        // Estilos
-        styles: {
-            encabezado: {
-                alignment: 'center',
-                fontSize: 24,
-                bold: true,
-                margin: [0, 0, 0, 20], // Margen inferior más grande
-                color: '#007bff' // Color azul
-            },
-            tableHeader: {
-                fillColor: '#007bff', // Color de fondo del encabezado de la tabla
-                color: '#ffffff', // Color del texto del encabezado de la tabla
-                bold: true,
-                alignment: 'center'
+                };
+
+                const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
+
+                pdfDoc.getBlob(blob => {
+                    const downloadPDF = (filename) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
+
+                    const checkAndDownload = (filename, count) => {
+                        const finalFilename = count > 0 ? `factura_venta_${count}.pdf` : 'factura_venta.pdf';
+                        fetch(finalFilename)
+                            .then(response => {
+                                if (!response.ok) {
+                                    downloadPDF(finalFilename);
+                                } else {
+                                    checkAndDownload('factura_venta.pdf', count + 1);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error al verificar la existencia del archivo:', error);
+                                downloadPDF('factura_venta.pdf');
+                            });
+                    };
+                    checkAndDownload('factura_venta.pdf', 0);
+                });
+            } catch (error) {
+                console.error('Error al generar factura de venta:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al generar la factura de venta. Por favor, inténtalo de nuevo más tarde.'
+                });
             }
         }
-    };
-
-    const pdfDoc = pdfMake.createPdf(contenido);
-
-    pdfDoc.getBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-    });
-}
 
         console.log(productos)
         console.log(datosVentas)
