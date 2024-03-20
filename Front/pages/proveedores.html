@@ -207,13 +207,21 @@
         }
 
         async function editarProveedor(id, nuevoNombre) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No se ha encontrado un token en localStorage.');
+                return;
+            }
+
             const urlEditar = `http://localhost:5033/Api/Proveedor/${id}`;
             const data = {
                 id: id,
                 nombre: nuevoNombre
             };
 
-            const headers = new Headers({ 'Content-Type': 'application/json' });
+            const headers = new Headers({ 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' });
             const config = {
                 method: 'PUT',
                 headers: headers,
@@ -279,7 +287,11 @@
         async function eliminarProveedor(id) {
             const urlEliminar = `http://localhost:5033/Api/Proveedor/${id}`;
             const config = {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             };
 
             try {

@@ -141,6 +141,12 @@
         });
 
         async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No se ha encontrado un token en localStorage.');
+                return;
+            }
+            
             const urlEditar = `http://localhost:5033/Api/Producto/${id}`;
 
             const productoActual = await obtenerProducto(id);
@@ -156,7 +162,9 @@
                 categoria: nuevaCategoria !== '' ? nuevaCategoria : productoActual.categoria
             };
 
-            const headers = new Headers({ 'Content-Type': 'application/json' });
+            const headers = new Headers({ 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' });
             const config = {
                 method: 'PUT',
                 headers: headers,
@@ -306,18 +314,12 @@
         }
 
         function obtenerProductos() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('No se ha encontrado un token en localStorage.');
-                return;
-            }
-
+            
             const apiUrl = 'http://localhost:5033/Api/Producto';
 
             fetch(apiUrl, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             })
