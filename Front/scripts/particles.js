@@ -21,7 +21,7 @@ tsParticles.load({
             color: {
                 value: "#d7e2f4"
             },
-            image: "", /* Se puede agregar una ft de fondo */
+            image: "",
             position: "50% 50%",
             repeat: "no-repeat",
             size: "cover"

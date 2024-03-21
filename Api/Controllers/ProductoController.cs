@@ -18,7 +18,6 @@ public class ProductoController : BaseApiController
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrador")] // Aqui le estoy pasando un bloqueador de accesos, que es el authorize
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

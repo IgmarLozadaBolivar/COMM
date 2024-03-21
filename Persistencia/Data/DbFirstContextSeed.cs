@@ -29,20 +29,6 @@ public class DbFirstContextSeed
 
             }
 
-            if (!context.Proveedores.Any())
-            {
-                using (var reader = new StreamReader(ruta + @"/Data/Csv/Proveedor.csv"))
-                {
-                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                    {
-                        var list = csv.GetRecords<Proveedor>();
-                        context.Proveedores.AddRange(list);
-                        await context.SaveChangesAsync();
-                    }
-                }
-
-            }
-
             if (!context.UserRols.Any())
             {
                 using (var reader = new StreamReader(ruta + @"\Data\Csv\UserRol.csv"))

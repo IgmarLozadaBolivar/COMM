@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="../assets/logo-removebg-preview.png" type="image/x-icon">
 </head>
 
 <body>
@@ -27,6 +28,12 @@
         <div class="menu-bar">
             <div class="menu">
                 <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="./dashboard.html">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Tablero</span>
+                        </a>
+                    </li>
                     <li class="nav-link">
                         <a href="./clientes.html">
                             <i class='bx bx-group icon'></i>
@@ -55,7 +62,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="#" onclick="cerrarSesion()">
+                    <a href="../index.html">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -70,15 +77,44 @@
         </div>
     </nav>
     <script>
-        function cerrarSesion() {
-            window.location.replace("../index.html");
-        }
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
             toggle = body.querySelector(".toggle")
         toggle.addEventListener("click", () => {
             sidebar.classList.toggle("close");
         });
+
+        function verificarTokenExpirado() {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                console.error('No se ha encontrado un token en localStorage.');
+                return;
+            }
+
+            const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+            const expirationTimeInSeconds = tokenPayload.exp;
+            const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+
+            if (currentTimeInSeconds >= expirationTimeInSeconds) {
+                console.error('El token ha expirado.');
+                Swal.fire({
+                    title: "Sesión Expirada",
+                    text: "Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.",
+                    icon: "warning",
+                    confirmButtonText: 'Entiendo',
+                }).then((value) => {
+                    if (value.isConfirmed) {
+                        window.location.href = 'auth.html';
+                    }
+                });
+            } else {
+                console.log('El token es válido.');
+            }
+        }
+
+        // Verificar el token cada minuto
+        setInterval(verificarTokenExpirado, 60000);
 
         Swal.fire({
             title: '¡Bienvenido!',
@@ -87,12 +123,17 @@
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Compras',
-            denyButtonText: 'Ventas'
+            denyButtonText: 'Ventas',
+            showCancelButton: true,
+            cancelButtonText: 'Dashboard',
+            allowOutsideClick: false
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = './compras.html';
             } else if (result.isDenied) {
                 window.location.href = './venta.html';
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = './dashboard.html';
             }
         });
     </script>

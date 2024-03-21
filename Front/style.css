@@ -12,9 +12,6 @@
 body {
     min-height: 100vh;
     background-color: #ffffff;
-    background-image: url(assets/scattered-forcefields.svg);
-    background-attachment: fixed;
-    background-size: cover;
 }
 
 .navbar {
@@ -104,7 +101,6 @@ div .dropdown-item:hover {
     margin-left: 4%;
 }
 
-/* Configuraciones para todo el contenido del contenedor */
 .container-body {
     position: absolute;
     top: 50%;
@@ -114,7 +110,6 @@ div .dropdown-item:hover {
     align-items: center;
 }
 
-/* Configuraciones para el texto, parrafo, ul, li y h1 */
 .parrafo-1 {
     color: #000;
     font-size: 1.1rem;
@@ -162,7 +157,6 @@ h1 {
     }
 }
 
-/* Configuraciones para la IMG - RIGHT */
 div .img-right {
     width: 400px;
 }
@@ -203,7 +197,6 @@ img {
     animation: shake 10s infinite;
 }
 
-/* Configuraciones para el BTN */
 .btn-about {
     background: transparent;
     color: #000;
@@ -283,4 +276,57 @@ img {
 
 .search-icon {
     font-size: 18px;
+}
+
+@media only screen and (max-width: 311px) and (max-height: 676px) {
+    .navbar {
+        font-size: 0.8rem;
+    }
+
+    .nav-item.dropdown {
+        display: none;
+    }
+
+    .parrafo-1 {
+        font-size: 0.9rem;
+        margin-right: -30%;
+    }
+
+    .typewriter h1 {
+        animation: none;
+        white-space: normal;
+        overflow: hidden;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    .img-right {
+        display: none;
+    }
+
+    #tsparticles {
+        display: none;
+    }
+
+    .btn-about {
+        padding: 8px 16px;
+        border: 2px solid #0056b3;
+        background: #0056b3;
+        color: #fff;
+        transition: none;
+    }
+
+    .btn-about::after {
+        display: none;
+    }
+    .nav-item a::before {
+        display: none;
+    }
+
+    .btn-about:hover {
+        background: #024894;
+        color: #fff;
+    }
 }

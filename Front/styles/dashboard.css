@@ -96,6 +96,7 @@ body.dark {
     font-weight: 500;
     white-space: nowrap;
     opacity: 1;
+    z-index: 1000;
 }
 
 .sidebar.close .text {
@@ -312,6 +313,7 @@ body.dark .switch::before {
     font-weight: 500;
     color: var(--text-color);
     padding: 12px 60px;
+    z-index: 100;
 }
 
 .home .text,
@@ -705,7 +707,7 @@ input:valid~label {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888; 
+    background: #888;
     border-radius: 10px;
 }
 
@@ -917,10 +919,6 @@ td {
     flex: 1 1 45%;
 }
 
-/* .input-container-5 {
-    flex: 1 50%;
-} */
-
 .label-style-1 {
     display: block;
     font-size: 16px;
@@ -954,6 +952,46 @@ td {
 .centered-select {
     margin: auto;
     display: block;
+}
+
+.btn-about {
+    background: transparent;
+    color: #000;
+    border: 2px solid #366ec9;
+    padding: 8px 40px;
+    border-radius: 5px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.btn-1 a {
+    text-decoration: none;
+}
+
+.btn-about:hover {
+    color: #fff;
+}
+
+.btn-about::after {
+    content: "";
+    background: #366ec9;
+    position: absolute;
+    z-index: -1;
+    padding: 16px 20px;
+    display: block;
+    left: -20%;
+    right: -20%;
+    top: 0;
+    bottom: 0;
+    transform: skewX(-45deg) scale(0, 1);
+    transition: all 0.3s ease;
+}
+
+.btn-about:hover::after {
+    transition: all 0.3s ease-out;
+    transform: skewX(-45deg) scale(1, 1);
 }
 
 @media (max-width: 768px) {
