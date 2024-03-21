@@ -61,22 +61,11 @@
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
                 </li>
-                <li class="nav-link">
-                    <a href="#">
-                        <i class='bx bx-user icon'></i>
-                        <span class="text nav-text">Tu información</span>
-                    </a>
-                </li>
             </div>
         </div>
     </nav>
     <section class="home">
         <div class="text">¡Bienvenido al sistema de gestión de inventario de COMM SAS!</div>
-        <div class="btn-1">
-            <a href="./productos.html" id="btn-about" class="btn-about">
-                Empezar
-            </a>
-        </div>
     </section>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -102,16 +91,18 @@
                     confirmButtonText: 'Entiendo',
                 }).then((value) => {
                     if (value.isConfirmed) {
+                        localStorage.removeItem('token');
                         window.location.href = 'auth.html';
                     }
                 });
             } else {
                 console.log('El token es válido.');
+                return token;
             }
         }
 
-        // Verificar el token cada minuto
-        setInterval(verificarTokenExpirado, 60000);
+        // Verificar el token en un lapso de 7 minutos
+        setInterval(verificarTokenExpirado, 420000);
     </script>
 </body>
 

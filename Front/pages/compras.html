@@ -72,12 +72,6 @@
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
                 </li>
-                <li class="nav-link">
-                    <a href="#">
-                        <i class='bx bx-user icon'></i>
-                        <span class="text nav-text">Tu información</span>
-                    </a>
-                </li>
             </div>
         </div>
     </nav>
@@ -127,16 +121,18 @@
                     confirmButtonText: 'Entiendo',
                 }).then((value) => {
                     if (value.isConfirmed) {
+                        localStorage.removeItem('token');
                         window.location.href = 'auth.html';
                     }
                 });
             } else {
                 console.log('El token es válido.');
+                return token;
             }
         }
 
-        // Verificar el token cada minuto
-        setInterval(verificarTokenExpirado, 60000);
+        // Verificar el token en un lapso de 7 minutos
+        setInterval(verificarTokenExpirado, 420000);
 
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
@@ -168,12 +164,13 @@
 
         Swal.fire({
             title: '¡Bienvenido!',
-            text: 'Por favor, seleccione una opción para continuar.',
-            icon: 'info',
+            text: '¿Qué deseas hacer?',
+            icon: 'question',
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Generar factura',
-            denyButtonText: 'Volver a facturación'
+            denyButtonText: 'Volver a facturación',
+            allowOutsideClick: false
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
@@ -761,43 +758,40 @@
 
                 const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
 
-                pdfDoc.getBlob(async blob => {
-                    const enviarCorreo = async () => {
-                        try {
-                            const transporter = nodemailer.createTransport({
-                                service: 'gmail',
-                                auth: {
-                                    user: 'losadabolivar@gmail.com',
-                                    pass: '1122809631'
-                                }
-                            });
-
-                            const mailOptions = {
-                                from: 'losadabolivar@gmail.com',
-                                to: 'losadabolivar@gmail.com',
-                                subject: 'Factura de compra',
-                                text: 'Adjunto encontrarás la factura de tu compra.',
-                                attachments: [{
-                                    filename: 'factura_compra.pdf',
-                                    content: blob
-                                }]
-                            };
-
-                            const info = await transporter.sendMail(mailOptions);
-                            console.log('Correo enviado:', info.response);
-                        } catch (error) {
-                            console.error('Error al enviar el correo:', error);
-                        }
+                pdfDoc.getBlob(blob => {
+                    const downloadPDF = (filename) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
                     };
 
-                    enviarCorreo();
+                    const checkAndDownload = (filename, count) => {
+                        const finalFilename = count > 0 ? `factura_compra_${count}.pdf` : 'factura_compra.pdf';
+                        fetch(finalFilename)
+                            .then(response => {
+                                if (!response.ok) {
+                                    downloadPDF(finalFilename);
+                                } else {
+                                    checkAndDownload('factura_compra.pdf', count + 1);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error al verificar la existencia del archivo:', error);
+                                downloadPDF('factura_compra.pdf');
+                            });
+                    };
+                    checkAndDownload('factura_compra.pdf', 0);
                 });
             } catch (error) {
-                console.error('Error al generar factura de venta:', error);
+                console.error('Error al generar factura de compra:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Hubo un error al generar la factura de venta. Por favor, inténtalo de nuevo más tarde.'
+                    text: 'Hubo un error al generar la factura de compra. Por favor, inténtalo de nuevo más tarde.'
                 });
             }
         }

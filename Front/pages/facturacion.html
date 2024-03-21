@@ -67,12 +67,6 @@
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
                 </li>
-                <li class="nav-link">
-                    <a href="#">
-                        <i class='bx bx-user icon'></i>
-                        <span class="text nav-text">Tu información</span>
-                    </a>
-                </li>
             </div>
         </div>
     </nav>
@@ -105,16 +99,18 @@
                     confirmButtonText: 'Entiendo',
                 }).then((value) => {
                     if (value.isConfirmed) {
+                        localStorage.removeItem('token');
                         window.location.href = 'auth.html';
                     }
                 });
             } else {
                 console.log('El token es válido.');
+                return token;
             }
         }
 
-        // Verificar el token cada minuto
-        setInterval(verificarTokenExpirado, 60000);
+        // Verificar el token en un lapso de 7 minutos
+        setInterval(verificarTokenExpirado, 420000);
 
         Swal.fire({
             title: '¡Bienvenido!',
