@@ -95,7 +95,6 @@
                         <th>Descripción</th>
                         <th>Presentación</th>
                         <th>Existencias</th>
-                        <th>Elemento</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -114,6 +113,18 @@
             sidebar.classList.toggle("close");
         });
 
+        let tokenCheckInterval;
+
+        function iniciarVerificacionToken() {
+            verificarTokenExpirado();
+
+            tokenCheckInterval = setInterval(verificarTokenExpirado, 420000);
+        }
+
+        function detenerVerificacionToken() {
+            clearInterval(tokenCheckInterval);
+        }
+
         function verificarTokenExpirado() {
             const token = localStorage.getItem('token');
 
@@ -125,8 +136,9 @@
             const tokenPayload = JSON.parse(atob(token.split('.')[1]));
             const expirationTimeInSeconds = tokenPayload.exp;
             const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+            const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
 
-            if (currentTimeInSeconds >= expirationTimeInSeconds) {
+            if (timeUntilExpirationInSeconds <= 0) {
                 console.error('El token ha expirado.');
                 Swal.fire({
                     title: "Sesión Expirada",
@@ -145,8 +157,8 @@
             }
         }
 
-        // Verificar el token en un lapso de 7 minutos
-        setInterval(verificarTokenExpirado, 420000);
+        document.addEventListener('DOMContentLoaded', iniciarVerificacionToken);
+        window.addEventListener('beforeunload', detenerVerificacionToken);
 
         var optionsButtons = document.querySelectorAll('.btn-options');
 
@@ -166,7 +178,7 @@
             });
         });
 
-        async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria) {
+        async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias,) {
             const token = verificarTokenExpirado();
             if (!token) {
                 console.error('No se ha encontrado un token en localStorage.');
@@ -185,7 +197,7 @@
                 descripcion: nuevaDescripcion !== '' ? nuevaDescripcion : productoActual.descripcion,
                 presentacion: nuevaPresentacion !== '' ? nuevaPresentacion : productoActual.presentacion,
                 totalExistencias: nuevoTotalExistencias !== '' ? nuevoTotalExistencias : productoActual.totalExistencias,
-                categoria: nuevaCategoria !== '' ? nuevaCategoria : productoActual.categoria
+
             };
 
             const headers = new Headers({
@@ -283,10 +295,7 @@
                                 <label for="inputNuevaDescripcion" class="label-style">Descripcion:</label>
                                 <input type="text" id="inputNuevaDescripcion" class="input-style" placeholder="Nueva descripcion">
                             </div>
-                            <div class="input-container-3 last-input">
-                                <label for="inputNuevaCategoria" class="label-style">Elemento:</label>
-                                <input type="text" id="inputNuevaCategoria" class="input-style" placeholder="Nuevo elemento del producto">
-                            </div>
+            
                         </div>
                     `,
                     showCancelButton: true,
@@ -301,8 +310,7 @@
                         const nuevaDescripcion = document.getElementById('inputNuevaDescripcion').value;
                         const nuevaPresentacion = document.getElementById('inputNuevaPresentacion').value;
                         const nuevoTotalExistencias = document.getElementById('inputNuevoTotalExistencias').value;
-                        const nuevaCategoria = document.getElementById('inputNuevaCategoria').value;
-                        editarProducto(productoId, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias, nuevaCategoria);
+                        editarProducto(productoId, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias);
                     }
                 });
             }, 2000);
@@ -405,7 +413,6 @@
                     <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${producto.descripcion}</td>
                     <td>${producto.presentacion}</td>
                     <td>${producto.totalExistencias}</td>
-                    <td>${producto.categoria}</td>
                     <td>
                         <div class="btns-actions">
                             <button class="btn-options">

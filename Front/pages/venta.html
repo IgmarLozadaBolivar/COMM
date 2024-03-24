@@ -86,6 +86,18 @@
             sidebar.classList.toggle("close");
         });
 
+        let tokenCheckInterval;
+
+        function iniciarVerificacionToken() {
+            verificarTokenExpirado();
+
+            tokenCheckInterval = setInterval(verificarTokenExpirado, 420000);
+        }
+
+        function detenerVerificacionToken() {
+            clearInterval(tokenCheckInterval);
+        }
+
         function verificarTokenExpirado() {
             const token = localStorage.getItem('token');
 
@@ -97,8 +109,9 @@
             const tokenPayload = JSON.parse(atob(token.split('.')[1]));
             const expirationTimeInSeconds = tokenPayload.exp;
             const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+            const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
 
-            if (currentTimeInSeconds >= expirationTimeInSeconds) {
+            if (timeUntilExpirationInSeconds <= 0) {
                 console.error('El token ha expirado.');
                 Swal.fire({
                     title: "Sesión Expirada",
@@ -117,8 +130,8 @@
             }
         }
 
-        // Verificar el token en un lapso de 7 minutos
-        setInterval(verificarTokenExpirado, 420000);
+        document.addEventListener('DOMContentLoaded', iniciarVerificacionToken);
+        window.addEventListener('beforeunload', detenerVerificacionToken);
 
         function startMarquee(element) {
             clearInterval(element.dataset.marqueeId);
@@ -290,120 +303,63 @@
         let datosVentas = [];
         let datoVentaProducto = [];
 
-        async function obtenerCategorias() {
+        async function obtenerMasDetalles(codigoBarrasIngresado) {
             try {
                 const response = await fetch('http://localhost:5033/Api/Producto');
                 if (!response.ok) {
                     throw new Error('Error al obtener los datos de los productos');
                 }
                 const data = await response.json();
-                const categorias = [...new Set(data.map(producto => producto.categoria))];
-                return categorias;
-            } catch (error) {
-                console.error('Error al obtener las categorías de los productos:', error);
-                return null;
-            }
-        }
-
-        async function obtenerNombre(categoria) {
-            try {
-                const response = await fetch('http://localhost:5033/Api/Producto');
-                if (!response.ok) {
-                    throw new Error('Error al obtener los datos de los productos');
-                }
-                const data = await response.json();
-                const nombres = [...new Set(data.filter(producto => producto.categoria === categoria).map(producto => producto.nombre))];
-                return nombres;
-            } catch (error) {
-                console.error('Error al obtener los nombres de los productos:', error);
-                return null;
-            }
-        }
-
-        async function obtenerPresentacion(categoria, nombre) {
-            try {
-                const response = await fetch('http://localhost:5033/Api/Producto');
-                if (!response.ok) {
-                    throw new Error('Error al obtener los datos de los productos');
-                }
-                const data = await response.json();
-                const presentaciones = [...new Set(data.filter(producto => producto.categoria === categoria && producto.nombre === nombre).map(producto => producto.presentacion))];
-                return presentaciones;
-            } catch (error) {
-                console.error('Error al obtener las presentaciones de los productos:', error);
-                return null;
-            }
-        }
-
-        async function obtenerMasDetalles(categoria, nombre, presentacion) {
-            try {
-                const response = await fetch('http://localhost:5033/Api/Producto');
-                if (!response.ok) {
-                    throw new Error('Error al obtener los datos de los productos');
-                }
-                const data = await response.json();
-                const detalles = data.filter(producto => producto.categoria === categoria && producto.nombre === nombre && producto.presentacion === presentacion);
-                return detalles;
+                const detalles = data.filter(producto => producto.codigoBarras === codigoBarrasIngresado);
+                return detalles.length > 0 ? detalles[0] : null;
             } catch (error) {
                 console.error('Error al obtener mas detalles de los productos:', error);
                 return null;
             }
         }
 
-        async function mostrarDetallesProducto(datosSeleccionados, detallesProductos) {
+        async function mostrarDetallesProducto(detallesProducto) {
             try {
-                const productoEncontrado = detallesProductos.find(producto =>
-                    producto.categoria === datosSeleccionados.categoria &&
-                    producto.nombre === datosSeleccionados.nombre &&
-                    producto.presentacion === datosSeleccionados.presentacion
-                );
-
-                if (!productoEncontrado) {
-                    throw new Error('No se encontró el producto');
+                if (!detallesProducto) {
+                    throw new Error('No se encontró un producto con el código de barras ingresado');
                 }
+
+                const productoEncontrado = detallesProducto;
 
                 const confirmationResult = await Swal.fire({
                     title: 'Detalles del producto',
                     html: `
-                        <div class="inputs-container-1">
-                            <div class="input-container-4">
-                                <label for="inputNombre" class="label-style-1">Nombre:</label>
-                                <input type="text" id="inputNombre" class="input-style-1" readonly value="${datosSeleccionados.nombre}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputPrecio" class="label-style-1">Precio:</label>
-                                <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precio}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputCodigoBarras" class="label-style-1">Codigo de barra:</label>
-                                <input type="text" id="inputCodigoBarras" class="input-style-1" readonly value="${productoEncontrado.codigoBarras}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputMarca" class="label-style-1">Marca:</label>
-                                <input type="text" id="inputMarca" class="input-style-1" readonly value="${productoEncontrado.marca}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputDescripcion" class="label-style-1">Descripción:</label>
-                                <input type="text" id="inputDescripcion" class="input-style-1" readonly value="${productoEncontrado.descripcion}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputPresentacion" class="label-style-1">Presentación:</label>
-                                <input type="text" id="inputPresentacion" class="input-style-1" readonly value="${datosSeleccionados.presentacion}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputCantidadDisponible" class="label-style-1">Cantidad disponible:</label>
-                                <input type="text" id="inputCantidadDisponible" class="no-arrows input-style-1" readonly value="${productoEncontrado.totalExistencias}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputCategoria" class="label-style-1">Categoría:</label>
-                                <input type="text" id="inputCategoria" class="no-arrows input-style-1"  readonly value="${datosSeleccionados.categoria}">
-                            </div>
-                            <div class="input-container-4">
-                                <label for="inputCantidad" class="label-style-1">Cantidad a vender:</label>
-                                <input type="number" id="inputCantidad" class="no-arrows input-style-1" min="0">
-                            </div>
-                        </div>
-                    `,
+                <div class="inputs-container-1">
+                    <div class="input-container-4">
+                        <label for="inputNombre" class="label-style-1">Nombre:</label>
+                        <input type="text" id="inputNombre" class="input-style-1" readonly value="${productoEncontrado.nombre}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputPrecio" class="label-style-1">Precio:</label>
+                        <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precio}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputCodigoBarras" class="label-style-1">Código de barras:</label>
+                        <input type="text" id="inputCodigoBarras" class="input-style-1" readonly value="${productoEncontrado.codigoBarras}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputDescripcion" class="label-style-1">Descripción:</label>
+                        <input type="text" id="inputDescripcion" class="input-style-1" readonly value="${productoEncontrado.descripcion}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputPresentacion" class="label-style-1">Presentación:</label>
+                        <input type="text" id="inputPresentacion" class="input-style-1" readonly value="${productoEncontrado.presentacion}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputCantidadDisponible" class="label-style-1">Cantidad disponible:</label>
+                        <input type="text" id="inputCantidadDisponible" class="no-arrows input-style-1" readonly value="${productoEncontrado.totalExistencias}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputCantidad" class="label-style-1">Cantidad a vender:</label>
+                        <input type="number" id="inputCantidad" class="no-arrows input-style-1" min="0">
+                    </div>
+                </div>
+            `,
                     showCancelButton: false,
                     confirmButtonText: 'Continuar',
                     didOpen: () => {
@@ -429,25 +385,23 @@
                     await Swal.fire({
                         title: 'Cantidad disponible restante',
                         html: `
-                        <div class="inputs-container-1">
-                            <div class="input-container-4">
-                                <label for="input" class="label-style-1">Resultado:</label>
-                                <input type="text" id="input" class="no-arrows input-style-2"  readonly value="${cantidadRestante}">
-                            </div>
+                    <div class="inputs-container-1">
+                        <div class="input-container-4">
+                            <label for="input" class="label-style-1">Resultado:</label>
+                            <input type="text" id="input" class="no-arrows input-style-2" readonly value="${cantidadRestante}">
                         </div>
-                    `,
+                    </div>
+                `,
                         confirmButtonText: 'Aceptar'
                     });
 
                     productos[idProducto] = {
                         id: idProductoExistente,
-                        nombre: datosSeleccionados.nombre,
+                        nombre: productoEncontrado.nombre,
                         precio: productoEncontrado.precio,
                         codigoBarras: productoEncontrado.codigoBarras,
-                        marca: productoEncontrado.marca,
                         descripcion: productoEncontrado.descripcion,
-                        presentacion: datosSeleccionados.presentacion,
-                        categoria: datosSeleccionados.categoria,
+                        presentacion: productoEncontrado.presentacion,
                         cantidadAVender: cantidadAVender,
                         idFacturaCompraFk: productoEncontrado.idFacturaCompraFk,
                         totalExistencias: cantidadRestante
@@ -457,7 +411,6 @@
                 } else {
                     continueForm2();
                 }
-
             } catch (error) {
                 console.error('Error al mostrar detalles del producto:', error);
                 Swal.fire({
@@ -470,6 +423,12 @@
 
         async function actualizarProductoEnBaseDeDatos(cantidadAVender) {
             try {
+                const token = verificarTokenExpirado();
+                if (!token) {
+                    console.error('No se ha encontrado un token en localStorage.');
+                    return;
+                }
+
                 for (const id in productos) {
                     const producto = productos[id];
 
@@ -479,7 +438,6 @@
                         nombre: producto.nombre,
                         precio: producto.precio,
                         codigoBarras: producto.codigoBarras,
-                        marca: producto.marca,
                         descripcion: producto.descripcion,
                         presentacion: producto.presentacion,
                         totalExistencias: nuevaCantidadDisponible,
@@ -489,7 +447,11 @@
 
                     console.log(data);
 
-                    const headers = new Headers({ 'Content-Type': 'application/json' });
+                    const headers = new Headers({
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    });
+                    
                     const config = {
                         method: 'PUT',
                         headers: headers,
@@ -527,117 +489,26 @@
 
         async function ContinueForm() {
             try {
-                const categorias = await obtenerCategorias();
-                if (categorias.length === 0) {
-                    throw new Error('No se encontraron categorías de productos');
-                }
-
-                const categoriaResult = await Swal.fire({
+                const codigoBarras = await Swal.fire({
                     title: 'Datos del producto',
-                    text: 'Seleccione la categoría del producto',
-                    input: 'select',
-                    inputOptions: categorias.reduce((obj, categoria) => {
-                        obj[categoria] = categoria;
-                        return obj;
-                    }, {}),
-                    inputPlaceholder: 'Seleccione una categoría',
+                    text: 'Ingrese el código de barras del producto:',
+                    input: 'text',
+                    inputPlaceholder: 'Código de barras',
                     showCancelButton: true,
                     confirmButtonText: 'Confirmar',
                     cancelButtonText: 'Volver',
                     inputValidator: (value) => {
                         if (!value) {
-                            return 'Debes seleccionar una categoría';
+                            return 'Debes ingresar un código de barras';
                         }
-                    },
-                    customClass: {
-                        input: 'form-select centered-select'
-                    },
-                    inputAttributes: {
-                        style: 'width: 50%;'
                     }
                 });
 
-                if (categoriaResult.isConfirmed) {
-                    const categoriaSeleccionada = categoriaResult.value;
-                    const datosSeleccionados = {
-                        categoria: categoriaSeleccionada
-                    };
+                if (codigoBarras.isConfirmed) {
+                    const codigoBarrasIngresado = codigoBarras.value;
 
-                    const nombres = await obtenerNombre(categoriaSeleccionada);
-                    if (nombres.length === 0) {
-                        throw new Error('No se encontraron nombres de productos para la categoría seleccionada');
-                    }
-
-                    const nombreResult = await Swal.fire({
-                        title: 'Datos del producto',
-                        text: 'Seleccione el nombre del producto',
-                        input: 'select',
-                        inputOptions: nombres.reduce((obj, nombre) => {
-                            obj[nombre] = nombre;
-                            return obj;
-                        }, {}),
-                        inputPlaceholder: 'Nombre del producto',
-                        showCancelButton: true,
-                        confirmButtonText: 'Confirmar',
-                        cancelButtonText: 'Volver',
-                        inputValidator: (value) => {
-                            if (!value) {
-                                return 'Debes seleccionar un nombre de producto';
-                            }
-                        },
-                        customClass: {
-                            input: 'form-select centered-select'
-                        },
-                        inputAttributes: {
-                            style: 'width: 50%;'
-                        }
-                    });
-
-                    if (nombreResult.isConfirmed) {
-                        const nombreSeleccionado = nombreResult.value;
-                        datosSeleccionados.nombre = nombreSeleccionado;
-
-                        const presentaciones = await obtenerPresentacion(categoriaSeleccionada, nombreSeleccionado);
-                        if (presentaciones.length === 0) {
-                            throw new Error('No se encontraron opciones de presentación para el producto seleccionado');
-                        }
-
-                        const presentacionResult = await Swal.fire({
-                            title: 'Datos del producto',
-                            text: 'Seleccione la presentación del producto',
-                            input: 'select',
-                            inputOptions: presentaciones.reduce((obj, presentacion) => {
-                                obj[presentacion] = presentacion;
-                                return obj;
-                            }, {}),
-                            inputPlaceholder: 'Seleccione la presentación',
-                            showCancelButton: true,
-                            confirmButtonText: 'Confirmar',
-                            cancelButtonText: 'Volver',
-                            inputValidator: (value) => {
-                                if (!value) {
-                                    return 'Debes seleccionar una presentación';
-                                }
-                            },
-                            customClass: {
-                                input: 'form-select centered-select'
-                            },
-                            inputAttributes: {
-                                style: 'width: 50%;'
-                            }
-                        });
-
-                        if (presentacionResult.isConfirmed) {
-                            const presentacionSeleccionada = presentacionResult.value;
-                            datosSeleccionados.presentacion = presentacionSeleccionada;
-
-                            const detallesProductos = await obtenerMasDetalles(categoriaSeleccionada, nombreSeleccionado, presentacionSeleccionada);
-                            if (!detallesProductos || detallesProductos.length === 0) {
-                                throw new Error('No se encontraron detalles de productos');
-                            }
-                            await mostrarDetallesProducto(datosSeleccionados, detallesProductos);
-                        }
-                    }
+                    const detallesProducto = await obtenerMasDetalles(codigoBarrasIngresado);
+                    await mostrarDetallesProducto(detallesProducto);
                 }
             } catch (error) {
                 console.error('Error en ContinueForm:', error);

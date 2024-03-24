@@ -70,6 +70,14 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle")
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
         function verificarTokenExpirado() {
             const token = localStorage.getItem('token');
 
@@ -101,7 +109,7 @@
             }
         }
 
-        // Verificar el token en un lapso de 7 minutos
+    
         setInterval(verificarTokenExpirado, 420000);
     </script>
 </body>
