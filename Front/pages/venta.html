@@ -187,7 +187,7 @@
 
                 setTimeout(function () {
                     Swal.close();
-                    fetch('http://localhost:5033/Api/Persona')
+                    fetch('https://api.commsas.com/Api/Persona')
                         .then(response => response.json())
                         .then(data => {
                             const inputCliente = document.createElement('input');
@@ -305,7 +305,7 @@
 
         async function obtenerMasDetalles(codigoBarrasIngresado) {
             try {
-                const response = await fetch('http://localhost:5033/Api/Producto');
+                const response = await fetch('https://api.commsas.com/Api/Producto');
                 if (!response.ok) {
                     throw new Error('Error al obtener los datos de los productos');
                 }
@@ -458,7 +458,7 @@
                         body: JSON.stringify(data)
                     };
 
-                    const urlEditar = `http://localhost:5033/Api/Producto/${producto.id}`;
+                    const urlEditar = `https://api.commsas.com/Api/Producto/${producto.id}`;
                     const response = await fetch(urlEditar, config);
 
                     if (!response.ok) {
@@ -538,7 +538,7 @@
                     idClienteFK: datoVenta.idClienteFK
                 };
 
-                const response = await fetch('http://localhost:5033/Api/FacturaVenta', {
+                const response = await fetch('https://api.commsas.com/Api/FacturaVenta', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(facturaVenta)
@@ -569,7 +569,7 @@
                     idProductoFK: idProducto
                 };
 
-                const response = await fetch('http://localhost:5033/Api/VentaProducto', {
+                const response = await fetch('https://api.commsas.com/Api/VentaProducto', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(detalleFactura)

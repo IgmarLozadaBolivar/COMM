@@ -185,7 +185,7 @@
                 return;
             }
 
-            const urlEditar = `http://localhost:5033/Api/Producto/${id}`;
+            const urlEditar = `https://api.commsas.com/Api/Producto/${id}`;
 
             const productoActual = await obtenerProducto(id);
 
@@ -348,7 +348,7 @@
                 console.error('No se ha encontrado un token en localStorage.');
                 return;
             }
-            const urlEliminar = `http://localhost:5033/Api/Producto/${id}`;
+            const urlEliminar = `https://api.commsas.com/Api/Producto/${id}`;
             const config = {
                 method: 'DELETE',
                 headers: {
@@ -372,7 +372,7 @@
         }
 
         async function obtenerProducto(id) {
-            const urlProducto = `http://localhost:5033/Api/Producto/${id}`;
+            const urlProducto = `https://api.commsas.com/Api/Producto/${id}`;
             try {
                 const response = await fetch(urlProducto);
                 if (response.ok) {
@@ -388,7 +388,7 @@
 
         function obtenerProductos() {
 
-            const apiUrl = 'http://localhost:5033/Api/Producto';
+            const apiUrl = 'https://api.commsas.com/Api/Producto';
 
             fetch(apiUrl, {
                 method: 'GET',

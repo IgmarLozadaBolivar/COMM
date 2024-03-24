@@ -1,0 +1,10 @@
+services:
+  security:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/diego/docker/data:/logs
+    restart: unless-stopped
+    ports:
+      - "8080:8080"

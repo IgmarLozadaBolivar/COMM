@@ -17,7 +17,7 @@ public class DbFirstContextSeed
 
             if (!context.Users.Any())
             {
-                using (var reader = new StreamReader(ruta + @"/Data/Csv/User.csv"))
+                using (var reader = new StreamReader("../Persistencia/Data/Csv/User.csv"))
                 {
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
@@ -31,7 +31,7 @@ public class DbFirstContextSeed
 
             if (!context.UserRols.Any())
             {
-                using (var reader = new StreamReader(ruta + @"\Data\Csv\UserRol.csv"))
+                using (var reader = new StreamReader("../Persistencia/Data/Csv/UserRol.csv"))
                 {
                     using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
                     {
