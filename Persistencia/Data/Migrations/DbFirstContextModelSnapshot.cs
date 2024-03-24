@@ -167,11 +167,6 @@ namespace Persistencia.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Categoria")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("longtext")
-                        .HasComment("Categoría de los productos en la factura");
-
                     b.Property<string>("CodigoBarras")
                         .HasColumnType("longtext")
                         .HasComment("Código de barras del producto");
@@ -181,10 +176,6 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("varchar(100)")
                         .HasComment("Descripción del producto");
 
-                    b.Property<string>("Marca")
-                        .HasMaxLength(25)
-                        .HasColumnType("varchar(25)")
-                        .HasComment("Nombre de la marca del producto");
 
                     b.Property<string>("Nombre")
                         .HasMaxLength(25)

@@ -313,10 +313,6 @@
                     <label for="inputCantidad" class="label-style-1">Cantidad:</label>
                     <input type="text" id="inputCantidad" class="input-style-1" placeholder="Cantidad del producto">
                 </div>
-                <div class="input-container-4">
-                    <label for="inputCategoria" class="label-style-1">Elemento:</label>
-                    <input type="text" id="inputCategoria" class="input-style-1" placeholder="Elemento">
-                </div>
             </div>
         `,
                 showCancelButton: true,
@@ -335,7 +331,6 @@
                         descripcion: document.getElementById('inputDescription').value || null,
                         presentacion: document.getElementById('inputPresentation').value,
                         cantidadAAgregar: parseInt(document.getElementById('inputCantidad').value),
-                        categoria: document.getElementById('inputCategoria').value
                     };
 
                     productoNuevo.totalExistencias = productoNuevo.cantidadAAgregar;
@@ -345,8 +340,7 @@
                         producto.precio === productoNuevo.precio &&
                         producto.codigoBarras === productoNuevo.codigoBarras &&
                         producto.descripcion === productoNuevo.descripcion &&
-                        producto.presentacion === productoNuevo.presentacion &&
-                        producto.categoria === productoNuevo.categoria
+                        producto.presentacion === productoNuevo.presentacion 
                     );
 
                     if (productoExistente) {
@@ -544,6 +538,7 @@
                         <option value="" disabled>Tipo de pago</option>
                         <option value="Efectivo">Efectivo</option>
                         <option value="Transferencia">Transferencia</option>
+                        <option value="Cuota">Cuotas</option>
                     </select>
                 </div>
                 <div class="input-container-4">

@@ -17,15 +17,7 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
         builder.Property(e => e.Descripcion)
             .HasMaxLength(100)
             .HasComment("Descripción del producto");
-
-        builder.Property(e => e.Categoria)
-            .HasPrecision(10, 2)
-            .HasComment("Categoría de los productos en la factura");
-
-        builder.Property(e => e.Marca)
-            .HasMaxLength(25)
-            .HasComment("Nombre de la marca del producto");
-
+       
         builder.Property(e => e.Nombre)
             .HasMaxLength(25)
             .HasComment("Nombre del producto");
