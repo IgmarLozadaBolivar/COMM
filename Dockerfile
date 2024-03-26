@@ -1,7 +1,7 @@
 ARG VARIANT=7.0.407-bookworm-slim-amd64
 FROM mcr.microsoft.com/dotnet/sdk:${VARIANT} AS build
 WORKDIR /source
-EXPOSE 5033
+EXPOSE 8080
 
 COPY Api/*.csproj Api/
 COPY Aplicacion/*.csproj Aplicacion/

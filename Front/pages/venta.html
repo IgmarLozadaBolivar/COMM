@@ -91,7 +91,7 @@
         function iniciarVerificacionToken() {
             verificarTokenExpirado();
 
-            tokenCheckInterval = setInterval(verificarTokenExpirado, 420000);
+            tokenCheckInterval = setInterval(verificarTokenExpirado, 720000);
         }
 
         function detenerVerificacionToken() {
@@ -111,22 +111,34 @@
             const currentTimeInSeconds = Math.floor(Date.now() / 1000);
             const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
 
-            if (timeUntilExpirationInSeconds <= 0) {
-                console.error('El token ha expirado.');
-                Swal.fire({
-                    title: "Sesión Expirada",
-                    text: "Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.",
-                    icon: "warning",
-                    confirmButtonText: 'Entiendo',
-                }).then((value) => {
-                    if (value.isConfirmed) {
-                        localStorage.removeItem('token');
-                        window.location.href = 'auth.html';
-                    }
-                });
+            if (token) {
+                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+                const expirationTimeInSeconds = tokenPayload.exp;
+                const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+                const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
+
+                if (timeUntilExpirationInSeconds <= 0) {
+                    console.error('El token ha expirado.');
+                    Swal.fire({
+                        title: "Sesión Expirada",
+                        text: "Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.",
+                        icon: "warning",
+                        confirmButtonText: 'Entiendo',
+                    }).then((value) => {
+                        if (value.isConfirmed) {
+                            localStorage.removeItem('token');
+                            window.history.replaceState({}, document.title, './auth.html');
+                            window.location.href = './auth.html';
+                        }
+                    });
+                } else {
+                    console.log('El token es válido.');
+                    return token;
+                }
             } else {
-                console.log('El token es válido.');
-                return token;
+                // No hay token almacenado, redirigir a la página de inicio de sesión
+                window.history.replaceState({}, document.title, './auth.html');
+                window.location.href = './auth.html';
             }
         }
 
@@ -451,7 +463,7 @@
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     });
-                    
+
                     const config = {
                         method: 'PUT',
                         headers: headers,
