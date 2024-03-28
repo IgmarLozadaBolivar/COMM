@@ -150,6 +150,18 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        let tokenCheckInterval;
+
+        function iniciarVerificacionToken() {
+            verificarTokenExpirado();
+
+            tokenCheckInterval = setInterval(verificarTokenExpirado, 60);
+        }
+
+        function detenerVerificacionToken() {
+            clearInterval(tokenCheckInterval);
+        }
+
         function verificarTokenExpirado() {
             const token = localStorage.getItem('token');
 
@@ -187,14 +199,13 @@
                     return token;
                 }
             } else {
-                // No hay token almacenado, redirigir a la página de inicio de sesión
                 window.history.replaceState({}, document.title, './auth.html');
                 window.location.href = './auth.html';
             }
         }
 
-        // Verificar el token en un lapso de 7 minutos
-        setInterval(verificarTokenExpirado, 720000);
+        document.addEventListener('DOMContentLoaded', iniciarVerificacionToken);
+        window.addEventListener('beforeunload', detenerVerificacionToken);
 
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
