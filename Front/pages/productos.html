@@ -118,7 +118,7 @@
         function iniciarVerificacionToken() {
             verificarTokenExpirado();
 
-            tokenCheckInterval = setInterval(verificarTokenExpirado, 720000);
+            tokenCheckInterval = setInterval(verificarTokenExpirado, 12000000);
         }
 
         function detenerVerificacionToken() {
@@ -136,7 +136,6 @@
             const tokenPayload = JSON.parse(atob(token.split('.')[1]));
             const expirationTimeInSeconds = tokenPayload.exp;
             const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-            const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
 
             if (token) {
                 const tokenPayload = JSON.parse(atob(token.split('.')[1]));
@@ -163,7 +162,6 @@
                     return token;
                 }
             } else {
-                // No hay token almacenado, redirigir a la página de inicio de sesión
                 window.history.replaceState({}, document.title, './auth.html');
                 window.location.href = './auth.html';
             }

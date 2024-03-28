@@ -195,7 +195,7 @@ public class UserService : IUserService
             return new RefreshToken
             {
                 Token = Convert.ToBase64String(randomNumber),
-                TokenExpired = DateTime.UtcNow.AddMinutes(12),
+                TokenExpired = DateTime.UtcNow.AddMinutes(20),
                 TokenCreated = DateTime.UtcNow
             };
         }
