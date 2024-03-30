@@ -83,7 +83,7 @@
         function iniciarVerificacionToken() {
             verificarTokenExpirado();
 
-            tokenCheckInterval = setInterval(verificarTokenExpirado, 1200);
+            tokenCheckInterval = setInterval(verificarTokenExpirado, 1200000);
         }
 
         function detenerVerificacionToken() {
