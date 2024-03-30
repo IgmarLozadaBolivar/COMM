@@ -168,7 +168,9 @@ public class UserService : IUserService
             dataUserDto.Message = $"Token is not active.";
             return dataUserDto;
         }
-        refreshTokenBd.TokenRevoked = DateTime.UtcNow;
+        TimeZoneInfo colombiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+        DateTime currentDateTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, colombiaTimeZone);
+        refreshTokenBd.TokenRevoked = currentDateTimeColombia;
         var newRefreshToken = CreateRefreshToken();
         usuario.RefreshTokens.Add(newRefreshToken);
         _unitOfWork.Users.Update(usuario);
@@ -176,7 +178,6 @@ public class UserService : IUserService
         dataUserDto.IsAuthenticated = true;
         JwtSecurityToken jwtSecurityToken = CreateJwtToken(usuario);
         dataUserDto.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        /* dataUserDto.Email = usuario.Email; */
         dataUserDto.UserName = usuario.Nombre;
         dataUserDto.Roles = usuario.Rols
                                         .Select(u => u.Nombre)
@@ -192,11 +193,13 @@ public class UserService : IUserService
         using (var generator = RandomNumberGenerator.Create())
         {
             generator.GetBytes(randomNumber);
+            TimeZoneInfo colombiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+            DateTime currentDateTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, colombiaTimeZone);
             return new RefreshToken
             {
                 Token = Convert.ToBase64String(randomNumber),
-                TokenExpired = DateTime.UtcNow.AddMinutes(20),
-                TokenCreated = DateTime.UtcNow
+                TokenExpired = currentDateTimeColombia.AddMinutes(20),
+                TokenCreated = currentDateTimeColombia
             };
         }
     }
@@ -218,11 +221,14 @@ public class UserService : IUserService
         .Union(roleClaims);
         var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+        TimeZoneInfo colombiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+        DateTime currentDateTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, colombiaTimeZone);
+        DateTime expirationTimeColombia = currentDateTimeColombia.AddMinutes(_jwt.DurationInMinutes);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _jwt.Issuer,
             audience: _jwt.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
+            expires: expirationTimeColombia,
             signingCredentials: signingCredentials);
         return jwtSecurityToken;
     }
