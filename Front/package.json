@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "jsonwebtoken": "^9.0.2",
     "makepdf": "^0.1.2",
+    "nodemailer": "^6.9.13",
     "pdfmake": "^0.2.10"
   }
 }

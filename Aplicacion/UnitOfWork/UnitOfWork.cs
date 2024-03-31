@@ -17,6 +17,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ProveedorRepository _proveedores;
     private VentaProductoRepository _ventaProductos;
     private CompraProductoRepository _compraProductos;
+
+    private RefreshTokenRepository _refreshTokens;
     
     public UnitOfWork(DbFirstContext _context)
     {
@@ -46,8 +48,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
             return _roles;
         }
     }
-
-    
 
     public IFacturaCompra FacturaCompras
     {
@@ -130,6 +130,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
                 _compraProductos = new CompraProductoRepository(context);
             }
             return _compraProductos;
+        }
+    }
+
+    public IRefreshToken RefreshTokens
+    {
+        get
+        {
+            if (_refreshTokens == null)
+            {
+                _refreshTokens = new RefreshTokenRepository(context);
+            }
+            return _refreshTokens;
         }
     }
     

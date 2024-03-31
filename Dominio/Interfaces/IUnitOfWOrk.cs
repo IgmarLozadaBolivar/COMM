@@ -13,6 +13,8 @@ public interface IUnitOfWork
     IProveedor Proveedores { get; }
     IVentaProducto VentasProductos { get; }
     ICompraProducto ComprasProductos { get; }
+
+    IRefreshToken RefreshTokens { get; }
     
     Task<int> SaveAsync();
 }

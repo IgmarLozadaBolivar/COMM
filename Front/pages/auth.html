@@ -107,12 +107,23 @@
                     localStorage.setItem('token', token);
                     window.location.href = "./dashboard.html";
                 } else {
-                    alert("Autenticación fallida. Verifique sus credenciales o regístrese.");
+                    alert("Autenticación fallida. Verifique sus credenciales.");
                 }
             } catch (error) {
                 console.error("Error al realizar la autenticación:", error);
             }
         }
+
+        window.onload = function () {
+            if (window.history && window.history.pushState) {
+                window.history.pushState('forward', null, './auth.html');
+                window.onpopstate = function (event) {
+                    if (event.state && location.hash !== '#forward') {
+                        window.history.pushState('forward', null, './auth.html');
+                    }
+                };
+            }
+        };
     </script>
 </body>
 

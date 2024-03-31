@@ -112,63 +112,113 @@
         toggle.addEventListener("click", () => {
             sidebar.classList.toggle("close");
         });
-
-        /* let tokenCheckInterval;
-
-        function iniciarVerificacionToken() {
-            verificarTokenExpirado();
-
-            tokenCheckInterval = setInterval(verificarTokenExpirado, 1200000);
-        }
-
-        function detenerVerificacionToken() {
-            clearInterval(tokenCheckInterval);
-        }
-
-        function verificarTokenExpirado() {
+        
+        function obtenerToken() {
             const token = localStorage.getItem('token');
 
             if (!token) {
                 console.error('No se ha encontrado un token en localStorage.');
+                window.location.href = './auth.html';
+            }
+            return token;
+        }
+
+        function decodeJwt(token) {
+            if (!token) {
+                console.error('No se proporcionó un token.');
                 return;
             }
 
-            const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-            const expirationTimeInSeconds = tokenPayload.exp;
-            const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+            const [, payloadBase64] = token.split('.');
+            const payload = atob(payloadBase64);
+            return JSON.parse(payload);
+        }
 
-            if (token) {
-                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-                const expirationTimeInSeconds = tokenPayload.exp;
-                const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-                const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
+        const token = obtenerToken();
+        const decoded = decodeJwt(token);
+        console.log(decoded);
+        function obtenerDatosDecodificados(decoded) {
+            if (!decoded) {
+                console.error('No se pudo decodificar el token correctamente.');
+                return null;
+            }
 
-                if (timeUntilExpirationInSeconds <= 0) {
-                    console.error('El token ha expirado.');
-                    Swal.fire({
-                        title: "Sesión Expirada",
-                        text: "Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.",
-                        icon: "warning",
-                        confirmButtonText: 'Entiendo',
-                    }).then((value) => {
-                        if (value.isConfirmed) {
-                            localStorage.removeItem('token');
-                            window.history.replaceState({}, document.title, './auth.html');
-                            window.location.href = './auth.html';
-                        }
-                    });
-                } else {
-                    console.log('El token es válido.');
-                    return token;
+            const { TokenExpired } = decoded;
+            console.log('TokenExpired:', TokenExpired);
+
+            return { TokenExpired };
+        }
+
+        async function obtenerDatosDesdeDB(token) {
+            try {
+                const data = await compararTokenEnDB(token);
+                if (!data) {
+                    console.error('No se pudieron obtener los datos de la base de datos.');
+                    return null;
                 }
-            } else {
-                window.history.replaceState({}, document.title, './auth.html');
-                window.location.href = './auth.html';
+                return data;
+            } catch (error) {
+                console.error('Error al comparar los tokens:', error);
+                return null;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', iniciarVerificacionToken);
-        window.addEventListener('beforeunload', detenerVerificacionToken); */
+        function mostrarVentanaEmergente() {
+            Swal.fire({
+                title: "Ha finalizado tu sesión!",
+                text: "Tus 20 minutos de sesión terminarón, por favor, inicie sesión nuevamente",
+                icon: "warning",
+                allowOutsideClick: false
+            }).then(() => {
+                window.history.pushState({}, '', './auth.html');
+                window.location.href = './auth.html';
+                localStorage.removeItem('token');
+            });
+        }
+
+        async function compareTokens(token, decoded) {
+            if (!decoded) {
+                console.error('No se pudo decodificar el token correctamente.');
+                return;
+            }
+
+            const { TokenExpired } = decoded;
+
+            const data = await obtenerDatosDesdeDB(token);
+            if (!data) return;
+
+            const currentTime = new Date();
+            const currentTimeUTC = new Date(currentTime.getTime() + currentTime.getTimezoneOffset() * 60000);
+            const tokenExpiredDate = new Date(TokenExpired);
+            const tokenExpiredDateUTC = new Date(tokenExpiredDate.getTime() + tokenExpiredDate.getTimezoneOffset() * 60000);
+
+            if (currentTimeUTC >= tokenExpiredDateUTC) {
+                mostrarVentanaEmergente();
+            } else {
+                const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
+                const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
+                const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
+
+                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
+                console.log(currentTime)
+                console.log(tokenExpiredDate)
+
+                if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
+                    mostrarVentanaEmergente();
+                } else {
+                    setTimeout(() => {
+                        compareTokens(token, decoded);
+                    }, 1000);
+                }
+            }
+        }
+        compareTokens(token, decoded);
+
+        async function compararTokenEnDB(token) {
+            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const data = await response.json();
+            return data;
+        }
 
         var optionsButtons = document.querySelectorAll('.btn-options');
 
@@ -189,7 +239,7 @@
         });
 
         async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias,) {
-            const token = verificarTokenExpirado();
+            const token = obtenerToken();
             if (!token) {
                 console.error('No se ha encontrado un token en localStorage.');
                 return;
@@ -353,7 +403,7 @@
         }
 
         async function eliminarProducto(id) {
-            const token = verificarTokenExpirado();
+            const token = obtenerToken();
             if (!token) {
                 console.error('No se ha encontrado un token en localStorage.');
                 return;
@@ -372,9 +422,23 @@
 
                 if (response.ok) {
                     obtenerProductos();
-                    console.log('Producto eliminado exitosamente.');
+                    Swal.fire({
+                        title: '¡Felicidades!',
+                        text: 'Se ha eliminado el producto correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
                 } else {
-                    console.error('Error al eliminar el producto:', response.statusText);
+                    if (response.status === 401) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No tienes autorización para realizar esta acción.',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        console.error('Error al eliminar el producto:', response.statusText);
+                    }
                 }
             } catch (error) {
                 console.error('Error de red:', error);
@@ -502,9 +566,6 @@
                 }
             });
         });
-
-
-
     </script>
 </body>
 

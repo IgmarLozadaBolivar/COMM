@@ -168,9 +168,8 @@ public class UserService : IUserService
             dataUserDto.Message = $"Token is not active.";
             return dataUserDto;
         }
-        TimeZoneInfo colombiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
-        DateTime currentDateTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, colombiaTimeZone);
-        refreshTokenBd.TokenRevoked = currentDateTimeColombia;
+
+        refreshTokenBd.TokenRevoked = DateTime.UtcNow;
         var newRefreshToken = CreateRefreshToken();
         usuario.RefreshTokens.Add(newRefreshToken);
         _unitOfWork.Users.Update(usuario);
@@ -193,13 +192,23 @@ public class UserService : IUserService
         using (var generator = RandomNumberGenerator.Create())
         {
             generator.GetBytes(randomNumber);
-            TimeZoneInfo colombiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
-            DateTime currentDateTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, colombiaTimeZone);
+            TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+            DateTime currentTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
+            var truncatedTimeColombia = new DateTime(
+                currentTimeColombia.Year,
+                currentTimeColombia.Month,
+                currentTimeColombia.Day,
+                currentTimeColombia.Hour,
+                currentTimeColombia.Minute,
+                currentTimeColombia.Second,
+                DateTimeKind.Unspecified
+            );
+            var tokenExpiration = truncatedTimeColombia.AddMinutes(20);
             return new RefreshToken
             {
                 Token = Convert.ToBase64String(randomNumber),
-                TokenExpired = currentDateTimeColombia.AddMinutes(20),
-                TokenCreated = currentDateTimeColombia
+                TokenExpired = tokenExpiration,
+                TokenCreated = truncatedTimeColombia
             };
         }
     }
@@ -212,23 +221,25 @@ public class UserService : IUserService
         {
             roleClaims.Add(new Claim("roles", role.Nombre));
         }
+        TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+        DateTime currentTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
+        var tokenExpiration = currentTimeColombia.AddMinutes(20);
         var claims = new[]
         {
-                                new Claim(JwtRegisteredClaimNames.Sub, user.Nombre),
-                                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                                new Claim("uid", user.Id.ToString())
-                        }
+            new Claim(JwtRegisteredClaimNames.Sub, user.Nombre),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("uid", user.Id.ToString()),
+            new Claim("TokenExpired", tokenExpiration.ToString("yyyy-MM-dd HH:mm:ss")),
+            new Claim("TokenCreated", currentTimeColombia.ToString("yyyy-MM-dd HH:mm:ss"))
+        }
         .Union(roleClaims);
         var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-        TimeZoneInfo colombiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
-        DateTime currentDateTimeColombia = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, colombiaTimeZone);
-        DateTime expirationTimeColombia = currentDateTimeColombia.AddMinutes(_jwt.DurationInMinutes);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _jwt.Issuer,
             audience: _jwt.Audience,
             claims: claims,
-            expires: expirationTimeColombia,
+            expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
             signingCredentials: signingCredentials);
         return jwtSecurityToken;
     }

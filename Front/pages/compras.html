@@ -100,62 +100,112 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
-        /* let tokenCheckInterval;
-
-        function iniciarVerificacionToken() {
-            verificarTokenExpirado();
-
-            tokenCheckInterval = setInterval(verificarTokenExpirado, 1200000);
-        }
-
-        function detenerVerificacionToken() {
-            clearInterval(tokenCheckInterval);
-        }
-
-        function verificarTokenExpirado() {
+        function obtenerToken() {
             const token = localStorage.getItem('token');
 
             if (!token) {
                 console.error('No se ha encontrado un token en localStorage.');
+                window.location.href = './auth.html';
+            }
+            return token;
+        }
+
+        function decodeJwt(token) {
+            if (!token) {
+                console.error('No se proporcionó un token.');
                 return;
             }
 
-            const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-            const expirationTimeInSeconds = tokenPayload.exp;
-            const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+            const [, payloadBase64] = token.split('.');
+            const payload = atob(payloadBase64);
+            return JSON.parse(payload);
+        }
 
-            if (token) {
-                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-                const expirationTimeInSeconds = tokenPayload.exp;
-                const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-                const timeUntilExpirationInSeconds = expirationTimeInSeconds - currentTimeInSeconds;
+        const token = obtenerToken();
+        const decoded = decodeJwt(token);
+        console.log(decoded);
+        function obtenerDatosDecodificados(decoded) {
+            if (!decoded) {
+                console.error('No se pudo decodificar el token correctamente.');
+                return null;
+            }
 
-                if (timeUntilExpirationInSeconds <= 0) {
-                    console.error('El token ha expirado.');
-                    Swal.fire({
-                        title: "Sesión Expirada",
-                        text: "Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.",
-                        icon: "warning",
-                        confirmButtonText: 'Entiendo',
-                    }).then((value) => {
-                        if (value.isConfirmed) {
-                            localStorage.removeItem('token');
-                            window.history.replaceState({}, document.title, './auth.html');
-                            window.location.href = './auth.html';
-                        }
-                    });
-                } else {
-                    console.log('El token es válido.');
-                    return token;
+            const { TokenExpired } = decoded;
+            console.log('TokenExpired:', TokenExpired);
+
+            return { TokenExpired };
+        }
+
+        async function obtenerDatosDesdeDB(token) {
+            try {
+                const data = await compararTokenEnDB(token);
+                if (!data) {
+                    console.error('No se pudieron obtener los datos de la base de datos.');
+                    return null;
                 }
-            } else {
-                window.history.replaceState({}, document.title, './auth.html');
-                window.location.href = './auth.html';
+                return data;
+            } catch (error) {
+                console.error('Error al comparar los tokens:', error);
+                return null;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', iniciarVerificacionToken);
-        window.addEventListener('beforeunload', detenerVerificacionToken); */
+        function mostrarVentanaEmergente() {
+            Swal.fire({
+                title: "Ha finalizado tu sesión!",
+                text: "Tus 20 minutos de sesión terminarón, por favor, inicie sesión nuevamente",
+                icon: "warning",
+                allowOutsideClick: false
+            }).then(() => {
+                window.history.pushState({}, '', './auth.html');
+                window.location.href = './auth.html';
+                localStorage.removeItem('token');
+            });
+        }
+
+        async function compareTokens(token, decoded) {
+            if (!decoded) {
+                console.error('No se pudo decodificar el token correctamente.');
+                return;
+            }
+
+            const { TokenExpired } = decoded;
+
+            const data = await obtenerDatosDesdeDB(token);
+            if (!data) return;
+
+            const currentTime = new Date();
+            const currentTimeUTC = new Date(currentTime.getTime() + currentTime.getTimezoneOffset() * 60000);
+            const tokenExpiredDate = new Date(TokenExpired);
+            const tokenExpiredDateUTC = new Date(tokenExpiredDate.getTime() + tokenExpiredDate.getTimezoneOffset() * 60000);
+
+            if (currentTimeUTC >= tokenExpiredDateUTC) {
+                mostrarVentanaEmergente();
+            } else {
+                const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
+                const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
+                const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
+
+                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
+                console.log(currentTime)
+                console.log(tokenExpiredDate)
+
+                if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
+                    mostrarVentanaEmergente();
+                } else {
+                    setTimeout(() => {
+                        compareTokens(token, decoded);
+                    }, 1000);
+                }
+            }
+        }
+        compareTokens(token, decoded);
+
+        async function compararTokenEnDB(token) {
+            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const data = await response.json();
+            return data;
+        }
 
         const body = document.querySelector('body'),
             sidebar = body.querySelector('nav'),
@@ -246,7 +296,6 @@
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     proveedorId = result.value;
-                                    /* proveedorNombre = result.value.nombre; */
                                     ContinueForm(proveedorId);
                                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                                     window.location.href = './facturacion.html';
@@ -623,7 +672,181 @@
             }
         }
 
+        // Version nueva
         async function generarFacturaPDF(datoCompra) {
+            try {
+                let detallesProductos = [];
+
+                if (Object.keys(productos).length > 0) {
+                    Object.values(productos).forEach(producto => {
+                        if (producto.nombre !== undefined && producto.cantidadAAgregar !== undefined && producto.precio !== undefined) {
+                            detallesProductos.push([
+                                producto.nombre,
+                                producto.cantidadAAgregar,
+                                `$${producto.precio * producto.cantidadAAgregar}`
+                            ]);
+                        }
+                    });
+                }
+
+                if (Object.keys(productosExistentes).length > 0) {
+                    Object.values(productosExistentes).forEach(arrayProductos => {
+                        arrayProductos.forEach(producto => {
+                            if (producto.nombre !== undefined && producto.cantidadAAgregar !== undefined && producto.precio !== undefined) {
+                                detallesProductos.push([
+                                    producto.nombre,
+                                    producto.cantidadAAgregar,
+                                    `$${producto.precio * producto.cantidadAAgregar}`
+                                ]);
+                            }
+                        });
+                    });
+                }
+
+                const pdfDocDefinition = {
+                    content: [
+                        {
+                            canvas: [
+                                {
+                                    type: 'rect',
+                                    x: 0,
+                                    y: 0,
+                                    w: 595.28,
+                                    h: 100,
+                                    color: '#305da8',
+                                }
+                            ],
+                            absolutePosition: { x: 0, y: 0 },
+                            zIndex: -1
+                        },
+                        {
+                            columns: [
+                                {
+                                    width: 'auto',
+                                    text: 'Factura',
+                                    fontSize: 30,
+                                    color: '#ffffff',
+                                    bold: true,
+                                    alignment: 'left',
+                                    margin: [10, 0, 0, 10],
+                                },
+                                {
+                                    width: '*',
+                                    text: [
+                                        { text: 'Fecha: ', bold: true },
+                                        { text: datoCompra.fechaCompra }
+                                    ],
+                                    fontSize: 16,
+                                    color: '#ffffff',
+                                    alignment: 'right',
+                                    margin: [0, 0, 10, 10],
+                                },
+                            ],
+                            layout: 'noBorders',
+                            margin: [0, 10, 0, 20]
+                        },
+                        {
+                            text: [
+                                { text: 'PROVEEDOR:\n', bold: true, fontSize: 18, color: '#305da8' },
+                                `${proveedorNombre}\n\n`,
+                            ],
+                            margin: [0, 0, 10, 10],
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', 'auto', 'auto'],
+                                body: [
+                                    [
+                                        { text: 'Producto', style: 'tableHeader' },
+                                        { text: 'Cantidad', style: 'tableHeader' },
+                                        { text: 'Precio', style: 'tableHeader' }
+                                    ]
+                                ].concat(detallesProductos),
+                                layout: {
+                                    fillColor: function (i, node) {
+                                        return i % 2 === 0 ? '#f2f2f2' : null;
+                                    },
+                                    hLineWidth: function (i, node) {
+                                        return (i === 0 || i === node.table.body.length) ? 2 : 1;
+                                    },
+                                    vLineWidth: function (i) {
+                                        return 0;
+                                    },
+                                    hLineColor: function (i) {
+                                        return i === 0 ? '#305da8' : '#e3e3e3';
+                                    },
+                                    vLineColor: function (i) {
+                                        return '#ffffff';
+                                    },
+                                },
+                                style: 'tableContent'
+                            },
+                            margin: [0, 10, 0, 10],
+                        },
+                        {
+                            columns: [
+                                { width: '*', text: '' },
+                                {
+                                    width: 'auto',
+                                    stack: [
+                                        { text: 'Medio de pago:', bold: true },
+                                        { text: `${datoCompra.tipoPago}`, bold: false },
+                                        { text: 'Total:', bold: true },
+                                        { text: `$${datoCompra.precioTotal}`, bold: false }
+                                    ],
+                                    margin: [0, 10, 10, 0]
+                                }
+                            ],
+                            margin: [0, 10, 0, 10]
+                        },
+                        {
+                            text: 'Gracias por elegirnos, esperamos que disfrute de su compra.',
+                            margin: [0, 30, 0, 0],
+                            fontSize: 16,
+                            alignment: 'center',
+                            color: '#305da8'
+                        },
+                    ],
+                    styles: {
+                        tableHeader: {
+                            fillColor: '#305da8',
+                            color: '#ffffff',
+                            bold: true,
+                            alignment: 'center',
+                            fontSize: 20
+                        },
+                        tableContent: {
+                            color: '#000000',
+                            alignment: 'center',
+                            fontSize: 14
+                        }
+                    }
+                };
+
+                const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
+
+                pdfDoc.getBlob(blob => {
+                    const openPDFInNewWindow = (blob, fileName) => {
+                        const url = URL.createObjectURL(blob);
+                        window.open(url, fileName);
+                    };
+
+                    const fileName = "factura_compra.pdf";
+                    openPDFInNewWindow(blob, fileName);
+                });
+            } catch (error) {
+                console.error('Error al generar factura de compra:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al generar la factura de compra. Por favor, inténtalo de nuevo más tarde.'
+                });
+            }
+        }
+
+        // Version original
+        /* async function generarFacturaPDF(datoCompra) {
             try {
                 let detallesProductos = [];
 
@@ -804,205 +1027,6 @@
                     };
                     checkAndDownload('factura_compra.pdf', 0);
                 });
-            } catch (error) {
-                console.error('Error al generar factura de compra:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al generar la factura de compra. Por favor, inténtalo de nuevo más tarde.'
-                });
-            }
-        }
-
-        // Version modificada
-        /* async function generarFacturaPDF(datoCompra) {
-            try {
-                let detallesProductos = [];
-
-                if (Object.keys(productos).length > 0) {
-                    Object.values(productos).forEach(producto => {
-                        if (producto.nombre !== undefined && producto.cantidadAAgregar !== undefined && producto.precio !== undefined) {
-                            detallesProductos.push([
-                                producto.nombre,
-                                producto.cantidadAAgregar,
-                                `$${producto.precio * producto.cantidadAAgregar}`
-                            ]);
-                        }
-                    });
-                }
-
-                if (Object.keys(productosExistentes).length > 0) {
-                    Object.values(productosExistentes).forEach(arrayProductos => {
-                        arrayProductos.forEach(producto => {
-                            if (producto.nombre !== undefined && producto.cantidadAAgregar !== undefined && producto.precio !== undefined) {
-                                detallesProductos.push([
-                                    producto.nombre,
-                                    producto.cantidadAAgregar,
-                                    `$${producto.precio * producto.cantidadAAgregar}`
-                                ]);
-                            }
-                        });
-                    });
-                }
-
-                const pdfDocDefinition = {
-                    content: [
-                        {
-                            canvas: [
-                                {
-                                    type: 'rect',
-                                    x: 0,
-                                    y: 0,
-                                    w: 595.28,
-                                    h: 100,
-                                    color: '#305da8',
-                                }
-                            ],
-                            absolutePosition: { x: 0, y: 0 },
-                            zIndex: -1
-                        },
-                        {
-                            columns: [
-                                {
-                                    width: 'auto',
-                                    text: 'Factura',
-                                    fontSize: 30,
-                                    color: '#ffffff',
-                                    bold: true,
-                                    alignment: 'left',
-                                    margin: [10, 0, 0, 10],
-                                },
-                                {
-                                    width: '*',
-                                    text: [
-                                        { text: 'Fecha: ', bold: true },
-                                        { text: datoCompra.fechaCompra }
-                                    ],
-                                    fontSize: 16,
-                                    color: '#ffffff',
-                                    alignment: 'right',
-                                    margin: [0, 0, 10, 10],
-                                },
-                            ],
-                            layout: 'noBorders',
-                            margin: [0, 10, 0, 20]
-                        },
-                        {
-                            text: [
-                                { text: 'PROVEEDOR:\n', bold: true, fontSize: 18, color: '#305da8' },
-                                `${proveedorNombre}\n\n`,
-                            ],
-                            margin: [0, 0, 10, 10],
-                        },
-                        {
-                            table: {
-                                headerRows: 1,
-                                widths: ['*', 'auto', 'auto'],
-                                body: [
-                                    [
-                                        { text: 'Producto', style: 'tableHeader' },
-                                        { text: 'Cantidad', style: 'tableHeader' },
-                                        { text: 'Precio', style: 'tableHeader' }
-                                    ]
-                                ].concat(detallesProductos),
-                                layout: {
-                                    fillColor: function (i, node) {
-                                        return i % 2 === 0 ? '#f2f2f2' : null;
-                                    },
-                                    hLineWidth: function (i, node) {
-                                        return (i === 0 || i === node.table.body.length) ? 2 : 1;
-                                    },
-                                    vLineWidth: function (i) {
-                                        return 0;
-                                    },
-                                    hLineColor: function (i) {
-                                        return i === 0 ? '#305da8' : '#e3e3e3';
-                                    },
-                                    vLineColor: function (i) {
-                                        return '#ffffff';
-                                    },
-                                },
-                                style: 'tableContent'
-                            },
-                            margin: [0, 10, 0, 10],
-                        },
-                        {
-                            columns: [
-                                { width: '*', text: '' },
-                                {
-                                    width: 'auto',
-                                    stack: [
-                                        { text: 'Medio de pago:', bold: true },
-                                        { text: `${datoCompra.tipoPago}`, bold: false },
-                                        { text: 'Total:', bold: true },
-                                        { text: `$${datoCompra.precioTotal}`, bold: false }
-                                    ],
-                                    margin: [0, 10, 10, 0]
-                                }
-                            ],
-                            margin: [0, 10, 0, 10]
-                        },
-                        {
-                            text: 'Gracias por elegirnos, esperamos que disfrute de su compra.',
-                            margin: [0, 30, 0, 0],
-                            fontSize: 16,
-                            alignment: 'center',
-                            color: '#305da8'
-                        },
-                    ],
-                    styles: {
-                        tableHeader: {
-                            fillColor: '#305da8',
-                            color: '#ffffff',
-                            bold: true,
-                            alignment: 'center',
-                            fontSize: 20
-                        },
-                        tableContent: {
-                            color: '#000000',
-                            alignment: 'center',
-                            fontSize: 14
-                        }
-                    }
-                };
-
-                const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
-
-                const blob = await new Promise((resolve, reject) => {
-                    pdfDoc.getBlob((pdfBlob) => {
-                        resolve(pdfBlob);
-                    }, (error) => {
-                        reject(error);
-                    });
-                });
-
-                const downloadPDF = (filename) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                };
-
-                const checkAndDownload = (filename, count) => {
-                    const finalFilename = count > 0 ? `factura_compra_${count}.pdf` : 'factura_compra.pdf';
-                    fetch(finalFilename)
-                        .then(response => {
-                            if (!response.ok) {
-                                downloadPDF(finalFilename);
-                            } else {
-                                checkAndDownload('factura_compra.pdf', count + 1);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error al verificar la existencia del archivo:', error);
-                            downloadPDF('factura_compra.pdf');
-                        });
-                };
-
-                checkAndDownload('factura_compra.pdf', 0);
             } catch (error) {
                 console.error('Error al generar factura de compra:', error);
                 Swal.fire({

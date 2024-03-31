@@ -17,5 +17,7 @@ public class MappingProfiles : Profile
         CreateMap<FacturaCompra, FacturaCompraDto>().ReverseMap();
         CreateMap<VentaProducto, VentaProductoDto>().ReverseMap();
         CreateMap<CompraProducto, CompraProductoDto>().ReverseMap();
+
+        CreateMap<RefreshToken, RefreshTokenDto>().ReverseMap();
     }
 }
