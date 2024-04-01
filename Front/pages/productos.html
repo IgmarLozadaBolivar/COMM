@@ -281,7 +281,7 @@
                         confirmButtonText: 'Aceptar'
                     });
                     obtenerProductos();
-                } else if (response.status === 401) {
+                } else if (response.status === 401 || response.status == 403) {
                     Swal.fire({
                         title: 'Error de autorización',
                         text: 'No estás autorizado para realizar esta acción.',
@@ -429,7 +429,7 @@
                         confirmButtonText: 'Aceptar'
                     });
                 } else {
-                    if (response.status === 401) {
+                    if (response.status === 401 || response.status == 403) {
                         Swal.fire({
                             title: 'Error',
                             text: 'No tienes autorización para realizar esta acción.',

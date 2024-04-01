@@ -340,7 +340,7 @@
                     });
                     obtenerProveedores();
                 } else {
-                    if (response.status === 401) {
+                    if (response.status === 401 || response.status == 403) {
                         Swal.fire({
                             title: 'Error',
                             text: 'No tienes autorización para realizar esta acción.',
@@ -420,7 +420,7 @@
                         confirmButtonText: 'Aceptar'
                     });
                 } else {
-                    if (response.status === 401) {
+                    if (response.status === 401 || response.status == 403) {
                         Swal.fire({
                             title: 'Error',
                             text: 'No tienes autorización para realizar esta acción.',
