@@ -9,6 +9,7 @@
     <script
         src="https://cdn.jsdelivr.net/npm/@tsparticles/preset-triangles@3/tsparticles.preset.triangles.bundle.min.js"></script>
     <link rel="shortcut icon" href="../assets/logo-removebg-preview.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -84,6 +85,17 @@
 
         async function autorizarUsuario(event) {
             event.preventDefault();
+
+            const validationModal = Swal.fire({
+                title: 'Validando credenciales',
+                html: '<img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" style="width: 80px; height: 80px;">',
+                showCancelButton: false,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false
+            });
+
             let inputUsuario = document.getElementById('username').value;
             let inputPassword = document.getElementById('password').value;
 
@@ -102,12 +114,33 @@
                 const response = await fetch(urlAuth, config);
 
                 if (response.ok) {
-                    const responseData = await response.json();
-                    const token = responseData.token;
-                    localStorage.setItem('token', token);
-                    window.location.href = "./dashboard.html";
+                    setTimeout(() => {
+                        validationModal.close();
+
+                        Swal.fire({
+                            title: 'Acceso permitido',
+                            text: 'Bienvenido, sus credenciales son válidas.',
+                            icon: 'success',
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        setTimeout(async () => {
+                            const responseData = await response.json();
+                            const token = responseData.token;
+                            localStorage.setItem('token', token);
+                            window.location.href = "./dashboard.html";
+                        }, 3000);
+                    }, 3000);
                 } else {
-                    alert("Autenticación fallida. Verifique sus credenciales.");
+                    validationModal.close();
+
+                    Swal.fire({
+                        title: 'Autenticación fallida',
+                        text: 'Verifique sus credenciales e inténtelo de nuevo.',
+                        icon: 'error'
+                    });
                 }
             } catch (error) {
                 console.error("Error al realizar la autenticación:", error);
