@@ -472,6 +472,13 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    data.sort((a, b) => {
+                        const nombreComparison = a.nombre.localeCompare(b.nombre);
+                        if (nombreComparison !== 0) {
+                            return nombreComparison;
+                        }
+                        return b.presentacion.localeCompare(a.presentacion);
+                    });
                     const tablaData = document.getElementById('tabla-data');
                     tablaData.innerHTML = '';
 
@@ -527,11 +534,20 @@
                             btn.addEventListener('click', function () {
                                 const productoId = this.getAttribute('data-id');
 
-                                const confirmacion = confirm('¿Estás seguro de que deseas eliminar este producto?');
-
-                                if (confirmacion) {
-                                    eliminarProducto(productoId);
-                                }
+                                Swal.fire({
+                                    title: '¿Estás seguro?',
+                                    text: '¿Estás seguro de que deseas eliminar este producto?',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Confirmar',
+                                    cancelButtonText: 'Cancelar'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        eliminarProducto(productoId);
+                                    }
+                                });
                             });
                         });
                     });
