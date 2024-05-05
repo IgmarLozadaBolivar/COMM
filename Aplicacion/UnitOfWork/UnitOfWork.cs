@@ -8,8 +8,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private readonly DbFirstContext context;
     private UserRepository _usuarios;
     private RolRepository _roles;
-    
-   
+
+
     private FacturaCompraRepository _facturaCompras;
     private FacturaVentaRepository _facturaVentas;
     private PersonaRepository _personas;
@@ -19,12 +19,12 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private CompraProductoRepository _compraProductos;
 
     private RefreshTokenRepository _refreshTokens;
-    
+
     public UnitOfWork(DbFirstContext _context)
     {
         context = _context;
     }
-     
+
     public IUser Users
     {
         get
@@ -144,12 +144,12 @@ public class UnitOfWork : IUnitOfWork, IDisposable
             return _refreshTokens;
         }
     }
-    
+
     public void Dispose()
     {
         context.Dispose();
     }
-    
+
     public async Task<int> SaveAsync()
     {
         return await context.SaveChangesAsync();

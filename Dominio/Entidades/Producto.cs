@@ -3,7 +3,8 @@
 public class Producto : BaseEntity
 {
     public string Nombre { get; set; }
-    public decimal Precio { get; set; } = 0.00m;
+    public decimal PrecioCompra { get; set; } = 0.00m;
+    public decimal PrecioVenta { get; set; } = 0.00m;
     public string CodigoBarras { get; set; }
     public string Descripcion { get; set; }
     public string Presentacion { get; set; }

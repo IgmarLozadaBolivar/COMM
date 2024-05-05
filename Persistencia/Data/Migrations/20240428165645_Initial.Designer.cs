@@ -11,7 +11,7 @@ using Persistencia.Data;
 namespace Persistencia.Data.Migrations
 {
     [DbContext(typeof(DbFirstContext))]
-    [Migration("20240318010457_Initial")]
+    [Migration("20240428165645_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -77,7 +77,7 @@ namespace Persistencia.Data.Migrations
                         .HasComment("Precio total de los productos en la factura");
 
                     b.Property<string>("TipoPago")
-                        .HasColumnType("longtext")
+                        .HasColumnType("varchar(25)")
                         .HasComment("Tipo de pago de los productos en la factura");
 
                     b.HasKey("Id")
@@ -108,13 +108,21 @@ namespace Persistencia.Data.Migrations
                         .HasColumnName("IdClienteFk")
                         .HasComment("Identificador de puenteo con la tabla de Cliente (Persona)");
 
+                    b.Property<string>("TipoCliente")
+                        .HasColumnType("varchar(25)")
+                        .HasComment("Tipo de cliente en la factura");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("varchar(225)")
+                        .HasComment("Observacion del cliente en la factura");
+
                     b.Property<decimal>("PrecioTotal")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)")
                         .HasComment("Precio total de la venta");
 
                     b.Property<string>("TipoPago")
-                        .HasColumnType("longtext")
+                        .HasColumnType("varchar(25)")
                         .HasComment("Tipo de pago de los productos en la factura");
 
                     b.HasKey("Id")
@@ -179,13 +187,17 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("varchar(100)")
                         .HasComment("Descripción del producto");
 
-
                     b.Property<string>("Nombre")
                         .HasMaxLength(25)
                         .HasColumnType("varchar(25)")
                         .HasComment("Nombre del producto");
 
-                    b.Property<decimal>("Precio")
+                    b.Property<decimal>("PrecioCompra")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)")
+                        .HasComment("Precio de compra del producto");
+
+                    b.Property<decimal>("PrecioVenta")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)")
                         .HasComment("Precio de venta del producto");
@@ -198,9 +210,6 @@ namespace Persistencia.Data.Migrations
                     b.Property<int>("TotalExistencias")
                         .HasColumnType("int")
                         .HasComment("Cantidad o existencia total por producto");
-
-                    b.Property<string>("UsoClinico")
-                        .HasColumnType("enum('SI','NO')");
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
@@ -323,6 +332,15 @@ namespace Persistencia.Data.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdProductoFK")
                         .HasComment("Identificador de puenteo con la tabla de Producto");
+
+                    b.Property<DateTime>("FechaVenta")
+                        .HasColumnType("datetime")
+                        .HasComment("Fecha de la venta");
+
+                    b.Property<int>("CantidadVendida")
+                        .HasColumnType("int")
+                        .HasColumnName("CantidadVendida")
+                        .HasComment("Cantidad vendida de un producto");
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");

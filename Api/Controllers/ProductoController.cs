@@ -77,7 +77,7 @@ public class ProductoController : BaseApiController
         return CreatedAtAction(nameof(Post), new { id = dataDto.Id }, dataDto);
     }
 
-    [Authorize(Roles = "Administrador")] 
+    /* [Authorize(Roles = "Administrador")]  */
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

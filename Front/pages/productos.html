@@ -56,6 +56,12 @@
                             <span class="text nav-text">Clientes</span>
                         </a>
                     </li>
+                    <li class="nav-link" id="informesNavItem">
+                        <a href="./informes.html">
+                            <i class='bx bx-bar-chart-alt icon'></i>
+                            <span class="text nav-text">Informes</span>
+                        </a>
+                    </li>
                     <li class="nav-link">
                         <a href="./proveedores.html">
                             <i class='bx bx-package icon'></i>
@@ -90,7 +96,8 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
-                        <th>Precio</th>
+                        <th>Precio compra</th>
+                        <th>Precio venta</th>
                         <th>Barcode</th>
                         <th>Descripción</th>
                         <th>Presentación</th>
@@ -137,6 +144,7 @@
         const token = obtenerToken();
         const decoded = decodeJwt(token);
         console.log(decoded);
+
         function obtenerDatosDecodificados(decoded) {
             if (!decoded) {
                 console.error('No se pudo decodificar el token correctamente.');
@@ -145,8 +153,23 @@
 
             const { TokenExpired } = decoded;
             console.log('TokenExpired:', TokenExpired);
+            const { roles } = decoded;
+            if (roles === 'Empleado') {
+                informesNavItem.addEventListener("click", function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Acceso denegado!",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Entendido"
+                    });
+                });
+            }
+            console.log('Roles:', roles);
 
             return { TokenExpired };
+            return { roles };
         }
 
         async function obtenerDatosDesdeDB(token) {
@@ -211,6 +234,7 @@
                     }, 1000);
                 }
             }
+            obtenerDatosDecodificados(decoded);
         }
         compareTokens(token, decoded);
 
@@ -238,7 +262,7 @@
             });
         });
 
-        async function editarProducto(id, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias,) {
+        async function editarProducto(id, nuevoNombre, nuevoPrecioCompra, nuevoPrecioVenta, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias,) {
             const token = obtenerToken();
             if (!token) {
                 console.error('No se ha encontrado un token en localStorage.');
@@ -252,7 +276,8 @@
             const data = {
                 id: id,
                 nombre: nuevoNombre !== '' ? nuevoNombre : productoActual.nombre,
-                precio: nuevoPrecio !== '' ? nuevoPrecio : productoActual.precio,
+                precioCompra: nuevoPrecioCompra !== '' ? nuevoPrecioCompra : productoActual.precioCompra,
+                precioVenta: nuevoPrecioVenta !== '' ? nuevoPrecioVenta : productoActual.precioVenta,
                 codigoBarras: nuevoCódigoBarra !== '' ? nuevoCódigoBarra : productoActual.codigoBarras,
                 descripcion: nuevaDescripcion !== '' ? nuevaDescripcion : productoActual.descripcion,
                 presentacion: nuevaPresentacion !== '' ? nuevaPresentacion : productoActual.presentacion,
@@ -321,10 +346,13 @@
                                 <input type="text" id="inputNuevoNombre" class="input-style" placeholder="Nuevo nombre del producto">
                             </div>
                             <div class="input-container-3">
-                                <label for="inputNuevoPrecio" class="label-style">Precio:</label>
-                                <input type="number" class="no-arrows input-style" min="0" id="inputNuevoPrecio" placeholder="Nuevo precio del producto">
+                                <label for="inputNuevoPrecioCompra" class="label-style">Precio compra:</label>
+                                <input type="number" class="no-arrows input-style" min="0" id="inputNuevoPrecioCompra" placeholder="Nuevo precio de compra del producto">
                             </div>
-                            
+                            <div class="input-container-3">
+                                <label for="inputNuevoPrecioVenta" class="label-style">Precio venta:</label>
+                                <input type="number" class="no-arrows input-style" min="0" id="inputNuevoPrecioVenta" placeholder="Nuevo precio de venta del producto">
+                            </div>
                             <div class="input-container-3">
                                 <label for="inputNuevoCódigoBarra" class="label-style">Barcode:</label>
                                 <input type="text" id="inputNuevoCódigoBarra" class="no-arrows input-style" placeholder="Nuevo código de barra">
@@ -365,12 +393,13 @@
                     preConfirm: () => {
                         const productoId = document.getElementById('inputID').value;
                         const nuevoNombre = document.getElementById('inputNuevoNombre').value;
-                        const nuevoPrecio = document.getElementById('inputNuevoPrecio').value;
+                        const nuevoPrecioCompra = document.getElementById('inputNuevoPrecioCompra').value;
+                        const nuevoPrecioVenta = document.getElementById('inputNuevoPrecioVenta').value;
                         const nuevoCódigoBarra = document.getElementById('inputNuevoCódigoBarra').value;
                         const nuevaDescripcion = document.getElementById('inputNuevaDescripcion').value;
                         const nuevaPresentacion = document.getElementById('inputNuevaPresentacion').value;
                         const nuevoTotalExistencias = document.getElementById('inputNuevoTotalExistencias').value;
-                        editarProducto(productoId, nuevoNombre, nuevoPrecio, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias);
+                        editarProducto(productoId, nuevoNombre, nuevoPrecioCompra, nuevoPrecioVenta, nuevoCódigoBarra, nuevaDescripcion, nuevaPresentacion, nuevoTotalExistencias);
                     }
                 });
             }, 2000);
@@ -461,8 +490,10 @@
         }
 
         function obtenerProductos() {
-
             const apiUrl = 'http://localhost:5033/Api/Producto';
+            const token = obtenerToken();
+            const decoded = decodeJwt(token);
+            const roles = decoded.roles;
 
             fetch(apiUrl, {
                 method: 'GET',
@@ -485,11 +516,19 @@
                     const limiteProductosPorPagina = 7;
                     const productosPagina = data.slice(0, limiteProductosPorPagina);
 
+                    const thPrecioCompra = document.querySelector('.table-box th:nth-child(2)');
+                    if (roles === 'Empleado') {
+                        thPrecioCompra.style.display = 'none';
+                    } else {
+                        thPrecioCompra.style.display = '';
+                    }
+
                     data.forEach(producto => {
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
                     <td>${producto.nombre}</td>
-                    <td>${producto.precio}</td>
+                    ${roles === 'Administrador' ? `<td>${producto.precioCompra}</td>` : ''}
+                    <td>${producto.precioVenta}</td>
                     <td>${producto.codigoBarras}</td>
                     <td class="description-cell" onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)">${producto.descripcion}</td>
                     <td>${producto.presentacion}</td>
@@ -524,7 +563,16 @@
                         btnsEditar.forEach(btn => {
                             btn.addEventListener('click', function () {
                                 const productoId = this.getAttribute('data-id');
-                                mostrarFormularioEdicion(productoId);
+                                if (roles === 'Empleado') {
+                                    Swal.fire({
+                                        title: "Acceso denegado!",
+                                        text: "No tienes permiso para editar este producto.",
+                                        icon: "error",
+                                        confirmButtonText: "Entendido"
+                                    });
+                                } else {
+                                    mostrarFormularioEdicion(productoId);
+                                }
                             });
                         });
 

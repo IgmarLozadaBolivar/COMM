@@ -4,6 +4,8 @@ public class FacturaVenta : BaseEntity
 {
     public DateTime FechaVenta { get; set; }
     public int IdClienteFk { get; set; }
+    public string TipoCliente { get; set; }
+    public string Observacion { get; set; }
     public int Cantidad { get; set; }
     public decimal PrecioTotal { get; set; }
     public string TipoPago { get; set; }

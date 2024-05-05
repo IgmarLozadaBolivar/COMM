@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMM: Informes</title>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="shortcut icon" href="../assets/logo-removebg-preview.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fff;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        #searchInput {
+            width: 35%;
+            padding: 12px;
+            margin-left: 40px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+            margin-right: 5px;
+        }
+
+        #searchInput-1 {
+            width: 35%;
+            padding: 12px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+            margin-right: 5px;
+        }
+
+        #searchInputMonthYear-1 {
+            width: 35%;
+            padding: 12px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+            margin-right: 5px;
+        }
+
+        #searchInputYear-1 {
+            width: 35%;
+            padding: 12px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+            margin-right: 5px;
+        }
+
+        #filterButton,
+        #clearButton {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #filterButton:hover,
+        #clearButton:hover {
+            background-color: #0056b3;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .ticket,
+            .ticket * {
+                visibility: visible;
+            }
+
+            .ticket {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+
+            .oculto-impresion,
+            .oculto-impresion * {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="../assets/logo-removebg-preview.png" alt="">
+                </span>
+                <div class="text logo-text">
+                    <span class="name">COMM SAS</span>
+                    <span class="profession">Healthcare</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="./dashboard.html">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Tablero</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./clientes.html">
+                            <i class='bx bx-group icon'></i>
+                            <span class="text nav-text">Clientes</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./productos.html">
+                            <i class='bx bx-store icon'></i>
+                            <span class="text nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./proveedores.html">
+                            <i class='bx bx-package icon'></i>
+                            <span class="text nav-text">Proveedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="./facturacion.html">
+                            <i class='bx bx-receipt icon'></i>
+                            <span class="text nav-text">Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-content">
+                <li class="">
+                    <a href="../index.html">
+                        <i class='bx bx-log-out icon'></i>
+                        <span class="text nav-text">Cerrar sesión</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <section class="home">
+        <div class="text">Sección de informes!</div>
+        <div class="table-container">
+            <div class="list-box-4">
+                <div class="search-container">
+                    <select id="searchInput" style="margin-right: 5px;">
+                        <option value="default">Seleccione un tipo de fecha</option>
+                        <option value="fullDate">Dia, Mes y Año</option>
+                        <option value="monthYear">Mes y Año</option>
+                        <option value="year">Año</option>
+                    </select>
+                    <input type="date" id="searchInput-1" placeholder="Escriba una fecha completa para filtrar..."
+                        style="display: block;">
+                    <input type="text" id="searchInputMonthYear-1" placeholder="Escriba el mes y año para filtrar..."
+                        style="display: none;">
+                    <input type="text" id="searchInputYear-1" placeholder="Escriba un año para filtrar..."
+                        style="display: none;">
+                    <button id="filterButton"><ion-icon name="swap-vertical-outline"></ion-icon></button>
+                    <button id="clearButton"><ion-icon name="color-wand-outline"></ion-icon></button>
+                </div>
+                <table class="table-box">
+                    <thead>
+                        <tr>
+                            <th>FechaVenta</th>
+                            <th>Cantidad</th>
+                            <th>PrecioTotal</th>
+                            <th>TipoPago</th>
+                            <th>Saber más</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-data">
+                    </tbody>
+                </table>
+            </div>
+            <div id="total-text">Renumeración Total:</div>
+            <span id="total-precio" style="padding-bottom: 20px; display: block; margin-bottom: 10px;">0</span>
+        </div>
+    </section>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle")
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        function obtenerToken() {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                console.error('No se ha encontrado un token en localStorage.');
+                window.location.href = './auth.html';
+            }
+            return token;
+        }
+
+        function decodeJwt(token) {
+            if (!token) {
+                console.error('No se proporcionó un token.');
+                return;
+            }
+
+            const [, payloadBase64] = token.split('.');
+            const payload = atob(payloadBase64);
+            return JSON.parse(payload);
+        }
+
+        const token = obtenerToken();
+        const decoded = decodeJwt(token);
+        console.log(decoded);
+        function obtenerDatosDecodificados(decoded) {
+            if (!decoded) {
+                console.error('No se pudo decodificar el token correctamente.');
+                return null;
+            }
+
+            const { roles } = decoded;
+
+            if (roles === 'Empleado') {
+                if (document.referrer.includes("venta.html")) {
+                    return decoded;
+                } else {
+                    document.body.style.display = "none";
+                    Swal.fire({
+                        title: "Acceso denegado!",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Entendido"
+                    }).then(() => {
+                        window.location.href = './dashboard.html';
+                    });
+                    return null;
+                }
+            } else {
+                return decoded;
+            }
+        }
+
+        async function obtenerDatosDesdeDB(token) {
+            try {
+                const data = await compararTokenEnDB(token);
+                if (!data) {
+                    console.error('No se pudieron obtener los datos de la base de datos.');
+                    return null;
+                }
+                return data;
+            } catch (error) {
+                console.error('Error al comparar los tokens:', error);
+                return null;
+            }
+        }
+
+        function mostrarVentanaEmergente() {
+            Swal.fire({
+                title: "Ha finalizado tu sesión!",
+                text: "Tus 20 minutos de sesión terminarón, por favor, inicie sesión nuevamente",
+                icon: "warning",
+                allowOutsideClick: false
+            }).then(() => {
+                window.history.pushState({}, '', './auth.html');
+                window.location.href = './auth.html';
+                localStorage.removeItem('token');
+            });
+        }
+
+        async function compareTokens(token, decoded) {
+            if (!decoded) {
+                console.error('No se pudo decodificar el token correctamente.');
+                return;
+            }
+
+            const { TokenExpired } = decoded;
+
+            const data = await obtenerDatosDesdeDB(token);
+            if (!data) return;
+
+            const currentTime = new Date();
+            const currentTimeUTC = new Date(currentTime.getTime() + currentTime.getTimezoneOffset() * 60000);
+            const tokenExpiredDate = new Date(TokenExpired);
+            const tokenExpiredDateUTC = new Date(tokenExpiredDate.getTime() + tokenExpiredDate.getTimezoneOffset() * 60000);
+
+            if (currentTimeUTC >= tokenExpiredDateUTC) {
+                mostrarVentanaEmergente();
+            } else {
+                const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
+                const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
+                const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
+
+                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
+                console.log(currentTime)
+                console.log(tokenExpiredDate)
+
+                if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
+                    mostrarVentanaEmergente();
+                } else {
+                    setTimeout(() => {
+                        compareTokens(token, decoded);
+                    }, 1000);
+                }
+            }
+            obtenerDatosDecodificados(decoded);
+        }
+        compareTokens(token, decoded);
+
+        async function compararTokenEnDB(token) {
+            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const data = await response.json();
+            return data;
+        }
+
+        function obtenerFacturasVenta(callback) {
+            const apiUrl = 'http://localhost:5033/Api/VentaProducto/DatosFacturaDeVenta';
+
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    callback(data);
+                    calcularYMostrarSumaTotal();
+                })
+                .catch(error => {
+                    console.error('Error obteniendo facturas:', error);
+                });
+        }
+
+        function calcularYMostrarSumaTotal() {
+            const filas = document.querySelectorAll('#tabla-data tr');
+            let sumaTotal = 0;
+
+            filas.forEach(fila => {
+                const precioTotal = parseFloat(fila.querySelector('td:nth-child(3)').textContent);
+                sumaTotal += precioTotal;
+            });
+
+            const sumaTotalFormateada = sumaTotal.toLocaleString('es-ES', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+            document.getElementById('total-precio').textContent = `$${sumaTotalFormateada}`;
+        }
+
+        obtenerFacturasVenta(function (facturas) {
+            const tablaData = document.getElementById('tabla-data');
+            tablaData.innerHTML = '';
+
+            facturas.forEach(factura => {
+                const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+                const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
+
+                const tableRow = document.createElement('tr');
+                tableRow.innerHTML = `
+            <td>${fechaFormateada}</td>
+            <td>${factura.datosDeFactura.cantidadTotal}</td>
+            <td>${factura.datosDeFactura.precioTotal}</td>
+            <td style="text-align: start;">${factura.datosDeFactura.tipoDePago}</td>
+            <td>
+                <div class="btns-actions">
+                    <button class="btn-options-1">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </button>
+                    <div class="btns-more-actions" style="display:none;">
+                            <button class="btn-product" data-id="${factura.idFacturaVentaFK}"><ion-icon name="cart-outline"></ion-icon></button>
+                            <button class="btn-client" data-id="${factura.idFacturaVentaFK}"><ion-icon name="person-outline"></ion-icon></button>
+                            <button class="btn-print" data-id="${factura.idFacturaVentaFK}"><ion-icon name="print-outline"></ion-icon></button>
+                    </div>
+                </div>
+            </td>
+            `;
+                tablaData.appendChild(tableRow);
+                const btnOptions = tableRow.querySelector('.btn-options-1');
+                const btnsMoreActions = tableRow.querySelector('.btns-more-actions');
+                btnOptions.addEventListener('click', function () {
+                    if (btnsMoreActions.style.display === 'none') {
+                        btnsMoreActions.style.display = 'block';
+                        btnsMoreActions.setAttribute('style', '/* display: block; */');
+                    } else {
+                        btnsMoreActions.style.display = 'none';
+                    }
+                });
+                const btnsProducto = tableRow.querySelectorAll('.btn-product');
+                btnsProducto.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const facturaVentaId = this.getAttribute('data-id');
+                        const factura = facturas.find(factura => factura.idFacturaVentaFK === parseInt(facturaVentaId));
+                        mostrarProductosFactura(factura);
+                    });
+                });
+                const btnsCliente = tableRow.querySelectorAll('.btn-client');
+                btnsCliente.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const facturaVentaId = this.getAttribute('data-id');
+                        const factura = facturas.find(factura => factura.idFacturaVentaFK === parseInt(facturaVentaId));
+                        mostrarClienteFactura(factura);
+                    });
+                });
+                const btnsPrint = tableRow.querySelectorAll('.btn-print');
+                btnsPrint.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const facturaVentaId = this.getAttribute('data-id');
+                        imprimirFactura(parseInt(facturaVentaId), facturas);
+                    });
+                });
+            });
+        });
+
+        function mostrarProductosFactura(factura) {
+            Swal.fire({
+                title: 'Cargando visualizador',
+                text: 'Por favor espere mientras se carga el visualizador...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
+
+            setTimeout(function () {
+                Swal.close();
+
+                let productosHTML = '';
+
+                factura.ventasProductos.forEach(producto => {
+                    productosHTML += `
+                <tr>
+                    <td>${producto.nombreDelProducto}</td>
+                    <td>${producto.presentacionDelProducto}</td>
+                    <td>${producto.codigoDeBarras}</td>
+                    <td>${producto.precioDeCompra}</td>
+                    <td>${producto.precioDeVenta}</td>
+                    <td>${producto.cantidadVendida}</td>
+                </tr>
+            `;
+                });
+
+                const html = `
+            <div class="table-container-1">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Presentación</th>
+                            <th>Código de Barras</th>
+                            <th>Precio de Compra</th>
+                            <th>Precio de Venta</th>
+                            <th>Cantidad vendida</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${productosHTML}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+                Swal.fire({
+                    title: 'Productos',
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    customClass: 'swal-productos'
+                });
+            }, 2000);
+        }
+
+        function startMarquee(element) {
+            element.dataset.marqueeId = setInterval(function () {
+                if (element.scrollWidth > element.offsetWidth) {
+                    element.scrollLeft += 1;
+                    if (element.scrollLeft >= element.scrollWidth - element.offsetWidth) {
+                        element.scrollLeft = 0;
+                    }
+                }
+            }, 25);
+        }
+
+        function stopMarquee(element) {
+            clearInterval(element.dataset.marqueeId);
+            delete element.dataset.marqueeId;
+            element.scrollLeft = 0;
+
+            setTimeout(() => {
+                element.scrollLeft = 0;
+            }, 2000);
+        }
+
+        function mostrarClienteFactura(factura) {
+            if (factura.datosDeCliente.tipoDeCliente === 'Contado' && factura.datosDeCliente.observacionDelCliente === 'Este es un cliente no registrado.') {
+                Swal.fire({
+                    title: 'Factura sin cliente registrado',
+                    text: 'Esta factura tiene asignado cliente de contado.',
+                    icon: 'info'
+                });
+            } else if (factura.datosDeCliente.tipoDeCliente === 'Otro') {
+                Swal.fire({
+                    title: 'Cargando visualizador',
+                    text: 'Por favor espere mientras se carga el visualizador...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+
+                setTimeout(function () {
+                    Swal.close();
+
+                    Swal.fire({
+                        title: 'Cliente',
+                        html: `
+                    <div class="form-grid-3">
+                        <div class="input-container-4">
+                            <label for="tipoCliente" class="label-style-2">Tipo de cliente:</label>
+                            <input type="text" value="${factura.datosDeCliente.tipoDeCliente}" id="inputID" class="input-style-3" readonly>
+                        </div>
+                        <div class="input-container-4">
+                            <label for="observacion" class="label-style-2">Observación:</label>
+                            <input onmouseover="startMarquee(this)" onmouseout="stopMarquee(this)" type="text" value="${factura.datosDeCliente.observacionDelCliente}" id="inputID" class="input-style-3" readonly>
+                        </div>
+                    </div>
+                `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                    });
+                }, 2000);
+            } else {
+                Swal.fire({
+                    title: 'Cargando visualizador',
+                    text: 'Por favor espere mientras se carga el visualizador...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+
+                setTimeout(function () {
+                    Swal.close();
+
+                    Swal.fire({
+                        title: 'Cliente',
+                        html: `
+                    <div class="form-grid">
+                        <div class="input-container-3">
+                            <label for="nombreCliente" class="label-style">Nombre:</label>
+                            <input type="text" value="${factura.datosDeCliente.nombreDelCliente}" id="inputID" class="input-style" readonly>
+                        </div>
+                        <div class="input-container-3">
+                            <label for="cedulaCliente" class="label-style">Cédula:</label>
+                            <input type="text" value="${factura.datosDeCliente.cedulaDelCliente}" id="inputID" class="input-style" readonly>
+                        </div>
+                        <div class="input-container-3">
+                            <label for="telefonoCliente" class="label-style">Teléfono:</label>
+                            <input type="text" value="${factura.datosDeCliente.telefonoDelCliente}" id="inputID" class="input-style" readonly>
+                        </div>
+                        <div class="input-container-3">
+                            <label for="correoCliente" class="label-style">Correo:</label>
+                            <input type="text" value="${factura.datosDeCliente.correoDelCliente}" id="inputID" class="input-style" readonly>
+                        </div>
+                    </div>
+                `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                    });
+                }, 2000);
+            }
+        }
+
+        const filterButton = document.getElementById('filterButton');
+        const searchInput = document.getElementById('searchInput');
+        const searchInput1 = document.getElementById('searchInput-1');
+        const searchInputMonthYear1 = document.getElementById('searchInputMonthYear-1');
+        const searchInputYear1 = document.getElementById('searchInputYear-1');
+
+        searchInput.addEventListener('change', function () {
+            const selectedOption = this.value;
+            if (selectedOption === "monthYear") {
+                searchInput1.style.display = 'none';
+                searchInputMonthYear1.style.display = 'block';
+                searchInputYear1.style.display = 'none';
+            } else if (selectedOption === "year") {
+                searchInput1.style.display = 'none';
+                searchInputMonthYear1.style.display = 'none';
+                searchInputYear1.style.display = 'block';
+            } else {
+                searchInput1.style.display = 'block';
+                searchInputMonthYear1.style.display = 'none';
+                searchInputYear1.style.display = 'none';
+            }
+        });
+
+        function filtrarMesYAño() {
+            const inputText = searchInputMonthYear1.value;
+
+            const regex = /^(\d{2})\/(\d{4})$/;
+            const match = inputText.match(regex);
+
+            if (match) {
+                const month = parseInt(match[1], 10);
+                const year = parseInt(match[2], 10);
+
+                obtenerFacturasVenta(function (facturas) {
+                    const facturasFiltradas = facturas.filter(function (factura) {
+                        const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+                        const facturaMonth = fechaVenta.getMonth() + 1;
+
+                        return facturaMonth === month && fechaVenta.getFullYear() === year;
+                    });
+
+                    mostrarFacturas(facturasFiltradas);
+                });
+            } else {
+                console.error('Formato de fecha incorrecto. Por favor, ingrese en formato mm/YY.');
+            }
+        }
+
+        function filtrarAño() {
+            const inputText = searchInputYear1.value;
+            const regex = /^\d{4}$/;
+            if (regex.test(inputText)) {
+                const year = parseInt(inputText, 10);
+
+                obtenerFacturasVenta(function (facturas) {
+                    const facturasFiltradas = facturas.filter(function (factura) {
+                        const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+                        const facturaYear = fechaVenta.getFullYear();
+
+                        return facturaYear === year;
+                    });
+
+                    mostrarFacturas(facturasFiltradas);
+                });
+            } else {
+                Swal.fire('Formato de año incorrecto. Por favor, ingrese en formato YYYY.');
+            }
+        }
+
+        const esEmpleado = true;
+
+        filterButton.addEventListener('click', function () {
+            if (esEmpleado) {
+                return; // No hacer nada si el usuario es un empleado
+            }
+
+            const selectedOption = searchInput.value;
+            let selectedDate;
+
+            if (selectedOption === "default") {
+                Swal.fire("Por favor, seleccione una opción de fecha válida!");
+                return;
+            }
+
+            selectedDate = new Date(searchInput1.value);
+
+            selectedDate.setUTCHours(0, 0, 0, 0);
+
+            obtenerFacturasVenta(function (facturas) {
+                const facturasFiltradas = facturas.filter(function (factura) {
+                    const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+
+                    fechaVenta.setUTCHours(0, 0, 0, 0);
+
+                    if (!isNaN(fechaVenta.getTime())) {
+                        if (selectedOption === "year") {
+                            filtrarAño();
+                        } else if (selectedOption === "fullDate") {
+                            return fechaVenta.getTime() === selectedDate.getTime();
+                        } else if (selectedOption === "monthYear") {
+                            filtrarMesYAño();
+                        } else {
+                            console.log("Inserte una opción de fecha válida!");
+                            return false;
+                        }
+                    } else {
+                        console.error('La fecha de venta no es válida:', factura.datosDeFactura.fechaDeVenta);
+                        return false;
+                    }
+                });
+
+                mostrarFacturas(facturasFiltradas);
+            });
+        });
+
+        const clearButton = document.getElementById('clearButton');
+        clearButton.addEventListener('click', function () {
+            if (esEmpleado) {
+                return;
+            }
+
+            searchInput.value = 'default';
+            searchInput1.value = '';
+            searchInputMonthYear1.value = '';
+            searchInputYear1.value = '';
+            obtenerFacturasVenta(function (facturas) {
+                mostrarFacturas(facturas);
+            });
+        });
+
+        function mostrarFacturas(facturas) {
+            const tablaData = document.getElementById('tabla-data');
+            tablaData.innerHTML = '';
+
+            facturas.forEach(factura => {
+                const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+                const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
+
+                const tableRow = document.createElement('tr');
+                tableRow.innerHTML = `
+            <td>${fechaFormateada}</td>
+            <td>${factura.datosDeFactura.cantidadTotal}</td>
+            <td>${factura.datosDeFactura.precioTotal}</td>
+            <td style="text-align: start;">${factura.datosDeFactura.tipoDePago}</td>
+            <td>
+                <div class="btns-actions">
+                    <button class="btn-options-1">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </button>
+                    <div class="btns-more-actions" style="display:none;">
+                            <button class="btn-product" data-id="${factura.idFacturaVentaFK}"><ion-icon name="cart-outline"></ion-icon></button>
+                            <button class="btn-client" data-id="${factura.idFacturaVentaFK}"><ion-icon name="person-outline"></ion-icon></button>
+                            <button class="btn-print" data-id="${factura.idFacturaVentaFK}"><ion-icon name="print-outline"></ion-icon></button>
+                    </div>
+                </div>
+            </td>
+            `;
+                tablaData.appendChild(tableRow);
+                const btnOptions = tableRow.querySelector('.btn-options-1');
+                const btnsMoreActions = tableRow.querySelector('.btns-more-actions');
+                btnOptions.addEventListener('click', function () {
+                    if (btnsMoreActions.style.display === 'none') {
+                        btnsMoreActions.style.display = 'block';
+                        btnsMoreActions.setAttribute('style', '/* display: block; */');
+                    } else {
+                        btnsMoreActions.style.display = 'none';
+                    }
+                });
+                const btnsProducto = tableRow.querySelectorAll('.btn-product');
+                btnsProducto.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const facturaVentaId = this.getAttribute('data-id');
+                        const factura = facturas.find(factura => factura.idFacturaVentaFK === parseInt(facturaVentaId));
+                        mostrarProductosFactura(factura);
+                    });
+                });
+                const btnsCliente = tableRow.querySelectorAll('.btn-client');
+                btnsCliente.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const facturaVentaId = this.getAttribute('data-id');
+                        const factura = facturas.find(factura => factura.idFacturaVentaFK === parseInt(facturaVentaId));
+                        mostrarClienteFactura(factura);
+                    });
+                });
+                const btnsPrint = tableRow.querySelectorAll('.btn-print');
+                btnsPrint.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const facturaVentaId = this.getAttribute('data-id');
+                        imprimirFactura(parseInt(facturaVentaId), facturas);
+                    });
+                });
+            });
+        }
+
+        function obtenerFacturaVentaExterna(idFacturaVenta) {
+            obtenerFacturasVenta(function (facturas) {
+                const facturaEspecifica = facturas.find(factura => factura.idFacturaVentaFK == idFacturaVenta);
+
+                if (facturaEspecifica) {
+                    mostrarFacturaEspecifica(facturaEspecifica, facturas);
+                } else {
+                    console.log('No se encontró ninguna factura con el ID proporcionado.');
+                }
+            });
+        }
+
+        function mostrarFacturaEspecifica(factura, facturas) {
+            const tablaData = document.getElementById('tabla-data');
+            tablaData.innerHTML = '';
+
+            const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+            const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
+
+            const tableRow = document.createElement('tr');
+            tableRow.innerHTML = `
+            <td>${fechaFormateada}</td>
+            <td>${factura.datosDeFactura.cantidadTotal}</td>
+            <td>${factura.datosDeFactura.precioTotal}</td>
+            <td style="text-align: start;">${factura.datosDeFactura.tipoDePago}</td>
+            <td>
+                <div class="btns-actions">
+                <button class="btn-options-1">
+                    <ion-icon name="search-outline"></ion-icon>
+                </button>
+                <div class="btns-more-actions" style="display:none;">
+                        <button class="btn-product" data-id="${factura.idFacturaVentaFK}"><ion-icon name="cart-outline"></ion-icon></button>
+                        <button class="btn-client" data-id="${factura.idFacturaVentaFK}"><ion-icon name="person-outline"></ion-icon></button>
+                        <button class="btn-print" data-id="${factura.idFacturaVentaFK}"><ion-icon name="print-outline"></ion-icon></button>
+                </div>
+            </div>
+            </td>
+            `;
+            tablaData.appendChild(tableRow);
+            const btnOptions = tableRow.querySelector('.btn-options-1');
+            const btnsMoreActions = tableRow.querySelector('.btns-more-actions');
+            btnOptions.addEventListener('click', function () {
+                if (btnsMoreActions.style.display === 'none') {
+                    btnsMoreActions.style.display = 'block';
+                    btnsMoreActions.setAttribute('style', '/* display: block; */');
+                } else {
+                    btnsMoreActions.style.display = 'none';
+                }
+            });
+            const btnsProducto = tableRow.querySelectorAll('.btn-product');
+            btnsProducto.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const facturaVentaId = this.getAttribute('data-id');
+                    console.log(facturaVentaId);
+                    const bill = facturas.find(factura => factura.idFacturaVentaFK === parseInt(facturaVentaId))
+                    mostrarProductosFactura(bill);
+                });
+            });
+            const btnsCliente = tableRow.querySelectorAll('.btn-client');
+            btnsCliente.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const facturaVentaId = this.getAttribute('data-id');
+                    const client = facturas.find(factura => factura.idFacturaVentaFK === parseInt(facturaVentaId));
+                    mostrarClienteFactura(client);
+                });
+            });
+            const btnsPrint = tableRow.querySelectorAll('.btn-print');
+            btnsPrint.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const facturaVentaId = this.getAttribute('data-id');
+                    imprimirFactura(parseInt(facturaVentaId), facturas);
+                });
+            });
+        }
+
+        function obtenerIdFacturaVentaDesdeURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idFacturaVenta = urlParams.get('idFacturaVenta');
+
+            if (idFacturaVenta) {
+                const decoded = obtenerDatosDecodificados(decodeJwt(obtenerToken()));
+                if (decoded) {
+                    const { roles } = decoded;
+                    const esEmpleado = roles === 'Empleado';
+                    const vieneDeVentas = document.referrer.includes("venta.html");
+
+                    if (esEmpleado && vieneDeVentas) {
+                        obtenerFacturaVentaExterna(idFacturaVenta);
+                    } else {
+                        console.log('No tienes permiso para acceder a esta factura o no se originó desde ventas.');
+                    }
+                } else {
+                    console.error('No se pudo decodificar el token correctamente.');
+                }
+            } else {
+                console.log('No se proporcionó ningún ID de factura en la URL.');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', obtenerIdFacturaVentaDesdeURL);
+
+        function imprimirFactura(facturaId, facturas) {
+            const factura = facturas.find(factura => factura.idFacturaVentaFK === facturaId);
+
+            if (!factura) {
+                console.error('Factura no encontrada');
+                return;
+            }
+
+            let productosFactura = '';
+            let fechaFactura = '';
+            let totalFactura = '';
+            let datosCliente = '';
+
+            const idFactura = factura.idFacturaVentaFK;
+            const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
+            const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
+            totalFactura = factura.datosDeFactura.precioTotal;
+
+            const tipoCliente = factura.datosDeCliente.tipoDeCliente;
+            if (tipoCliente === 'Específico' || tipoCliente === 'Especifico') {
+                datosCliente = `
+                    <p><strong>Identificación: </strong><span>${factura.datosDeCliente.cedulaDelCliente}</span></p>
+                    <p><strong>Cliente: </strong><span>${factura.datosDeCliente.nombreDelCliente}</span></p>
+                    <p><strong>Celular: </strong><span>${factura.datosDeCliente.telefonoDelCliente}</span></p>
+                `;
+            } else if (tipoCliente === 'Contado') {
+                datosCliente = `
+                    <p><strong>Tipo de Cliente: </strong><span>${factura.datosDeCliente.tipoDeCliente}</span></p>
+                    <p><strong>Observación: </strong><span>${factura.datosDeCliente.observacionDelCliente}</span></p>
+                `;
+            } else if (tipoCliente === 'Otro') {
+                datosCliente = `
+                    <p><strong>Tipo de Cliente: </strong><span>${factura.datosDeCliente.tipoDeCliente}</span></p>
+                    <p><strong>Observación: </strong><span>${factura.datosDeCliente.observacionDelCliente}</span></p>
+                `;
+            }
+
+            factura.ventasProductos.forEach(producto => {
+                productosFactura += `
+                <tr>
+                    <td class="cantidad">${producto.cantidadVendida}</td>
+                    <td class="producto">${producto.nombreDelProducto}</td>
+                    <td class="precio">${producto.precioDeVenta}</td>
+                </tr>
+                `;
+            });
+
+            window.imprimir = function () {
+                popupWindow.print();
+            };
+
+            const html = `
+            <head>
+                <style>
+                    * {
+                        font-size: 12px;
+                        font-family: 'Times New Roman';
+                    }
+
+                    td,
+                    th,
+                    tr,
+                    table {
+                        border-top: 1px solid black;
+                        border-collapse: collapse;
+                    }
+
+                    td.producto,
+                    th.producto {
+                        width: 75px;
+                        max-width: 75px;
+                    }
+
+                    td.cantidad,
+                    th.cantidad {
+                        width: 40px;
+                        max-width: 40px;
+                        word-break: break-all;
+                    }
+
+                    td.precio,
+                    th.precio {
+                        width: 40px;
+                        max-width: 40px;
+                        word-break: break-all;
+                    }
+
+                    .centrado {
+                        text-align: center;
+                        align-content: center;
+                    }
+
+                    .ticket {
+                        width: 155px;
+                        max-width: 155px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+
+                    img {
+                        max-width: 100%;
+                        height: auto;
+                        max-height: 70px;
+                    }
+
+                    .datos-cliente {
+                        margin-top: 10px;
+                        text-align: left;
+                        margin-bottom: 20px;
+                        align-self: flex-start;
+                    }
+
+                    .datos-cliente p {
+                        margin: 5px 0;
+                        display: inline-block;
+                    }
+
+                    .datos-cliente strong {
+                        display: inline-block;
+                    }
+
+                    .datos-cliente span {
+                        margin-left: 5px;
+                    }
+
+                    @media print {
+                        body * {
+                            visibility: hidden;
+                        }
+
+                        .ticket,
+                        .ticket * {
+                            visibility: visible;
+                        }
+
+                        .ticket {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                        }
+
+                        .oculto-impresion,
+                        .oculto-impresion * {
+                            display: none !important;
+                        }
+                    }
+                </style>
+        </head>
+        <div class="ticket">
+            <img src="../assets/logo-removebg-preview.png" alt="Logotipo">
+            <p class="centrado">TICKET DE VENTA<br>ID: ${idFactura}<br>${fechaFormateada}</p>
+            <div class="datos-cliente">
+                ${datosCliente}
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="cantidad">CANT</th>
+                        <th class="producto">PRODUCTO</th>
+                        <th class="precio">$$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${productosFactura}
+                    <tr>
+                        <td class="cantidad"></td>
+                        <td class="producto">TOTAL</td>
+                        <td class="precio">${totalFactura}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="centrado">¡GRACIAS POR SU COMPRA!</p>
+        </div>
+        <button class="oculto-impresion" onclick="window.print()">Imprimir</button>
+        `;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const ticketDiv = tempDiv.querySelector('.ticket');
+            const popupWindow = window.open('', '_blank');
+            popupWindow.document.open();
+            popupWindow.document.write(html);
+            popupWindow.document.close();
+        }
+    </script>
+</body>
+
+</html>

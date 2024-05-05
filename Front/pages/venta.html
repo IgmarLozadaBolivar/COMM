@@ -40,6 +40,12 @@
                             <span class="text nav-text">Clientes</span>
                         </a>
                     </li>
+                    <li class="nav-link" id="informesNavItem">
+                        <a href="./informes.html">
+                            <i class='bx bx-bar-chart-alt icon'></i>
+                            <span class="text nav-text">Informes</span>
+                        </a>
+                    </li>
                     <li class="nav-link">
                         <a href="./productos.html">
                             <i class='bx bx-store icon'></i>
@@ -117,7 +123,19 @@
 
             const { TokenExpired } = decoded;
             console.log('TokenExpired:', TokenExpired);
+            const { roles } = decoded;
+            if (roles === 'Empleado') {
+                informesNavItem.addEventListener("click", function (event) {
+                    event.preventDefault();
 
+                    Swal.fire({
+                        title: "Acceso denegado!",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Entendido"
+                    });
+                });
+            }
             return { TokenExpired };
         }
 
@@ -183,6 +201,7 @@
                     }, 1000);
                 }
             }
+            obtenerDatosDecodificados(decoded);
         }
         compareTokens(token, decoded);
 
@@ -224,6 +243,9 @@
         let clienteCedula;
         let clienteTelefono;
         let clienteCorreo;
+        let clienteTipo;
+        let clienteObservacion;
+        let tipoCliente;
 
         Swal.fire({
             title: '¡Bienvenido!',
@@ -246,116 +268,214 @@
 
                 setTimeout(function () {
                     Swal.close();
-                    fetch('http://localhost:5033/Api/Persona')
-                        .then(response => response.json())
-                        .then(data => {
-                            const inputCliente = document.createElement('input');
-                            inputCliente.setAttribute('type', 'text');
-                            inputCliente.setAttribute('placeholder', 'Buscar cliente por nombre o cédula');
-                            inputCliente.classList.add('swal2-input');
+                    Swal.fire({
+                        title: 'Seleccione el tipo de cliente',
+                        html: `
+                    <select id="selectTipoCliente" class="form-select-1">
+                        <option value="Contado">Contado</option>
+                        <option value="Específico">Específico</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                        cancelButtonText: 'Cancelar',
+                        preConfirm: () => {
+                            const selectedTipoCliente = document.getElementById('selectTipoCliente').value;
 
-                            Swal.fire({
-                                title: 'Busca un cliente',
-                                html: inputCliente,
-                                showCancelButton: true,
-                                confirmButtonText: 'Confirmar',
-                                cancelButtonText: 'Cancelar',
-                                showLoaderOnConfirm: true,
-                                allowOutsideClick: () => !Swal.isLoading(),
-                                preConfirm: () => {
-                                    const inputValue = inputCliente.value.trim().toLowerCase();
-
-                                    if (!inputValue) {
-                                        Swal.showValidationMessage('Por favor, ingresa el nombre o la cédula del cliente.');
-                                        return false;
-                                    }
-
-                                    const selectedCliente = data.find(cliente =>
-                                        cliente.nombre.toLowerCase().includes(inputValue) ||
-                                        cliente.cedula.toLowerCase().includes(inputValue)
-                                    );
-
-                                    if (!selectedCliente) {
-                                        Swal.showValidationMessage('Cliente no encontrado. Por favor, intenta de nuevo.');
-                                    } else {
-
-                                        const correoLength = selectedCliente.correo.length;
-                                        const marqueeEffect = correoLength >= 24 ? 'scroll' : 'none';
-
-                                        Swal.fire({
-                                            title: 'Información del cliente',
-                                            html: `
-                                            <div class="inputs-container-1">
-                                                <div class="input-container-4">
-                                                    <label for="inputNombre" class="label-style-1">Nombre:</label>
-                                                    <input type="text" id="inputNombre" class="input-style-1" readonly value="${selectedCliente.nombre + ' ' + selectedCliente.apellidos}">
-                                                </div>
-                                                <div class="input-container-4">
-                                                    <label for="inputTelefono" class="label-style-1">Telefono:</label>
-                                                    <input type="text" id="inputTelefono" class="input-style-1" readonly value="${selectedCliente.telefono}">
-                                                </div>
-                                                <div class="input-container-4">
-                                                    <label for="inputCorreo" class="label-style-1">Correo:</label>
-                                                    <input type="text" id="inputCorreo" class="input-style-1" readonly value="${selectedCliente.correo}">
-                                                </div>
-                                                <div class="input-container-4">
-                                                    <label for="inputCedula" class="label-style-1">Cedula:</label>
-                                                    <input type="text" id="inputCedula" class="input-style-1" readonly value="${selectedCliente.cedula}">
-                                                </div>
-                                            </div>
-                                            `,
-                                            showCancelButton: true,
-                                            confirmButtonText: 'Continuar',
-                                            cancelButtonText: 'Volver',
-                                            allowOutsideClick: false,
-                                            didOpen: () => {
-                                                if (marqueeEffect === 'scroll') {
-                                                    const inputCorreo = document.getElementById('inputCorreo');
-                                                    startMarquee(inputCorreo);
-                                                }
-                                            },
-                                            willClose: () => {
-                                                if (marqueeEffect === 'scroll') {
-                                                    const inputCorreo = document.getElementById('inputCorreo');
-                                                    stopMarquee(inputCorreo);
-                                                }
-                                            }
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                ContinueForm(selectedCliente.id);
-                                                clienteId = selectedCliente.id;
-                                                clienteNombre = selectedCliente.nombre;
-                                                clienteApellidos = selectedCliente.apellidos;
-                                                clienteCorreo = selectedCliente.correo;
-                                                clienteTelefono = selectedCliente.telefono;
-                                                clienteCedula = selectedCliente.cedula;
-                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                setTimeout(() => {
-                                                    Swal.close();
-                                                }, 100);
-                                                window.location.href = './venta.html';
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error al obtener la lista de clientes:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'Hubo un error al cargar la lista de clientes. Por favor, inténtalo de nuevo más tarde.'
-                            });
-                        })
-                        .finally(() => {
-                            Swal.hideLoading();
-                        });
+                            if (selectedTipoCliente === "Específico" || selectedTipoCliente === "Especifico") {
+                                tipoCliente = selectedTipoCliente;
+                                modalClienteEspecifico();
+                            } else if (selectedTipoCliente === "Contado") {
+                                tipoCliente = selectedTipoCliente;
+                                modalClienteContado();
+                            } else if (selectedTipoCliente === "Otro") {
+                                tipoCliente = selectedTipoCliente;
+                                modalClienteOtro();
+                            }
+                        }
+                    });
                 }, 2000);
             } else if (result.isDenied) {
                 window.location.href = './facturacion.html';
             }
         });
+
+        function modalClienteOtro() {
+            const inputCliente = document.createElement('input');
+            inputCliente.setAttribute('type', 'text');
+            inputCliente.setAttribute('placeholder', 'Ingrese su observación');
+            inputCliente.classList.add('swal2-input');
+
+            Swal.fire({
+                title: 'Observación',
+                html: inputCliente,
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+                preConfirm: () => {
+                    const inputObservacion = inputCliente.value;
+
+                    if (!inputObservacion) {
+                        Swal.showValidationMessage('Por favor, ingresa la observación del cliente.');
+                        return false;
+                    }
+
+                    Swal.fire({
+                        title: 'Información del cliente',
+                        html: `
+                                <div class="inputs-container-1">
+                                    <div class="input-container-4">
+                                        <label for="inputTipoCliente" class="label-style-1">Tipo cliente:</label>
+                                        <input type="text" id="inputTipoCliente" class="input-style-1" readonly value="${tipoCliente}">
+                                    </div>
+                                    <div class="input-container-4">
+                                        <label for="inputObservacion" class="label-style-1">Observación:</label>
+                                        <input type="text" id="inputObservacion" class="input-style-1" readonly value="${inputObservacion}">
+                                    </div>
+                                </div>
+                            `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Continuar',
+                        cancelButtonText: 'Volver',
+                        allowOutsideClick: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            idClienteOtro = 3;
+                            ContinueForm(idClienteOtro);
+                            clienteId = idClienteOtro;
+                            clienteTipo = tipoCliente;
+                            clienteObservacion = inputObservacion;
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            setTimeout(() => {
+                                Swal.close();
+                            }, 100);
+                            window.location.href = './venta.html';
+                        }
+                    });
+                }
+            });
+        }
+
+        function modalClienteContado() {
+            idClienteContado = 2;
+            ContinueForm(idClienteContado);
+            clienteId = idClienteContado;
+            clienteTipo = "Contado";
+            clienteObservacion = "Este es un cliente no registrado.";
+        }
+
+        function modalClienteEspecifico() {
+            fetch('http://localhost:5033/Api/Persona')
+                .then(response => response.json())
+                .then(data => {
+                    const inputCliente = document.createElement('input');
+                    inputCliente.setAttribute('type', 'text');
+                    inputCliente.setAttribute('placeholder', 'Buscar cliente por nombre o cédula');
+                    inputCliente.classList.add('swal2-input');
+
+                    Swal.fire({
+                        title: 'Busca un cliente',
+                        html: inputCliente,
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                        cancelButtonText: 'Cancelar',
+                        showLoaderOnConfirm: true,
+                        allowOutsideClick: () => !Swal.isLoading(),
+                        preConfirm: () => {
+                            const inputValue = inputCliente.value.trim().toLowerCase();
+
+                            if (!inputValue) {
+                                Swal.showValidationMessage('Por favor, ingresa el nombre o la cédula del cliente.');
+                                return false;
+                            }
+
+                            const selectedCliente = data.find(cliente =>
+                                cliente.nombre.toLowerCase().includes(inputValue) ||
+                                cliente.cedula.toLowerCase().includes(inputValue)
+                            );
+
+                            if (!selectedCliente) {
+                                Swal.showValidationMessage('Cliente no encontrado. Por favor, intenta de nuevo.');
+                            } else {
+                                const correoLength = selectedCliente.correo.length;
+                                const marqueeEffect = correoLength >= 24 ? 'scroll' : 'none';
+
+                                Swal.fire({
+                                    title: 'Información del cliente',
+                                    html: `
+                                <div class="inputs-container-1">
+                                    <div class="input-container-4">
+                                        <label for="inputNombre" class="label-style-1">Nombre:</label>
+                                        <input type="text" id="inputNombre" class="input-style-1" readonly value="${selectedCliente.nombre + ' ' + selectedCliente.apellidos}">
+                                    </div>
+                                    <div class="input-container-4">
+                                        <label for="inputTelefono" class="label-style-1">Telefono:</label>
+                                        <input type="text" id="inputTelefono" class="input-style-1" readonly value="${selectedCliente.telefono}">
+                                    </div>
+                                    <div class="input-container-4">
+                                        <label for="inputCorreo" class="label-style-1">Correo:</label>
+                                        <input type="text" id="inputCorreo" class="input-style-1" readonly value="${selectedCliente.correo}">
+                                    </div>
+                                    <div class="input-container-4">
+                                        <label for="inputCedula" class="label-style-1">Cedula:</label>
+                                        <input type="text" id="inputCedula" class="input-style-1" readonly value="${selectedCliente.cedula}">
+                                    </div>
+                                </div>
+                            `,
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Continuar',
+                                    cancelButtonText: 'Volver',
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        if (marqueeEffect === 'scroll') {
+                                            const inputCorreo = document.getElementById('inputCorreo');
+                                            startMarquee(inputCorreo);
+                                        }
+                                    },
+                                    willClose: () => {
+                                        if (marqueeEffect === 'scroll') {
+                                            const inputCorreo = document.getElementById('inputCorreo');
+                                            stopMarquee(inputCorreo);
+                                        }
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        ContinueForm(selectedCliente.id);
+                                        clienteId = selectedCliente.id;
+                                        clienteNombre = selectedCliente.nombre;
+                                        clienteApellidos = selectedCliente.apellidos;
+                                        clienteCorreo = selectedCliente.correo;
+                                        clienteTelefono = selectedCliente.telefono;
+                                        clienteCedula = selectedCliente.cedula;
+                                        clienteTipo = "Específico";
+                                        clienteObservacion = "Este es un cliente registrado.";
+
+                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                        setTimeout(() => {
+                                            Swal.close();
+                                        }, 100);
+                                        window.location.href = './venta.html';
+                                    }
+                                });
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener la lista de clientes:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Hubo un error al cargar la lista de clientes. Por favor, inténtalo de nuevo más tarde.'
+                    });
+                })
+                .finally(() => {
+                    Swal.hideLoading();
+                });
+        }
 
         let productos = {};
         let contadorProductos = 0;
@@ -395,7 +515,11 @@
                     </div>
                     <div class="input-container-4">
                         <label for="inputPrecio" class="label-style-1">Precio:</label>
-                        <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precio}">
+                        <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precioCompra}">
+                    </div>
+                    <div class="input-container-4">
+                        <label for="inputPrecio" class="label-style-1">Precio:</label>
+                        <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precioVenta}">
                     </div>
                     <div class="input-container-4">
                         <label for="inputCodigoBarras" class="label-style-1">Código de barras:</label>
@@ -432,18 +556,23 @@
                 });
 
                 if (confirmationResult.isConfirmed) {
-                    contadorProductos++;
-                    const idProducto = `Producto ${contadorProductos}`;
-                    const idProductoExistente = productoEncontrado.id || null;
                     const cantidad = document.getElementById('inputCantidad').value;
                     const cantidadAVender = parseInt(cantidad, 10);
 
-                    const cantidadDisponible = productoEncontrado.totalExistencias;
-                    const cantidadRestante = cantidadDisponible - cantidadAVender;
+                    if (isNaN(cantidadAVender) || cantidadAVender <= 0) {
+                        Swal.showValidationMessage('Por favor, ingresa una cantidad.');
+                        return false;
+                    } else {
+                        contadorProductos++;
+                        const idProducto = `Producto ${contadorProductos}`;
+                        const idProductoExistente = productoEncontrado.id || null;
 
-                    await Swal.fire({
-                        title: 'Cantidad disponible restante',
-                        html: `
+                        const cantidadDisponible = productoEncontrado.totalExistencias;
+                        const cantidadRestante = cantidadDisponible - cantidadAVender;
+
+                        await Swal.fire({
+                            title: 'Cantidad disponible restante',
+                            html: `
                     <div class="inputs-container-1">
                         <div class="input-container-4">
                             <label for="input" class="label-style-1">Resultado:</label>
@@ -451,22 +580,24 @@
                         </div>
                     </div>
                 `,
-                        confirmButtonText: 'Aceptar'
-                    });
+                            confirmButtonText: 'Aceptar'
+                        });
 
-                    productos[idProducto] = {
-                        id: idProductoExistente,
-                        nombre: productoEncontrado.nombre,
-                        precio: productoEncontrado.precio,
-                        codigoBarras: productoEncontrado.codigoBarras,
-                        descripcion: productoEncontrado.descripcion,
-                        presentacion: productoEncontrado.presentacion,
-                        cantidadAVender: cantidadAVender,
-                        idFacturaCompraFk: productoEncontrado.idFacturaCompraFk,
-                        totalExistencias: cantidadRestante
-                    };
+                        productos[idProducto] = {
+                            id: idProductoExistente,
+                            nombre: productoEncontrado.nombre,
+                            precioCompra: productoEncontrado.precioCompra,
+                            precioVenta: productoEncontrado.precioVenta,
+                            codigoBarras: productoEncontrado.codigoBarras,
+                            descripcion: productoEncontrado.descripcion,
+                            presentacion: productoEncontrado.presentacion,
+                            cantidadAVender: cantidadAVender,
+                            idFacturaCompraFk: productoEncontrado.idFacturaCompraFk,
+                            totalExistencias: cantidadRestante
+                        };
 
-                    askToAddAnotherProduct();
+                        askToAddAnotherProduct();
+                    }
                 } else {
                     continueForm2();
                 }
@@ -495,7 +626,8 @@
                     const data = {
                         id: producto.id,
                         nombre: producto.nombre,
-                        precio: producto.precio,
+                        precioCompra: producto.precioCompra,
+                        precioVenta: producto.precioVenta,
                         codigoBarras: producto.codigoBarras,
                         descripcion: producto.descripcion,
                         presentacion: producto.presentacion,
@@ -579,23 +711,18 @@
             }
         }
 
-        async function enviarFacturaPDF() {
-            Swal.fire({
-                title: 'En desarrollo!',
-                icon: 'warning',
-                confirmButtonText: 'Cool'
-            })
-        }
-
         async function enviarFacturaVenta(datoVenta) {
             try {
                 const facturaVenta = {
                     fechaVenta: datoVenta.fechaVenta,
                     cantidad: datoVenta.cantidadTotal,
+                    tipoCliente: clienteTipo,
+                    observacion: clienteObservacion,
                     precioTotal: datoVenta.precioTotal,
                     tipoPago: datoVenta.tipoPago,
                     idClienteFK: datoVenta.idClienteFK
                 };
+                console.log(facturaVenta);
 
                 const response = await fetch('http://localhost:5033/Api/FacturaVenta', {
                     method: 'POST',
@@ -607,11 +734,12 @@
                     const data = await response.json();
                     const confirmationResult = await Swal.fire({
                         title: '¡Felicidades!',
-                        text: 'Factura de venta enviada con éxito',
+                        text: 'Factura de venta registrada con éxito',
                         icon: 'success',
                         confirmButtonText: 'Aceptar'
                     });
                     console.log('Factura de venta enviada con éxito:', facturaVenta);
+                    console.log(data);
                     return data.id;
                 } else {
                     console.error('Error al enviar la factura de venta:', response.statusText);
@@ -621,12 +749,16 @@
             }
         }
 
-        async function ventaProducto(idFacturaVenta, idProducto, datoVenta) {
+        async function ventaProducto(idFacturaVenta, idProducto, datoVenta, cantidadAVender) {
             try {
                 const detalleFactura = {
                     idFacturaVentaFK: idFacturaVenta,
-                    idProductoFK: idProducto
+                    idProductoFK: idProducto,
+                    fechaVenta: datoVenta.fechaVenta,
+                    cantidadVendida: cantidadAVender
                 };
+
+                console.log(datoVenta);
 
                 const response = await fetch('http://localhost:5033/Api/VentaProducto', {
                     method: 'POST',
@@ -640,10 +772,18 @@
                         title: '¡Felicidades!',
                         text: 'Detalles de factura enviada con éxito',
                         icon: 'success',
-                        confirmButtonText: 'Descargar factura'
-                    }).then((confirmationResult) => {
-                        if (confirmationResult.isConfirmed) {
-                            generarFacturaPDF(datoVenta);
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Ver informes',
+                        denyButtonText: 'No, regresar',
+                        cancelButtonText: 'Imprimir'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = './informes.html?idFacturaVenta=' + detalleFactura.idFacturaVentaFK;
+                        } else if (result.isDenied) {
+                            window.location.href = './dashboard.html';
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            imprimirFactura(detalleFactura);
                         }
                     });
                     console.log('Detalles de factura enviada con éxito:', detalleFactura);
@@ -661,7 +801,7 @@
             let valorTotal = 0;
             for (const nombreProducto in productos) {
                 cantidadTotal += productos[nombreProducto].cantidadAVender;
-                valorTotal += productos[nombreProducto].precio;
+                valorTotal += productos[nombreProducto].precioVenta * productos[nombreProducto].cantidadAVender;
             }
 
             Swal.fire({
@@ -692,139 +832,224 @@
         `,
                 showCancelButton: true,
                 confirmButtonText: 'Confirmar',
-                cancelButtonText: 'Cancelar'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-
+                cancelButtonText: 'Cancelar',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const fechaVenta = document.getElementById('inputFecha').value;
+                    const tipoPago = document.getElementById('tipopago').value;
+                    if (!fechaVenta) {
+                        Swal.showValidationMessage('Por favor, ingresa la fecha de la venta.');
+                        return false;
+                    }
+                    if (!tipoPago || tipoPago === 'text') {
+                        Swal.showValidationMessage('Por favor, selecciona un tipo de pago.');
+                        return false;
+                    }
                     const datoVenta = {
-                        fechaVenta: document.getElementById('inputFecha').value,
-                        tipoPago: document.getElementById('tipopago').value,
+                        fechaVenta,
+                        tipoPago,
                         cantidadTotal: parseInt(document.getElementById('inputCantidadTotal').value),
                         precioTotal: parseFloat(valorTotal),
                         idClienteFK: parseInt(clienteId)
                     };
-
                     datosVentas.push(datoVenta);
-                    await actualizarProductoEnBaseDeDatos(cantidadAVender);
-                    const idFacturaVenta = await enviarFacturaVenta(datoVenta);
-
-                    const idsProductos = Object.values(productos).map(producto => producto.id);
-                    idsProductos.forEach(async idProducto => {
-                        await ventaProducto(idFacturaVenta, idProducto, datoVenta);
+                    actualizarProductoEnBaseDeDatos(cantidadAVender);
+                    enviarFacturaVenta(datoVenta).then(idFacturaVenta => {
+                        for (const nombreProducto in productos) {
+                            const cantidadAVender = productos[nombreProducto].cantidadAVender;
+                            const idProducto = productos[nombreProducto].id;
+                            ventaProducto(idFacturaVenta, idProducto, datoVenta, cantidadAVender);
+                        }
                     });
                 }
             });
         }
 
-        // Version nueva
-        async function generarFacturaPDF(datoVenta) {
+        console.log(productos);
+        console.log(datosVentas);
+
+        async function obtenerProducto(idProducto) {
             try {
-                const detallesProductos = Object.values(productos);
+                const response = await fetch(`http://localhost:5033/Api/Producto/${idProducto}`);
+                if (response.ok) {
+                    const producto = await response.json();
+                    return producto;
+                } else {
+                    console.error('Error al obtener el producto:', response.statusText);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error al obtener el producto:', error);
+                return null;
+            }
+        }
 
-                const tableBody = detallesProductos.map(producto => [
-                    producto.nombre,
-                    producto.cantidadAVender,
-                    `$${producto.precio * producto.cantidadAVender}`
-                ]);
+        async function imprimirFactura(datoVenta, detalleFactura) {
+            try {
+                /* const idFactura = detalleFactura.idFacturaVentaFK; */
+                const fechaVenta = new Date(datoVenta.fechaVenta);
+                const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
+                /* const idProducto = obtenerProducto(detalleFactura.idProductoFK);
+                if (idProducto) {
+                    const productos = [
+                        [idProducto.nombreProducto, detalleFactura.cantidadVendida]
+                    ];
+                } else {
+                    console.error('No se encontró el producto');
+                } */
+                const facturasVentas = [
+                    [datoVenta.cantidad, datoVenta.precioTotal, datoVenta.tipoCliente, datoVenta.observacion, datoVenta.tipoPago,]
+                ];
+                /* const facturasVentas = datoVenta.map(facturaVenta => [
+                    facturaVenta.cantidad,
+                    facturaVenta.precioTotal,
+                    facturaVenta.tipoCliente,
+                    facturaVenta.observacion,
+                    facturaVenta.tipoPago,
+                ]); */
+                /* const datosCliente = datoVenta.map(cliente => [
+                    cliente.idClienteFK.nombre,
+                    cliente.idClienteFK.apellidos,
+                    cliente.idClienteFK.cedula,
+                    cliente.idClienteFK.telefono,
+                    cliente.idClienteFK.correo,
+                ]); */
 
-                const pdfDocDefinition = {
-                    content: [
-                        {
-                            canvas: [
-                                {
-                                    type: 'rect',
-                                    x: 0,
-                                    y: 0,
-                                    w: 595.28,
-                                    h: 100,
-                                    color: '#305da8',
-                                }
-                            ],
-                            absolutePosition: { x: 0, y: 0 },
-                            zIndex: -1
-                        },
-                        {
-                            columns: [
-                                {
-                                    width: 'auto',
-                                    text: 'Factura',
-                                    fontSize: 22,
-                                    color: '#ffffff',
-                                    alignment: 'left',
-                                    margin: [10, 5, 0, 0],
-                                },
-                                {
-                                    width: '*',
-                                    height: 30,
-                                    text: [
-                                        { text: 'Fecha: ', bold: true },
-                                        { text: datoVenta.fechaVenta }
-                                    ],
-                                    fontSize: 14,
-                                    color: '#ffffff',
-                                    alignment: 'right',
-                                    margin: [0, 10, 10, 0],
-                                },
-                            ],
-                            layout: 'noBorders',
-                            margin: [0, 0, 0, 10]
-                        },
-                        {
-                            text: [
-                                { text: 'Datos del cliente\n', bold: true },
-                                `${clienteNombre} ${clienteApellidos}\n`,
-                                `Doc: ${clienteCedula}\n`,
-                                `Tel: ${clienteTelefono}\n`,
-                            ],
-                            fontSize: 14,
-                            margin: [0, 30, 10, 10],
-                        },
-                        {
-                            text: `Tipo de Pago: ${datoVenta.tipoPago}`,
-                            style: 'subheader'
-                        },
-                        {
-                            table: {
-                                headerRows: 1,
-                                widths: ['*', 'auto', 'auto'],
-                                body: [
-                                    ['Producto', 'Cantidad', 'Precio']
-                                ].concat(tableBody)
+                const html = `
+                    <head>
+                        <style>
+                            * {
+                                font-size: 12px;
+                                font-family: 'Times New Roman';
                             }
-                        },
-                        {
-                            columns: [
-                                { width: '*', text: '' },
-                                {
-                                    width: 'auto',
-                                    text: [
-                                        { text: 'Total: ', bold: true },
-                                        { text: `$${datoVenta.precioTotal}`, bold: true }
-                                    ]
+
+                            td,
+                            th,
+                            tr,
+                            table {
+                                border-top: 1px solid black;
+                                border-collapse: collapse;
+                            }
+
+                            td.producto,
+                            th.producto {
+                                width: 75px;
+                                max-width: 75px;
+                            }
+
+                            td.cantidad,
+                            th.cantidad {
+                                width: 40px;
+                                max-width: 40px;
+                                word-break: break-all;
+                            }
+
+                            td.precio,
+                            th.precio {
+                                width: 40px;
+                                max-width: 40px;
+                                word-break: break-all;
+                            }
+
+                            .centrado {
+                                text-align: center;
+                                align-content: center;
+                            }
+
+                            .ticket {
+                                width: 155px;
+                                max-width: 155px;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                            }
+
+                            img {
+                                max-width: 100%;
+                                height: auto;
+                                max-height: 70px;
+                            }
+
+                            .datos-cliente {
+                                margin-top: 10px;
+                                text-align: left;
+                                margin-bottom: 20px;
+                                align-self: flex-start;
+                            }
+
+                            .datos-cliente p {
+                                margin: 5px 0;
+                                display: inline-block;
+                            }
+
+                            .datos-cliente strong {
+                                display: inline-block;
+                            }
+
+                            .datos-cliente span {
+                                margin-left: 5px;
+                            }
+
+                            @media print {
+                                body * {
+                                    visibility: hidden;
                                 }
-                            ],
-                            margin: [0, 20, 0, 0]
-                        }
-                    ],
-                    styles: {
-                        subheader: {
-                            fontSize: 14,
-                            margin: [0, 5, 0, 5]
-                        }
-                    }
-                };
 
-                const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
+                                .ticket,
+                                .ticket * {
+                                    visibility: visible;
+                                }
 
-                pdfDoc.getBlob(blob => {
-                    const openPDFInNewWindow = (blob, fileName) => {
-                        const url = URL.createObjectURL(blob);
-                        window.open(url, fileName);
-                    };
+                                .ticket {
+                                    position: absolute;
+                                    left: 0;
+                                    top: 0;
+                                }
 
-                    const fileName = "factura_venta.pdf";
-                    openPDFInNewWindow(blob, fileName);
-                });
+                                .oculto-impresion,
+                                .oculto-impresion * {
+                                    display: none !important;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <div class="ticket">
+                        <img src="../assets/logo-removebg-preview.png" alt="Logotipo">
+                        <p class="centrado">TICKET DE VENTA<br>ID: 111<br>${fechaFormateada}</p>
+                        <div class="datos-cliente">
+                            111
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="cantidad">CANT</th>
+                                    <th class="producto">PRODUCTO</th>
+                                    <th class="precio">$$</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                111
+                                <tr>
+                                    <td class="cantidad"></td>
+                                    <td class="producto">TOTAL</td>
+                                    /* <td class="precio">$111</td> */
+                                    <td class="precio">¿?</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="centrado">¡GRACIAS POR SU COMPRA!</p>
+                    </div>
+                    <button class="oculto-impresion" onclick="window.print()">Imprimir</button>
+                `;
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+
+                const ticketDiv = tempDiv.querySelector('.ticket');
+                const popupWindow = window.open('', '_blank');
+                popupWindow.document.open();
+                popupWindow.document.write(html);
+                popupWindow.document.close();
             } catch (error) {
                 console.error('Error al generar factura de venta:', error);
                 Swal.fire({
@@ -834,147 +1059,6 @@
                 });
             }
         }
-
-        // Version original
-        /* async function generarFacturaPDF(datoVenta) {
-            try {
-                const detallesProductos = Object.values(productos);
-
-                const tableBody = detallesProductos.map(producto => [
-                    producto.nombre,
-                    producto.cantidadAVender,
-                    `$${producto.precio * producto.cantidadAVender}`
-                ]);
-
-                const pdfDocDefinition = {
-                    content: [
-                        {
-                            canvas: [
-                                {
-                                    type: 'rect',
-                                    x: 0,
-                                    y: 0,
-                                    w: 595.28,
-                                    h: 100,
-                                    color: '#305da8',
-                                }
-                            ],
-                            absolutePosition: { x: 0, y: 0 },
-                            zIndex: -1
-                        },
-                        {
-                            columns: [
-                                {
-                                    width: 'auto',
-                                    text: 'Factura',
-                                    fontSize: 22,
-                                    color: '#ffffff',
-                                    alignment: 'left',
-                                    margin: [10, 5, 0, 0],
-                                },
-                                {
-                                    width: '*',
-                                    height: 30,
-                                    text: [
-                                        { text: 'Fecha: ', bold: true },
-                                        { text: datoVenta.fechaVenta }
-                                    ],
-                                    fontSize: 14,
-                                    color: '#ffffff',
-                                    alignment: 'right',
-                                    margin: [0, 10, 10, 0],
-                                },
-                            ],
-                            layout: 'noBorders',
-                            margin: [0, 0, 0, 10]
-                        },
-                        {
-                            text: [
-                                { text: 'Datos del cliente\n', bold: true },
-                                `${clienteNombre} ${clienteApellidos}\n`,
-                                `Doc: ${clienteCedula}\n`,
-                                `Tel: ${clienteTelefono}\n`,
-                            ],
-                            fontSize: 14,
-                            margin: [0, 30, 10, 10],
-                        },
-                        {
-                            text: `Tipo de Pago: ${datoVenta.tipoPago}`,
-                            style: 'subheader'
-                        },
-                        {
-                            table: {
-                                headerRows: 1,
-                                widths: ['*', 'auto', 'auto'],
-                                body: [
-                                    ['Producto', 'Cantidad', 'Precio']
-                                ].concat(tableBody)
-                            }
-                        },
-                        {
-                            columns: [
-                                { width: '*', text: '' },
-                                {
-                                    width: 'auto',
-                                    text: [
-                                        { text: 'Total: ', bold: true },
-                                        { text: `$${datoVenta.precioTotal}`, bold: true }
-                                    ]
-                                }
-                            ],
-                            margin: [0, 20, 0, 0]
-                        }
-                    ],
-                    styles: {
-                        subheader: {
-                            fontSize: 14,
-                            margin: [0, 5, 0, 5]
-                        }
-                    }
-                };
-
-                const pdfDoc = pdfMake.createPdf(pdfDocDefinition);
-
-                pdfDoc.getBlob(blob => {
-                    const downloadPDF = (filename) => {
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    };
-
-                    const checkAndDownload = (filename, count) => {
-                        const finalFilename = count > 0 ? `factura_venta_${count}.pdf` : 'factura_venta.pdf';
-                        fetch(finalFilename)
-                            .then(response => {
-                                if (!response.ok) {
-                                    downloadPDF(finalFilename);
-                                } else {
-                                    checkAndDownload('factura_venta.pdf', count + 1);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error al verificar la existencia del archivo:', error);
-                                downloadPDF('factura_venta.pdf');
-                            });
-                    };
-                    checkAndDownload('factura_venta.pdf', 0);
-                });
-            } catch (error) {
-                console.error('Error al generar factura de venta:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al generar la factura de venta. Por favor, inténtalo de nuevo más tarde.'
-                });
-            }
-        } */
-
-        console.log(productos)
-        console.log(datosVentas)
     </script>
 </body>
 

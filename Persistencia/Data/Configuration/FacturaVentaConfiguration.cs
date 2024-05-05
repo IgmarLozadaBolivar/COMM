@@ -27,6 +27,14 @@ public class FacturaVentaConfiguration : IEntityTypeConfiguration<FacturaVenta>
             .HasComment("Identificador de puenteo con la tabla de Cliente (Persona)")
             .HasColumnName("IdClienteFk");
 
+        builder.Property(e => e.TipoCliente)
+            .HasPrecision(10, 2)
+            .HasComment("Tipo de cliente en la factura");
+
+        builder.Property(e => e.Observacion)
+            .HasPrecision(10, 2)
+            .HasComment("Observacion del cliente en la factura");
+
         builder.Property(e => e.PrecioTotal)
             .HasPrecision(10, 2)
             .HasComment("Precio total de la venta");

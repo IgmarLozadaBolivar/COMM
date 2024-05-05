@@ -50,6 +50,12 @@
                             <span class="text nav-text">Tablero</span>
                         </a>
                     </li>
+                    <li class="nav-link" id="informesNavItem">
+                        <a href="./informes.html">
+                            <i class='bx bx-bar-chart-alt icon'></i>
+                            <span class="text nav-text">Informes</span>
+                        </a>
+                    </li>
                     <li class="nav-link">
                         <a href="./productos.html">
                             <i class='bx bx-store icon'></i>
@@ -181,6 +187,19 @@
             }
 
             const { TokenExpired } = decoded;
+            const { roles } = decoded;
+            if (roles === 'Empleado') {
+                informesNavItem.addEventListener("click", function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Acceso denegado!",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Entendido"
+                    });
+                });
+            }
             console.log('TokenExpired:', TokenExpired);
 
             return { TokenExpired };
@@ -248,6 +267,7 @@
                     }, 1000);
                 }
             }
+            obtenerDatosDecodificados(decoded);
         }
         compareTokens(token, decoded);
 
@@ -516,14 +536,28 @@
                 console.error('Error al obtener datos del cliente:', error);
             }
         }
+
         async function obtenerClientes() {
             fetch('http://localhost:5033/Api/Persona')
                 .then(response => response.json())
                 .then(data => {
+                    const clientesFiltrados = data.filter(cliente => {
+                        return cliente.nombre !== 'Anónimo' &&
+                            cliente.nombre !== 'Sin Lucro' &&
+                            cliente.apellidos !== 'Anónimo' &&
+                            cliente.apellidos !== 'Sin Lucro' &&
+                            cliente.telefono !== 'Anónimo' &&
+                            cliente.telefono !== 'Sin Lucro' &&
+                            cliente.cedula !== 'Anónimo' &&
+                            cliente.cedula !== 'Sin Lucro' &&
+                            cliente.correo !== 'Anonimo@example.com' &&
+                            cliente.correo !== 'SinLucro@example.com';
+                    });
+
                     const tablaData = document.getElementById('tabla-data');
                     tablaData.innerHTML = '';
 
-                    data.forEach(persona => {
+                    clientesFiltrados.forEach(persona => {
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
                     <td>${persona.nombre}</td>

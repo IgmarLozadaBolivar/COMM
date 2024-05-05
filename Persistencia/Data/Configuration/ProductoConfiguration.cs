@@ -17,12 +17,16 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
         builder.Property(e => e.Descripcion)
             .HasMaxLength(100)
             .HasComment("Descripción del producto");
-       
+
         builder.Property(e => e.Nombre)
             .HasMaxLength(25)
             .HasComment("Nombre del producto");
 
-        builder.Property(e => e.Precio)
+        builder.Property(e => e.PrecioCompra)
+            .HasPrecision(10, 2)
+            .HasComment("Precio de compra del producto");
+
+        builder.Property(e => e.PrecioVenta)
             .HasPrecision(10, 2)
             .HasComment("Precio de venta del producto");
 
@@ -32,7 +36,5 @@ public class ProductoConfiguration : IEntityTypeConfiguration<Producto>
 
         builder.Property(e => e.TotalExistencias)
             .HasComment("Cantidad o existencia total por producto");
-
-        
     }
 }

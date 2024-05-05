@@ -34,6 +34,12 @@
                             <span class="text nav-text">Clientes</span>
                         </a>
                     </li>
+                    <li class="nav-link" id="informesNavItem">
+                        <a href="./informes.html">
+                            <i class='bx bx-bar-chart-alt icon'></i>
+                            <span class="text nav-text">Informes</span>
+                        </a>
+                    </li>
                     <li class="nav-link">
                         <a href="./productos.html">
                             <i class='bx bx-store icon'></i>
@@ -109,6 +115,19 @@
             }
 
             const { TokenExpired } = decoded;
+            const { roles } = decoded;
+            if (roles === 'Empleado') {
+                informesNavItem.addEventListener("click", function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Acceso denegado!",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Entendido"
+                    });
+                });
+            }
             console.log('TokenExpired:', TokenExpired);
 
             return { TokenExpired };
@@ -176,6 +195,7 @@
                     }, 1000);
                 }
             }
+            obtenerDatosDecodificados(decoded);
         }
         compareTokens(token, decoded);
 
