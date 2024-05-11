@@ -330,6 +330,14 @@ body.dark .home .text {
     color: var(--text-color);
 }
 
+.home .slider img {
+    max-width: 100%;
+    max-height: 550px;
+    margin: auto;
+    border-radius: 10px;
+    opacity: 90%;
+}
+
 .form-box {
     position: absolute;
     top: 50%;
