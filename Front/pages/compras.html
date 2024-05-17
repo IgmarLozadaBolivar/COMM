@@ -226,7 +226,7 @@
         compareTokens(token, decoded);
 
         async function compararTokenEnDB(token) {
-            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const response = await fetch('https://api.commsas.com/Api/RefreshToken');
             const data = await response.json();
             return data;
         }
@@ -247,7 +247,7 @@
         let proveedorNombre;
 
         function traerProveedores() {
-            fetch('http://localhost:5033/Api/Proveedor')
+            fetch('https://api.commsas.com/Api/Proveedor')
                 .then(response => response.json())
                 .then(data => {
                     const selectProveedor = document.getElementById('proveedor');
@@ -286,7 +286,7 @@
                 setTimeout(function () {
                     Swal.close();
 
-                    fetch('http://localhost:5033/Api/Proveedor')
+                    fetch('https://api.commsas.com/Api/Proveedor')
                         .then(response => response.json())
                         .then(data => {
                             const selectProveedor = document.getElementById('proveedor');
@@ -347,7 +347,7 @@
 
         async function obtenerProductosExistentes() {
             try {
-                const response = await fetch('http://localhost:5033/Api/Producto');
+                const response = await fetch('https://api.commsas.com/Api/Producto');
                 if (!response.ok) {
                     throw new Error('Error al obtener los productos');
                 }
@@ -507,7 +507,7 @@
 
                 producto.id = id;
 
-                const response = await fetch('http://localhost:5033/Api/Producto', {
+                const response = await fetch('https://api.commsas.com/Api/Producto', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(producto)
@@ -531,7 +531,7 @@
                 console.log(idProductoExistente);
                 console.log(productoExistente);
 
-                const response = await fetch(`http://localhost:5033/Api/Producto/${idProductoExistente}`, {
+                const response = await fetch(`https://api.commsas.com/Api/Producto/${idProductoExistente}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(productoExistente)
@@ -557,7 +557,7 @@
                     idProveedorFk: parseInt(proveedorId)
                 };
 
-                const response = await fetch('http://localhost:5033/Api/FacturaCompra', {
+                const response = await fetch('https://api.commsas.com/Api/FacturaCompra', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(facturaCompra)
@@ -590,7 +590,7 @@
                     idProductoFK: idProducto
                 };
 
-                const response = await fetch('http://localhost:5033/Api/CompraProducto', {
+                const response = await fetch('https://api.commsas.com/Api/CompraProducto', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(detalleCompra)

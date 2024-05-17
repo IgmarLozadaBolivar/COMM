@@ -351,7 +351,7 @@
         compareTokens(token, decoded);
 
         async function compararTokenEnDB(token) {
-            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const response = await fetch('https://api.commsas.com/Api/RefreshToken');
             const data = await response.json();
             return data;
         }
@@ -362,7 +362,7 @@
         })
 
         function obtenerFacturasVenta(callback) {
-            const apiUrl = 'http://localhost:5033/Api/VentaProducto/DatosFacturaDeVenta';
+            const apiUrl = 'https://api.commsas.com/Api/VentaProducto/DatosFacturaDeVenta';
 
             fetch(apiUrl, {
                 method: 'GET',

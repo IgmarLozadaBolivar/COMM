@@ -241,7 +241,7 @@
         compareTokens(token, decoded);
 
         async function compararTokenEnDB(token) {
-            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const response = await fetch('https://api.commsas.com/Api/RefreshToken');
             const data = await response.json();
             return data;
         }
@@ -254,7 +254,7 @@
         async function generarID(editando) {
             if (!editando) {
                 try {
-                    const response = await fetch('http://localhost:5033/Api/Proveedor');
+                    const response = await fetch('https://api.commsas.com/Api/Proveedor');
                     const data = await response.json();
 
                     const existingIDs = data.map(item => item.id);
@@ -286,7 +286,7 @@
                 }
 
                 const headers = new Headers({ 'Content-Type': 'application/json' });
-                const urlRegister = "http://localhost:5033/Api/Proveedor";
+                const urlRegister = "https://api.commsas.com/Api/Proveedor";
 
                 const config = {
                     method: 'POST',
@@ -342,7 +342,7 @@
                 return;
             }
 
-            const urlEditar = `http://localhost:5033/Api/Proveedor/${id}`;
+            const urlEditar = `https://api.commsas.com/Api/Proveedor/${id}`;
             const data = {
                 id: id,
                 nombre: nuevoNombre
@@ -429,7 +429,7 @@
                 console.error('No se ha encontrado un token válido.');
                 return;
             }
-            const urlEliminar = `http://localhost:5033/Api/Proveedor/${id}`;
+            const urlEliminar = `https://api.commsas.com/Api/Proveedor/${id}`;
             const config = {
                 method: 'DELETE',
                 headers: {
@@ -467,7 +467,7 @@
         }
 
         function obtenerProveedores() {
-            fetch('http://localhost:5033/Api/Proveedor')
+            fetch('https://api.commsas.com/Api/Proveedor')
                 .then(response => response.json())
                 .then(data => {
                     const tablaData = document.getElementById('tabla-data');

@@ -278,7 +278,7 @@
         compareTokens(token, decoded);
 
         async function compararTokenEnDB(token) {
-            const response = await fetch('http://localhost:5033/Api/RefreshToken');
+            const response = await fetch('https://api.commsas.com/Api/RefreshToken');
             const data = await response.json();
             return data;
         }
@@ -297,7 +297,7 @@
 
         async function generarID() {
             try {
-                const response = await fetch('http://localhost:5033/Api/Persona');
+                const response = await fetch('https://api.commsas.com/Api/Persona');
                 const data = await response.json();
 
                 const existingIDs = data.map(item => item.id);
@@ -334,7 +334,7 @@
                 }
 
                 const headers = new Headers({ 'Content-Type': 'application/json' });
-                const urlRegister = "http://localhost:5033/Api/Persona";
+                const urlRegister = "https://api.commsas.com/Api/Persona";
 
                 const config = {
                     method: 'POST',
@@ -385,7 +385,7 @@
 
         async function editarCliente(id, nuevoNombre, nuevosApellidos, nuevaCedula, nuevoCorreo, nuevoTelefono) {
             const token = obtenerToken();
-            const urlEditar = `http://localhost:5033/Api/Persona/${id}`;
+            const urlEditar = `https://api.commsas.com/Api/Persona/${id}`;
             const clienteActual = await obtenerCliente(id);
 
             const data = {
@@ -496,7 +496,7 @@
 
         async function eliminarCliente(id) {
             const token = obtenerToken();
-            const urlEliminar = `http://localhost:5033/Api/Persona/${id}`;
+            const urlEliminar = `https://api.commsas.com/Api/Persona/${id}`;
             const config = {
                 method: 'DELETE',
                 headers: {
@@ -534,7 +534,7 @@
         }
 
         async function obtenerCliente(id) {
-            const urlCliente = `http://localhost:5033/Api/Persona/${id}`;
+            const urlCliente = `https://api.commsas.com/Api/Persona/${id}`;
             try {
                 const response = await fetch(urlCliente);
                 if (response.ok) {
@@ -549,7 +549,7 @@
         }
 
         async function obtenerClientes() {
-            fetch('http://localhost:5033/Api/Persona')
+            fetch('https://api.commsas.com/Api/Persona')
                 .then(response => response.json())
                 .then(data => {
                     const clientesFiltrados = data.filter(cliente => {
