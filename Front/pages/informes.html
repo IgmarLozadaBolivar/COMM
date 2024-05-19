@@ -663,12 +663,12 @@
             }
         }
 
-        const esEmpleado = true;
+        /* const esEmpleado = true; */
 
         filterButton.addEventListener('click', function () {
-            if (esEmpleado) {
-                return; // No hacer nada si el usuario es un empleado
-            }
+            /* if (esEmpleado) {
+                return;
+            } */
 
             const selectedOption = searchInput.value;
             let selectedDate;
@@ -711,9 +711,9 @@
 
         const clearButton = document.getElementById('clearButton');
         clearButton.addEventListener('click', function () {
-            if (esEmpleado) {
+            /* if (esEmpleado) {
                 return;
-            }
+            } */
 
             searchInput.value = 'default';
             searchInput1.value = '';
@@ -871,10 +871,10 @@
                 const decoded = obtenerDatosDecodificados(decodeJwt(obtenerToken()));
                 if (decoded) {
                     const { roles } = decoded;
-                    const esEmpleado = roles === 'Empleado';
+                    console.log(roles);
                     const vieneDeVentas = document.referrer.includes("venta.html");
 
-                    if (esEmpleado && vieneDeVentas) {
+                    if (vieneDeVentas) {
                         obtenerFacturaVentaExterna(idFacturaVenta);
                     } else {
                         console.log('No tienes permiso para acceder a esta factura o no se originó desde ventas.');
