@@ -277,3 +277,32 @@ img {
 .search-icon {
     font-size: 18px;
 }
+
+.social-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 25%;
+}
+
+.social-links img {
+    width: 40px;
+    height: 40px;
+    margin: 5px 0;
+}
+
+.social-links .social-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+.social-links .social-link img {
+    margin-right: 8px;
+}
+
+.social-links .social-link span {
+    font-size: 0.9rem;
+}

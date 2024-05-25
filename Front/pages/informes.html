@@ -202,8 +202,17 @@
                     </tbody>
                 </table>
             </div>
-            <div id="total-text">Renumeración Total:</div>
-            <span id="total-precio" style="padding-bottom: 20px; display: block; margin-bottom: 10px;">0</span>
+            <div id="total-remuneraciones">
+                <div class="total-item">
+                    <div id="total-text">INGRESO TOTAL</div>
+                    <span id="total-precio" style="padding-bottom: 20px; display: block; margin-bottom: 10px;">0</span>
+                </div>
+                <div class="total-item">
+                    <div id="total-text-hoy">INGRESO DEL DIA</div>
+                    <span id="total-precio-hoy"
+                        style="padding-bottom: 20px; display: block; margin-bottom: 10px;">0</span>
+                </div>
+            </div>
         </div>
     </section>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -239,7 +248,6 @@
 
         const token = obtenerToken();
         const decoded = decodeJwt(token);
-        console.log(decoded);
         function obtenerDatosDecodificados(decoded) {
             if (!decoded) {
                 console.error('No se pudo decodificar el token correctamente.');
@@ -318,10 +326,6 @@
                 const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
                 const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
 
-                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
-                console.log(currentTime)
-                console.log(tokenExpiredDate)
-
                 if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
                     mostrarVentanaEmergente();
                 } else {
@@ -351,7 +355,6 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     callback(data);
                     calcularYMostrarSumaTotal();
                 })
@@ -363,26 +366,70 @@
         function calcularYMostrarSumaTotal() {
             const filas = document.querySelectorAll('#tabla-data tr');
             let sumaTotal = 0;
+            let sumaTotalHoy = 0;
+
+            const fechaActual = obtenerFechaActual();
 
             filas.forEach(fila => {
                 const precioTotal = parseFloat(fila.querySelector('td:nth-child(3)').textContent);
                 sumaTotal += precioTotal;
             });
 
+            filas.forEach(fila => {
+                const celdas = fila.querySelectorAll('td');
+                console.log(celdas)
+                if (celdas.length > 0) {
+                    const fechaVenta = celdas[0].textContent.trim();
+                    const precioTotalHoy = parseFloat(celdas[2].textContent.trim());
+
+                    if (compararFechas(fechaVenta, fechaActual)) {
+                        sumaTotalHoy += precioTotalHoy;
+                    }
+                }
+            });
+
             const sumaTotalFormateada = sumaTotal.toLocaleString('es-ES', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            const sumaTotalFormateadaHoy = sumaTotalHoy.toLocaleString('es-ES', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
             document.getElementById('total-precio').textContent = `$${sumaTotalFormateada}`;
+            document.getElementById('total-precio-hoy').textContent = `$${sumaTotalFormateadaHoy}`
+        }
+
+        function obtenerFechaActual() {
+            const fecha = new Date();
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const año = fecha.getFullYear();
+            return `${dia}/${mes}/${año}`;
+        }
+
+        function compararFechas(fecha1, fecha2) {
+            const partesFecha1 = fecha1.split('/');
+            const partesFecha2 = fecha2.split('/');
+
+            const dia1 = parseInt(partesFecha1[0]);
+            const mes1 = parseInt(partesFecha1[1]);
+            const año1 = parseInt(partesFecha1[2]);
+
+            const dia2 = parseInt(partesFecha2[0]);
+            const mes2 = parseInt(partesFecha2[1]);
+            const año2 = parseInt(partesFecha2[2]);
+
+            return dia1 === dia2 && mes1 === mes2 && año1 === año2;
         }
 
         obtenerFacturasVenta(function (facturas) {
             const tablaData = document.getElementById('tabla-data');
             tablaData.innerHTML = '';
+            const limiteFacturasPorPagina = 5;
+            const facturasPagina = facturas.slice(0, limiteFacturasPorPagina);
 
             facturas.forEach(factura => {
                 const fechaVenta = new Date(factura.datosDeFactura.fechaDeVenta);
                 const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
 
                 const tableRow = document.createElement('tr');
+
                 tableRow.innerHTML = `
             <td>${fechaFormateada}</td>
             <td>${factura.datosDeFactura.cantidadTotal}</td>
@@ -663,13 +710,7 @@
             }
         }
 
-        /* const esEmpleado = true; */
-
         filterButton.addEventListener('click', function () {
-            /* if (esEmpleado) {
-                return;
-            } */
-
             const selectedOption = searchInput.value;
             let selectedDate;
 
@@ -711,10 +752,6 @@
 
         const clearButton = document.getElementById('clearButton');
         clearButton.addEventListener('click', function () {
-            /* if (esEmpleado) {
-                return;
-            } */
-
             searchInput.value = 'default';
             searchInput1.value = '';
             searchInputMonthYear1.value = '';
@@ -913,16 +950,19 @@
                     <p><strong>Identificación: </strong><span>${factura.datosDeCliente.cedulaDelCliente}</span></p>
                     <p><strong>Cliente: </strong><span>${factura.datosDeCliente.nombreDelCliente}</span></p>
                     <p><strong>Celular: </strong><span>${factura.datosDeCliente.telefonoDelCliente}</span></p>
+                    <p><strong>Tipo de pago: </strong><span>${factura.datosDeFactura.tipoDePago}</span></p>
                 `;
             } else if (tipoCliente === 'Contado') {
                 datosCliente = `
                     <p><strong>Tipo de Cliente: </strong><span>${factura.datosDeCliente.tipoDeCliente}</span></p>
                     <p><strong>Observación: </strong><span>${factura.datosDeCliente.observacionDelCliente}</span></p>
+                    <p><strong>Tipo de pago: </strong><span>${factura.datosDeFactura.tipoDePago}</span></p>
                 `;
             } else if (tipoCliente === 'Otro') {
                 datosCliente = `
                     <p><strong>Tipo de Cliente: </strong><span>${factura.datosDeCliente.tipoDeCliente}</span></p>
                     <p><strong>Observación: </strong><span>${factura.datosDeCliente.observacionDelCliente}</span></p>
+                    <p><strong>Tipo de pago: </strong><span>${factura.datosDeFactura.tipoDePago}</span></p>
                 `;
             }
 

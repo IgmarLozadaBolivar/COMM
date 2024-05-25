@@ -101,8 +101,6 @@
             </div>
         </div>
     </section>
-    <script src="../node_modules/pdfmake/build/pdfmake.min.js"></script>
-    <script src="../node_modules/pdfmake/build/vfs_fonts.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
@@ -129,7 +127,6 @@
 
         const token = obtenerToken();
         const decoded = decodeJwt(token);
-        console.log(decoded);
         function obtenerDatosDecodificados(decoded) {
             if (!decoded) {
                 console.error('No se pudo decodificar el token correctamente.');
@@ -150,7 +147,6 @@
                     });
                 });
             }
-            console.log('TokenExpired:', TokenExpired);
 
             return { TokenExpired };
         }
@@ -204,10 +200,6 @@
                 const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
                 const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
                 const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
-
-                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
-                console.log(currentTime)
-                console.log(tokenExpiredDate)
 
                 if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
                     mostrarVentanaEmergente();
@@ -704,11 +696,6 @@
                 }
             }
         }
-
-        console.log(productos);
-        console.log(datosCompras);
-        console.log(productosExistentes);
-        console.log(detallesCompra);
     </script>
 </body>
 

@@ -79,8 +79,6 @@
     <section class="home">
         <div class="text" style="display: flex; justify-content: center;">Facturacion de ventas!</div>
     </section>
-    <script src="../node_modules/pdfmake/build/pdfmake.min.js"></script>
-    <script src="../node_modules/pdfmake/build/vfs_fonts.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
@@ -114,7 +112,6 @@
 
         const token = obtenerToken();
         const decoded = decodeJwt(token);
-        console.log(decoded);
         function obtenerDatosDecodificados(decoded) {
             if (!decoded) {
                 console.error('No se pudo decodificar el token correctamente.');
@@ -122,7 +119,6 @@
             }
 
             const { TokenExpired } = decoded;
-            console.log('TokenExpired:', TokenExpired);
             const { roles } = decoded;
             if (roles === 'Empleado') {
                 informesNavItem.addEventListener("click", function (event) {
@@ -188,10 +184,6 @@
                 const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
                 const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
                 const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
-
-                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
-                console.log(currentTime)
-                console.log(tokenExpiredDate)
 
                 if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
                     mostrarVentanaEmergente();
@@ -515,10 +507,6 @@
                     </div>
                     <div class="input-container-4">
                         <label for="inputPrecio" class="label-style-1">Precio:</label>
-                        <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precioCompra}">
-                    </div>
-                    <div class="input-container-4">
-                        <label for="inputPrecio" class="label-style-1">Precio:</label>
                         <input type="text" id="inputPrecio" class="no-arrows input-style-1" readonly value="${productoEncontrado.precioVenta}">
                     </div>
                     <div class="input-container-4">
@@ -773,17 +761,13 @@
                         text: 'Detalles de factura enviada con éxito',
                         icon: 'success',
                         showDenyButton: true,
-                        showCancelButton: true,
                         confirmButtonText: 'Ver informes',
-                        denyButtonText: 'No, regresar',
-                        cancelButtonText: 'Imprimir'
+                        denyButtonText: 'No, regresar'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             window.location.href = './informes.html?idFacturaVenta=' + detalleFactura.idFacturaVentaFK;
                         } else if (result.isDenied) {
                             window.location.href = './dashboard.html';
-                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            imprimirFactura(detalleFactura);
                         }
                     });
                     console.log('Detalles de factura enviada con éxito:', detalleFactura);
@@ -825,6 +809,7 @@
                     <select class="form-select-1" id="tipopago">
                         <option value="text">Tipo de pago</option>
                         <option value="Efectivo">Efectivo</option>
+                        <option value="Datáfono">Datáfono</option>
                         <option value="Transferencia">Transferencia</option>
                     </select>
                 </div>
@@ -865,9 +850,6 @@
             });
         }
 
-        console.log(productos);
-        console.log(datosVentas);
-
         async function obtenerProducto(idProducto) {
             try {
                 const response = await fetch(`http://localhost:5033/Api/Producto/${idProducto}`);
@@ -881,182 +863,6 @@
             } catch (error) {
                 console.error('Error al obtener el producto:', error);
                 return null;
-            }
-        }
-
-        async function imprimirFactura(datoVenta, detalleFactura) {
-            try {
-                /* const idFactura = detalleFactura.idFacturaVentaFK; */
-                const fechaVenta = new Date(datoVenta.fechaVenta);
-                const fechaFormateada = `${fechaVenta.getDate()}/${fechaVenta.getMonth() + 1}/${fechaVenta.getFullYear()}`;
-                /* const idProducto = obtenerProducto(detalleFactura.idProductoFK);
-                if (idProducto) {
-                    const productos = [
-                        [idProducto.nombreProducto, detalleFactura.cantidadVendida]
-                    ];
-                } else {
-                    console.error('No se encontró el producto');
-                } */
-                const facturasVentas = [
-                    [datoVenta.cantidad, datoVenta.precioTotal, datoVenta.tipoCliente, datoVenta.observacion, datoVenta.tipoPago,]
-                ];
-                /* const facturasVentas = datoVenta.map(facturaVenta => [
-                    facturaVenta.cantidad,
-                    facturaVenta.precioTotal,
-                    facturaVenta.tipoCliente,
-                    facturaVenta.observacion,
-                    facturaVenta.tipoPago,
-                ]); */
-                /* const datosCliente = datoVenta.map(cliente => [
-                    cliente.idClienteFK.nombre,
-                    cliente.idClienteFK.apellidos,
-                    cliente.idClienteFK.cedula,
-                    cliente.idClienteFK.telefono,
-                    cliente.idClienteFK.correo,
-                ]); */
-
-                const html = `
-                    <head>
-                        <style>
-                            * {
-                                font-size: 12px;
-                                font-family: 'Times New Roman';
-                            }
-
-                            td,
-                            th,
-                            tr,
-                            table {
-                                border-top: 1px solid black;
-                                border-collapse: collapse;
-                            }
-
-                            td.producto,
-                            th.producto {
-                                width: 75px;
-                                max-width: 75px;
-                            }
-
-                            td.cantidad,
-                            th.cantidad {
-                                width: 40px;
-                                max-width: 40px;
-                                word-break: break-all;
-                            }
-
-                            td.precio,
-                            th.precio {
-                                width: 40px;
-                                max-width: 40px;
-                                word-break: break-all;
-                            }
-
-                            .centrado {
-                                text-align: center;
-                                align-content: center;
-                            }
-
-                            .ticket {
-                                width: 155px;
-                                max-width: 155px;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                            }
-
-                            img {
-                                max-width: 100%;
-                                height: auto;
-                                max-height: 70px;
-                            }
-
-                            .datos-cliente {
-                                margin-top: 10px;
-                                text-align: left;
-                                margin-bottom: 20px;
-                                align-self: flex-start;
-                            }
-
-                            .datos-cliente p {
-                                margin: 5px 0;
-                                display: inline-block;
-                            }
-
-                            .datos-cliente strong {
-                                display: inline-block;
-                            }
-
-                            .datos-cliente span {
-                                margin-left: 5px;
-                            }
-
-                            @media print {
-                                body * {
-                                    visibility: hidden;
-                                }
-
-                                .ticket,
-                                .ticket * {
-                                    visibility: visible;
-                                }
-
-                                .ticket {
-                                    position: absolute;
-                                    left: 0;
-                                    top: 0;
-                                }
-
-                                .oculto-impresion,
-                                .oculto-impresion * {
-                                    display: none !important;
-                                }
-                            }
-                        </style>
-                    </head>
-                    <div class="ticket">
-                        <img src="../assets/logo-removebg-preview.png" alt="Logotipo">
-                        <p class="centrado">TICKET DE VENTA<br>ID: 111<br>${fechaFormateada}</p>
-                        <div class="datos-cliente">
-                            111
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="cantidad">CANT</th>
-                                    <th class="producto">PRODUCTO</th>
-                                    <th class="precio">$$</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                111
-                                <tr>
-                                    <td class="cantidad"></td>
-                                    <td class="producto">TOTAL</td>
-                                    /* <td class="precio">$111</td> */
-                                    <td class="precio">¿?</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p class="centrado">¡GRACIAS POR SU COMPRA!</p>
-                    </div>
-                    <button class="oculto-impresion" onclick="window.print()">Imprimir</button>
-                `;
-
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-
-                const ticketDiv = tempDiv.querySelector('.ticket');
-                const popupWindow = window.open('', '_blank');
-                popupWindow.document.open();
-                popupWindow.document.write(html);
-                popupWindow.document.close();
-            } catch (error) {
-                console.error('Error al generar factura de venta:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al generar la factura de venta. Por favor, inténtalo de nuevo más tarde.'
-                });
             }
         }
     </script>

@@ -6,6 +6,7 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     font-style: normal;
+    box-sizing: border-box;
 }
 
 body.swal2-shown>[aria-hidden="true"] {
@@ -93,26 +94,8 @@ input:valid~label {
     font-size: 0.9em;
 }
 
-.form-box input[type="tel"] {
-    font-size: 1em;
-    width: 100%;
-    height: 40px;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid #ced4da;
-    border-radius: 15px;
-}
-
-.form-box input[type="password"] {
-    font-size: 1em;
-    width: 100%;
-    height: 40px;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid #ced4da;
-    border-radius: 15px;
-}
-
+.form-box input[type="tel"],
+.form-box input[type="password"],
 .form-box input[type="text"] {
     font-size: 1em;
     width: 100%;
@@ -134,25 +117,30 @@ input:valid~label {
 .btns {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
-.btns a {
-    color: #000;
-    text-decoration: none;
-}
-
-button {
-    display: block;
-    width: 48%;
-    padding: 8px;
+button,
+.btn-volver {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(50% - 10px);
+    padding: 10px;
     color: #000;
     border: 2px solid #366ec9;
     border-radius: 10px;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
     transition: background-color 0.3s ease;
+    height: 44px;
+    line-height: 44px;
+    font-size: 1em;
 }
 
-button:hover {
+button:hover,
+.btn-volver:hover {
     color: #fff;
     border: none;
     background-color: #16418bd2;

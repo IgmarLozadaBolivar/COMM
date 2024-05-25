@@ -143,7 +143,6 @@
 
         const token = obtenerToken();
         const decoded = decodeJwt(token);
-        console.log(decoded);
 
         function obtenerDatosDecodificados(decoded) {
             if (!decoded) {
@@ -152,7 +151,6 @@
             }
 
             const { TokenExpired } = decoded;
-            console.log('TokenExpired:', TokenExpired);
             const { roles } = decoded;
             if (roles === 'Empleado') {
                 informesNavItem.addEventListener("click", function (event) {
@@ -166,7 +164,6 @@
                     });
                 });
             }
-            console.log('Roles:', roles);
 
             return { TokenExpired };
             return { roles };
@@ -221,10 +218,6 @@
                 const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
                 const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
                 const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
-
-                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
-                console.log(currentTime)
-                console.log(tokenExpiredDate)
 
                 if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
                     mostrarVentanaEmergente();
@@ -513,7 +506,7 @@
                     const tablaData = document.getElementById('tabla-data');
                     tablaData.innerHTML = '';
 
-                    const limiteProductosPorPagina = 7;
+                    const limiteProductosPorPagina = 5;
                     const productosPagina = data.slice(0, limiteProductosPorPagina);
 
                     const thPrecioCompra = document.querySelector('.table-box th:nth-child(2)');

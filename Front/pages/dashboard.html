@@ -126,7 +126,6 @@
 
         const token = obtenerToken();
         const decoded = decodeJwt(token);
-        console.log(decoded);
         function obtenerDatosDecodificados(decoded) {
             if (!decoded) {
                 console.error('No se pudo decodificar el token correctamente.');
@@ -147,7 +146,6 @@
                     });
                 });
             }
-            console.log('TokenExpired:', TokenExpired);
 
             return { TokenExpired };
         }
@@ -201,10 +199,6 @@
                 const remainingTime = tokenExpiredDateUTC.getTime() - currentTimeUTC.getTime();
                 const remainingSeconds = Math.floor((remainingTime / 1000) % 60);
                 const remainingMinutes = Math.floor((remainingTime / 1000 / 60) % 60);
-
-                console.log(`Tiempo restante para la expiración del token: ${remainingMinutes} minutos, ${remainingSeconds} segundos`);
-                console.log(currentTime)
-                console.log(tokenExpiredDate)
 
                 if (currentTimeUTC.getTime() === tokenExpiredDateUTC.getTime()) {
                     mostrarVentanaEmergente();
