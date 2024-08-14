@@ -78,7 +78,7 @@
             </div>
             <div class="bottom-content">
                 <li class="">
-                    <a href="../index.html">
+                    <a href="../index.html" id="salir">
                         <i class='bx bx-log-out icon'></i>
                         <span class="text nav-text">Cerrar sesión</span>
                     </a>
@@ -136,8 +136,20 @@
                 return;
             }
 
-            const [, payloadBase64] = token.split('.');
-            const payload = atob(payloadBase64);
+            const parts = token.split('.');
+
+            if (parts.length !== 3) {
+                console.error('El token JWT no tiene el formato correcto.');
+                return;
+            }
+
+            const payloadBase64 = parts[1];
+
+            const payloadBase64Fixed = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+
+            const padding = '='.repeat((4 - (payloadBase64Fixed.length % 4)) % 4);
+
+            const payload = atob(payloadBase64Fixed + padding);
             return JSON.parse(payload);
         }
 
@@ -236,6 +248,11 @@
             const data = await response.json();
             return data;
         }
+
+        salirBtn = document.getElementById('salir');
+        salirBtn.addEventListener('click', function (e) {
+            localStorage.removeItem('token', token);
+        })
 
         var optionsButtons = document.querySelectorAll('.btn-options');
 

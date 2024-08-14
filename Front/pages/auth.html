@@ -108,7 +108,12 @@
                 const response = await fetch(urlAuth, config);
 
                 if (response.ok) {
-                    setTimeout(() => {
+                    const responseData = await response.json();
+                    const token = responseData.token;
+                    console.log(token)
+
+                    if (token) {
+                        localStorage.setItem('token', token);
                         validationModal.close();
 
                         Swal.fire({
@@ -120,26 +125,21 @@
                             timer: 3000
                         });
 
-                        setTimeout(async () => {
-                            const responseData = await response.json();
-                            const token = responseData.token;
-                            localStorage.setItem('token', token);
+                        setTimeout(() => {
                             window.location.href = "./dashboard.html";
                         }, 3000);
-                    }, 3000);
+                    } else {
+                        throw new Error('Token no válido');
+                    }
                 } else {
-                    validationModal.close();
-
-                    Swal.fire({
-                        title: 'Autenticación fallida',
-                        text: 'Verifique sus credenciales e inténtelo de nuevo.',
-                        icon: 'error'
-                    });
+                    throw new Error('Autenticación fallida');
                 }
             } catch (error) {
+                validationModal.close();
+
                 Swal.fire({
                     title: 'Autenticación fallida',
-                    text: 'Error al realizar la autenticación.',
+                    text: 'Verifique sus credenciales e inténtelo de nuevo.',
                     icon: 'error'
                 });
             }
